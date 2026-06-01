@@ -1,0 +1,23 @@
+<div class="stepper-wrapper">
+  <button class="stepper-arrow" type="button" (click)="scrollSteps('left')">
+    <i class="bi bi-caret-left-fill"></i>
+  </button>
+
+  <div class="stepper-scroll" #stepperScroll>
+    <div
+      class="stepper-item"
+      *ngFor="let step of steps"
+      [ngClass]="{
+        'stepper-item--active': step.number === currentStep,
+        'stepper-item--completed': step.number < currentStep
+      }"
+    >
+      <span>{{ step.number }}</span>
+      <p>{{ step.key | translate }}</p>
+    </div>
+  </div>
+
+  <button class="stepper-arrow" type="button" (click)="scrollSteps('right')">
+    <i class="bi bi-caret-right-fill"></i>
+  </button>
+</div>

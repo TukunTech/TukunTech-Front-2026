@@ -1,0 +1,64 @@
+<label>
+  {{ 'register.personal.fullName' | translate }}
+</label>
+
+<input
+  type="text"
+  name="fullName"
+  [(ngModel)]="patient.fullName"
+  (ngModelChange)="emitChange()"
+  [placeholder]="'register.personal.fullNamePlaceholder' | translate"
+/>
+
+<div class="form-grid">
+
+  <div>
+    <label>
+      {{ 'register.personal.age' | translate }}
+    </label>
+
+    <input
+      type="number"
+      name="age"
+      [(ngModel)]="patient.age"
+      (ngModelChange)="emitChange()"
+      [placeholder]="'register.personal.agePlaceholder' | translate"
+    />
+  </div>
+
+  <div>
+    <label>
+      {{ 'register.personal.gender' | translate }}
+    </label>
+
+    <app-custom-select
+      [options]="genderOptions"
+      [(value)]="patient.gender"
+      (valueChange)="emitChange()"
+      [placeholder]="'register.personal.selectGender' | translate">
+    </app-custom-select>
+  </div>
+
+</div>
+
+<label>
+  {{ 'register.personal.bloodType' | translate }}
+</label>
+
+<app-custom-select
+  [options]="bloodTypeOptions"
+  [(value)]="patient.bloodType"
+  (valueChange)="emitChange()"
+  [placeholder]="'register.personal.selectBloodType' | translate">
+</app-custom-select>
+
+<label>
+  {{ 'register.personal.additionalNotes' | translate }}
+</label>
+
+<textarea
+  name="additionalNotes"
+  [(ngModel)]="patient.additionalNotes"
+  (ngModelChange)="emitChange()"
+  [placeholder]="'register.personal.additionalNotesPlaceholder' | translate"
+></textarea>

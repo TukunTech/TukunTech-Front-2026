@@ -1,0 +1,89 @@
+<app-auth-layout>
+
+  <div class="welcome-container">
+
+    <div class="welcome-header">
+      <h1>{{ 'welcome.title' | translate }}</h1>
+
+
+      <p>{{ 'welcome.subtitle' | translate }}</p>
+
+    </div>
+
+    <div class="roles-container">
+
+      <!-- PATIENT -->
+      <button
+        class="role-card"
+        (click)="goToLogin('patient')"
+      >
+        <div class="role-card__left">
+
+          <div class="role-icon role-icon--blue">
+            <i class="bi bi-person role-icon-symbol"></i>
+          </div>
+
+          <div>
+            <h2>{{ 'welcome.patientTitle' | translate }}</h2>
+
+            <p>{{ 'welcome.patientDescription' | translate }}</p>
+          </div>
+
+        </div>
+
+        <span class="role-arrow">→</span>
+      </button>
+
+      <!-- CAREGIVER -->
+      <button
+        class="role-card"
+        (click)="goToLogin('caregiver')"
+      >
+        <div class="role-card__left">
+
+          <div class="role-icon role-icon--green">
+            <i class="bi bi-heart role-icon-symbol"></i>
+          </div>
+
+          <div>
+            <h2>{{ 'welcome.caregiverTitle' | translate }}</h2>
+
+            <p>{{ 'welcome.caregiverDescription' | translate }}</p>
+          </div>
+
+        </div>
+
+        <span class="role-arrow">→</span>
+      </button>
+
+      <!-- ADMIN -->
+      <button
+        class="role-card"
+        (click)="goToLogin('admin')"
+      >
+        <div class="role-card__left">
+
+          <div class="role-icon role-icon--green">
+            <i class="bi bi-shield role-icon-symbol"></i>
+          </div>
+
+          <div>
+            <h2>{{ 'welcome.adminTitle' | translate }}</h2>
+
+            <p>{{ 'welcome.adminDescription' | translate }}</p>
+          </div>
+
+        </div>
+
+        <span class="role-arrow">→</span>
+      </button>
+      <button class="language-button" (click)="toggleLanguage()">
+        {{ 'welcome.languageButton' | translate }}
+      </button>
+
+    </div>
+
+
+  </div>
+
+</app-auth-layout>

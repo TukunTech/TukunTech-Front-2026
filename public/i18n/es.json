@@ -1,0 +1,151 @@
+{
+  "auth": {
+    "brandTitle": "TukunTech",
+    "brandHeadline": "Monitoreo en tiempo real para las personas que amas.",
+    "brandDescription": "Signos vitales en tiempo real — diseñado para pacientes, familias y cuidadores."
+  },
+  "welcome": {
+    "title": "Bienvenido a TukunTech",
+    "subtitle": "Elige tu rol para continuar.",
+    "patientTitle": "Soy Paciente",
+    "patientDescription": "Accede a tus signos vitales, dispositivo y suscripción.",
+    "caregiverTitle": "Soy Cuidador / Familiar",
+    "caregiverDescription": "Monitorea hasta 5 personas bajo tu cuidado.",
+    "adminTitle": "Soy Administrador",
+    "adminDescription": "Consola operativa — solo inicio de sesión.",
+    "prototype": "Modo prototipo — maqueta visual.",
+    "languageButton": "English"
+  },
+  "roles": {
+    "patient": "Paciente",
+    "caregiver": "Cuidador",
+    "admin": "Administrador"
+  },
+  "login": {
+    "title": {
+      "patient": "Inicio de sesión de paciente",
+      "caregiver": "Inicio de sesión de cuidador",
+      "admin": "Inicio de sesión de administrador"
+    },
+    "subtitle": "Ingresa tus credenciales para continuar.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "signIn": "Iniciar sesión",
+    "simulateError": "Simular error de inicio de sesión",
+    "noAccount": "¿No tienes una cuenta?",
+    "createOne": "Crear una",
+    "chooseDifferentRole": "Elegir otro rol"
+  },
+  "register": {
+    "patient": {
+      "title": "Crea tu cuenta de paciente",
+      "subtitle": "Suscríbete para activar tu TukunTech."
+    },
+    "steps": {
+      "plan": "Plan",
+      "account": "Cuenta",
+      "personal": "Personal",
+      "address": "Dirección",
+      "delivery": "Entrega",
+      "payment": "Pago",
+      "done": "Finalizado"
+    },
+    "plan": {
+      "recommended": "RECOMENDADO",
+      "personal": {
+        "title": "Plan Individual",
+        "description": "1 dispositivo TukunTech · signos vitales · 50GB en la nube · acceso app móvil y web"
+      },
+      "family": {
+        "title": "Family Pro",
+        "description": "Hasta 5 dispositivos TukunTech · dashboard familiar · monitoreo de signos vitales · acceso web y móvil"
+      }
+    },
+    "family": {
+      "title": "Crea tu cuenta Family Pro",
+      "subtitle": "Monitorea hasta 5 pacientes bajo tu cuidado.",
+
+      "patient": "Paciente",
+
+      "registerPatientsInfo": "Registra a los 5 pacientes bajo tu cuidado.",
+
+      "previousPatient": "Paciente anterior",
+      "nextPatient": "Siguiente paciente",
+
+      "backToAccount": "Volver a cuenta",
+
+      "addPatient": "Agregar paciente"
+    },
+    "account": {
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "passwordPlaceholder": "••••••••"
+    },
+    "actions": {
+      "continue": "Continuar",
+      "back": "Atrás",
+      "chooseDifferentPlan": "Elegir otro plan"
+    },
+    "personal": {
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Ingresa tu nombre completo",
+      "age": "Edad",
+      "agePlaceholder": "Ingresa tu edad",
+      "gender": "Género",
+      "selectGender": "Selecciona género",
+      "female": "Femenino",
+      "male": "Masculino",
+      "bloodType": "Tipo de sangre",
+      "selectBloodType": "Selecciona tipo de sangre",
+      "additionalNotes": "Notas adicionales",
+      "additionalNotesPlaceholder": "Alergias, condiciones o información importante..."
+    },
+    "address": {
+      "street": "Dirección",
+      "streetPlaceholder": "Ingresa tu dirección",
+      "city": "Ciudad",
+      "cityPlaceholder": "Ingresa tu ciudad",
+      "reference": "Referencia",
+      "referencePlaceholder": "Departamento, piso, lugar cercano..."
+    },
+    "delivery": {
+      "phone": "Número de teléfono",
+      "instructions": "Instrucciones para delivery ",
+      "instructionsPlaceholder": "Ingresa las instrucciones adicionales para el delivery",
+      "phonePlaceholder": "Ingresa tu número"
+    },
+    "payment": {
+      "title": "Pago",
+      "description": "Este es un paso de pago simulado. La pasarela real se conectará más adelante.",
+      "plan": "Plan individual",
+      "mockPay": "Simular pago y continuar",
+      "familyPlan": "Plan Family Pro"
+    },
+    "done": {
+      "title": "Cuenta creada",
+      "description": "Tu cuenta de paciente fue creada correctamente.",
+
+      "familyTitle": "Cuenta Family Pro creada",
+      "familyDescription": "Tu cuenta de cuidador y pacientes fue registrada correctamente.",
+
+      "goToWebsite": "Ir a la página web"
+    }
+  },
+  "registerPlan": {
+    "title": "Crea tu cuenta",
+    "subtitle": "Elige el plan que se adapta a ti. Las cuentas se crean durante el registro.",
+    "individual": {
+      "title": "Plan individual",
+      "description": "1 dispositivo TukunTech · signos vitales · 50GB de almacenamiento en la nube · acceso web y móvil"
+    },
+    "family": {
+      "title": "Plan familiar",
+      "description": "Hasta 5 dispositivos TukunTech · dashboard familiar · monitoreo de signos vitales · acceso web y móvil"
+    },
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "signIn": "Iniciar sesión"
+  }
+}

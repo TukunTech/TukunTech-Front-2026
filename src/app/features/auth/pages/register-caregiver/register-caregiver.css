@@ -1,0 +1,491 @@
+.register-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.register-header {
+  margin-bottom: 12px;
+}
+
+.register-header h1 {
+  font-size: 25px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 4px;
+}
+
+.register-header p {
+  font-size: 14px;
+  color: #6b7c85;
+}
+
+/* PLAN */
+
+.plans {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-card {
+  width: 100%;
+  min-height: 78px;
+  border-radius: 22px;
+  border: 1.5px solid #dbe6e5;
+  background: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.plan-card--selected {
+  border-color: #3fa292;
+  background: #eefaf7;
+}
+
+.plan-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 6px;
+}
+
+.plan-title-row span {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #3fa292;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.plan-card p {
+  font-size: 14px;
+  color: #667985;
+}
+
+.plan-card strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: #10232b;
+  white-space: nowrap;
+}
+
+/* REGISTER CARD */
+
+.register-card,
+.patient-card {
+  width: 100%;
+  border-radius: 22px;
+  border: 1px solid #dbe6e5;
+  background: white;
+  padding: 18px 22px;
+}
+
+.register-card label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 5px;
+}
+
+.register-card input {
+  width: 100%;
+  height: 40px;
+  border-radius: 16px;
+  border: 1px solid #dbe6e5;
+  padding: 0 14px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #10232b;
+  background: #fbfefe;
+  outline: none;
+  transition: 0.2s ease;
+  box-shadow:
+    0 1px 1px rgba(15, 23, 42, 0.03),
+    0 1px 1px rgba(15, 23, 42, 0.02);
+}
+
+.register-card input:focus,
+.register-card textarea:focus {
+  border-color: #3fa292;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-68%);
+  border: none;
+  background: transparent;
+  color: #7a8a93;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.password-toggle:hover {
+  color: #3fa292;
+}
+
+.register-card textarea {
+  width: 100%;
+  min-height: 72px;
+  border-radius: 16px;
+  border: 1px solid #dbe6e5;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #10232b;
+  background: #fbfefe;
+  outline: none;
+  resize: none;
+  transition: 0.2s ease;
+}
+
+/* PATIENTS */
+
+.caregiver-patients-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patients-info-banner {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 18px;
+  border: 1px solid #dbe6e5;
+  background: #f8fdfb;
+  color: #667985;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  font-size: 14px;
+}
+
+.patients-info-banner i {
+  color: #3fa292;
+  font-size: 18px;
+}
+
+.patient-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.patient-tab {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #dbe6e5;
+  background: white;
+  color: #10232b;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.patient-tab:hover {
+  border-color: #3fa292;
+  color: #3fa292;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.patient-tab--active {
+  background: #3fa292;
+  border-color: #3fa292;
+  color: white;
+  font-weight: 600;
+}
+
+.patient-tab--active:hover {
+  background: #3fa292;
+  color: white;
+}
+
+.patient-form-card {
+  padding: 18px 22px;
+}
+
+.patient-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.previous-patient-button,
+.next-patient-button {
+  height: 38px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.previous-patient-button {
+  background: #dff5ef;
+  color: #10232b;
+}
+
+.next-patient-button {
+  background: #3fa292;
+  color: white;
+}
+
+.previous-patient-button:hover:not(:disabled) {
+  background: #c9f0e8;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.next-patient-button:hover:not(:disabled) {
+  background: #379484;
+  box-shadow: 0 8px 18px rgba(63, 162, 146, 0.22);
+}
+
+.previous-patient-button:disabled,
+.next-patient-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.back-to-account-button {
+  margin-top: 10px;
+  border: none;
+  background: transparent;
+  color: #10232b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* PAYMENT */
+
+.payment-card,
+.done-card {
+  text-align: center;
+}
+
+.payment-icon,
+.done-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.payment-icon {
+  background: #e8f4ff;
+  color: #5ba5df;
+}
+
+.done-icon {
+  background: #dff5ef;
+  color: #3fa292;
+}
+
+.payment-card h2,
+.done-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 6px;
+}
+
+.payment-card p,
+.done-card p {
+  font-size: 14px;
+  color: #667985;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.payment-summary {
+  height: 44px;
+  border-radius: 16px;
+  border: 1px solid #dbe6e5;
+  background: #fbfefe;
+  padding: 0 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #667985;
+}
+
+.payment-summary strong {
+  color: #10232b;
+  font-weight: 600;
+}
+
+.mock-payment-button,
+.dashboard-button {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 14px;
+  background: #3fa292;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 4px 12px rgba(63, 162, 146, 0.18);
+}
+
+.mock-payment-button:hover,
+.dashboard-button:hover {
+  background: #379484;
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 18px rgba(63, 162, 146, 0.22);
+}
+
+/* ACTIONS */
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.back-action-button {
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: #10232b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.continue-button {
+  height: 38px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 14px;
+  background: #3fa292;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 4px 12px rgba(63, 162, 146, 0.18);
+}
+
+.continue-button:hover {
+  background: #379484;
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 18px rgba(63, 162, 146, 0.22);
+}
+
+.secondary-link {
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  background: transparent;
+  color: #667985;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    max-width: 100%;
+  }
+
+  .plan-card,
+  .register-card,
+  .patient-card {
+    padding: 16px;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+
+  .patient-navigation {
+    gap: 12px;
+  }
+
+  .previous-patient-button,
+  .next-patient-button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+.back-action-button {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+  border-radius: 14px;
+  padding: 0 14px;
+}
+
+.back-action-button:hover {
+  background: #dff5ef;
+  color: #3fa292;
+  transform: translateY(-1px);
+}

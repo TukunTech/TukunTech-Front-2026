@@ -1,0 +1,324 @@
+<app-auth-layout>
+  <div class="register-container">
+
+    <div class="register-header">
+      <h1>{{ 'register.family.title' | translate }}</h1>
+      <p>{{ 'register.family.subtitle' | translate }}</p>
+    </div>
+
+    <!-- STEPPER -->
+
+    <app-register-stepper
+      [steps]="steps"
+      [currentStep]="currentStep">
+    </app-register-stepper>
+
+    <!-- STEP 1 -->
+
+    <div *ngIf="currentStep === 1" class="plans">
+
+      <div class="plan-card plan-card--selected">
+
+        <div>
+
+          <div class="plan-title-row">
+            <h2>{{ 'register.plan.family.title' | translate }}</h2>
+
+            <span>
+              {{ 'register.plan.recommended' | translate }}
+            </span>
+          </div>
+
+          <p>
+            {{ 'register.plan.family.description' | translate }}
+          </p>
+
+        </div>
+
+        <strong>$200/mo</strong>
+
+      </div>
+
+    </div>
+
+    <!-- STEP 2 -->
+
+    <div *ngIf="currentStep === 2" class="register-card">
+
+      <label>
+        {{ 'register.account.email' | translate }}
+      </label>
+
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        [placeholder]="'register.account.emailPlaceholder' | translate"
+      />
+
+      <label>
+        {{ 'register.account.password' | translate }}
+      </label>
+
+      <div class="password-input-wrapper">
+
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          [(ngModel)]="password"
+          [placeholder]="'register.account.passwordPlaceholder' | translate"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePasswordVisibility()"
+        >
+          <i
+            class="bi"
+            [class.bi-eye]="!showPassword"
+            [class.bi-eye-slash]="showPassword"
+          ></i>
+        </button>
+
+      </div>
+
+      <label>
+        {{ 'register.account.confirmPassword' | translate }}
+      </label>
+
+      <div class="password-input-wrapper">
+
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          [placeholder]="'register.account.passwordPlaceholder' | translate"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="toggleConfirmPasswordVisibility()"
+        >
+          <i
+            class="bi"
+            [class.bi-eye]="!showConfirmPassword"
+            [class.bi-eye-slash]="showConfirmPassword"
+          ></i>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- STEP 3 -->
+
+    <!-- STEP 3 -->
+
+    <div *ngIf="currentStep === 3" class="caregiver-patients-step">
+
+      <div class="patients-info-banner">
+        <i class="bi bi-people"></i>
+        <span>{{ 'register.family.registerPatientsInfo' | translate }}</span>
+      </div>
+
+      <div class="patient-tabs">
+        <button
+          type="button"
+          class="patient-tab"
+          *ngFor="let patient of patients; let i = index"
+          [class.patient-tab--active]="activePatientIndex === i"
+          (click)="selectPatient(i)"
+        >
+          {{ 'register.family.patient' | translate }} {{ i + 1 }}
+        </button>
+      </div>
+
+      <div class="register-card patient-form-card">
+
+        <app-patient-form
+          [(patient)]="patients[activePatientIndex]">
+        </app-patient-form>
+
+        <div class="patient-navigation">
+
+          <button
+            type="button"
+            class="previous-patient-button"
+            [disabled]="activePatientIndex === 0"
+            (click)="previousPatient()"
+          >
+            <i class="bi bi-arrow-left"></i>
+            {{ 'register.family.previousPatient' | translate }}
+          </button>
+
+          <button
+            type="button"
+            class="next-patient-button"
+            [disabled]="activePatientIndex === patients.length - 1"
+            (click)="nextPatient()"
+          >
+            {{ 'register.family.nextPatient' | translate }}
+            <i class="bi bi-arrow-right"></i>
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+    <!-- STEP 4 -->
+
+    <div *ngIf="currentStep === 4" class="register-card">
+
+      <label>
+        {{ 'register.address.street' | translate }}
+      </label>
+
+      <input
+        type="text"
+        name="street"
+        [(ngModel)]="street"
+        [placeholder]="'register.address.streetPlaceholder' | translate"
+      />
+
+      <app-address-map
+        [addressQuery]="street"
+        (addressSelected)="street = $event">
+      </app-address-map>
+
+    </div>
+
+    <!-- STEP 5 -->
+
+    <div *ngIf="currentStep === 5" class="register-card">
+
+      <label>
+        {{ 'register.delivery.phone' | translate }}
+      </label>
+
+      <input
+        type="tel"
+        name="deliveryPhone"
+        [(ngModel)]="deliveryPhone"
+        [placeholder]="'register.delivery.phonePlaceholder' | translate"
+      />
+
+      <label>
+        {{ 'register.delivery.instructions' | translate }}
+      </label>
+
+      <textarea
+        name="deliveryInstructions"
+        [(ngModel)]="deliveryInstructions"
+        [placeholder]="'register.delivery.instructionsPlaceholder' | translate"
+      ></textarea>
+
+    </div>
+
+    <!-- STEP 6 -->
+
+    <div *ngIf="currentStep === 6" class="register-card payment-card">
+
+      <div class="payment-icon">
+        <i class="bi bi-credit-card"></i>
+      </div>
+
+      <h2>
+        {{ 'register.payment.title' | translate }}
+      </h2>
+
+      <p>
+        {{ 'register.payment.description' | translate }}
+      </p>
+
+      <div class="payment-summary">
+
+        <span>
+          {{ 'register.payment.familyPlan' | translate }}
+        </span>
+
+        <strong>$200/mo</strong>
+
+      </div>
+
+      <button
+        class="mock-payment-button"
+        type="button"
+        (click)="continue()"
+      >
+        {{ 'register.payment.mockPay' | translate }}
+      </button>
+
+    </div>
+
+    <!-- STEP 7 -->
+
+    <div *ngIf="currentStep === 7" class="register-card done-card">
+
+      <div class="done-icon">
+        <i class="bi bi-check-lg"></i>
+      </div>
+
+      <h2>
+        {{ 'register.done.familyTitle' | translate }}
+      </h2>
+
+      <p>
+        {{ 'register.done.familyDescription' | translate }}
+      </p>
+
+      <button
+        class="dashboard-button"
+        type="button"
+      >
+        {{ 'register.done.goToWebsite' | translate }}
+      </button>
+
+    </div>
+
+    <!-- ACTIONS -->
+
+    <div class="actions" *ngIf="currentStep < 7">
+
+      <button
+        *ngIf="currentStep > 1"
+        class="back-action-button"
+        type="button"
+        (click)="backStep()"
+      >
+        <i class="bi bi-arrow-left"></i>
+
+        {{ 'register.actions.back' | translate }}
+      </button>
+
+      <button
+        *ngIf="currentStep !== 6"
+        class="continue-button"
+        type="button"
+        (click)="continue()"
+      >
+        {{ 'register.actions.continue' | translate }}
+
+        <i class="bi bi-check-lg"></i>
+      </button>
+
+    </div>
+
+    <!-- DIFFERENT PLAN -->
+
+    <button
+      class="secondary-link"
+      type="button"
+      *ngIf="currentStep === 1"
+      (click)="goToPlanSelection()"
+    >
+      ← {{ 'register.actions.chooseDifferentPlan' | translate }}
+    </button>
+
+  </div>
+</app-auth-layout>

@@ -1,0 +1,132 @@
+.register-plan-container {
+  width: 100%;
+  max-width: 470px;
+}
+
+.register-plan-header {
+  margin-bottom: 26px;
+}
+
+.register-plan-header h1 {
+  font-size: 25px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 6px;
+}
+
+.register-plan-header p {
+  font-size: 14px;
+  color: #667985;
+}
+
+.plan-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-option-card {
+  width: 100%;
+  min-height: 96px;
+
+  border-radius: 22px;
+  border: 1px solid #dbe6e5;
+
+  background: #ffffff;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.plan-option-card:hover {
+  border-color: #3fa292;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.plan-option-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.plan-option-icon {
+  width: 68px;
+  height: 48px;
+
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+}
+
+.plan-option-icon--blue {
+  background: #e8f4ff;
+  color: #5ba5df;
+}
+
+.plan-option-icon--green {
+
+  background: #dff5ef;
+  color: #3fa292;
+}
+
+.plan-option-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 4px;
+}
+
+.plan-option-card p {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #667985;
+}
+
+.plan-option-arrow {
+  color: #7a8a93;
+  font-size: 18px;
+}
+
+.sign-in-text {
+  margin-top: 24px;
+  text-align: center;
+
+  font-size: 14px;
+  color: #667985;
+}
+
+.sign-in-text button {
+  border: none;
+  background: transparent;
+
+  color: #3fa292;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .register-plan-container {
+    max-width: 100%;
+  }
+
+  .plan-option-card {
+    padding: 18px;
+  }
+}

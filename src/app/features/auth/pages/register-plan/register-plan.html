@@ -1,0 +1,51 @@
+<app-auth-layout>
+  <div class="register-plan-container">
+
+    <div class="register-plan-header">
+      <h1>{{ 'registerPlan.title' | translate }}</h1>
+      <p>{{ 'registerPlan.subtitle' | translate }}</p>
+    </div>
+
+    <div class="plan-options">
+
+      <button class="plan-option-card" type="button" (click)="goToPatientRegister()">
+        <div class="plan-option-content">
+          <div class="plan-option-icon plan-option-icon--blue">
+            <i class="bi bi-person"></i>
+          </div>
+
+          <div>
+            <h2>{{ 'registerPlan.individual.title' | translate }}</h2>
+            <p>{{ 'registerPlan.individual.description' | translate }}</p>
+          </div>
+        </div>
+
+        <i class="bi bi-arrow-right plan-option-arrow"></i>
+      </button>
+
+      <button class="plan-option-card" type="button" (click)="goToCaregiverRegister()">
+        <div class="plan-option-content">
+          <div class="plan-option-icon plan-option-icon--green">
+            <i class="bi bi-heart"></i>
+          </div>
+
+          <div>
+            <h2>{{ 'registerPlan.family.title' | translate }}</h2>
+            <p>{{ 'registerPlan.family.description' | translate }}</p>
+          </div>
+        </div>
+
+        <i class="bi bi-arrow-right plan-option-arrow"></i>
+      </button>
+
+    </div>
+
+    <p class="sign-in-text">
+      {{ 'registerPlan.alreadyHaveAccount' | translate }}
+      <button type="button" (click)="goToLogin()">
+        {{ 'registerPlan.signIn' | translate }}
+      </button>
+    </p>
+
+  </div>
+</app-auth-layout>

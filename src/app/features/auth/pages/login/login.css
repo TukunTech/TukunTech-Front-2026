@@ -1,0 +1,198 @@
+.login-container {
+  width: 100%;
+  max-width: 470px;
+}
+
+.login-header {
+  margin-bottom: 20px;
+}
+
+.login-header h1 {
+  font-size: 25px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 4px;
+}
+
+.login-header p {
+  font-size: 14px;
+  color: #6b7c85;
+}
+
+.role-pill {
+  width: fit-content;
+  height: 30px;
+  padding: 0 14px;
+  margin-bottom: 14px;
+
+  border-radius: 999px;
+  background: #e8f4ff;
+  color: #5ba5df;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label,
+.password-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #10232b;
+  margin-bottom: 6px;
+}
+
+.login-form input {
+  width: 100%;
+  height: 42px;
+
+  border-radius: 16px;
+  border: 1px solid #dbe6e5;
+
+  padding: 0 14px;
+  margin-bottom: 14px;
+
+  font-size: 14px;
+  color: #10232b;
+
+  background: #fbfefe;
+
+  outline: none;
+
+  transition: 0.2s ease;
+
+  box-shadow:
+    0 1px 1px rgba(15, 23, 42, 0.03),
+    0 1px 1px rgba(15, 23, 42, 0.02);
+}
+
+.login-form input:focus {
+  border-color: #3fa292;
+}
+
+.password-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.password-row button {
+  border: none;
+  background: transparent;
+  color: #3fa292;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-68%);
+
+  border: none;
+  background: transparent;
+  color: #7a8a93;
+
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.password-toggle:hover {
+  color: #3fa292;
+}
+
+.sign-in-button {
+  width: 100%;
+  height: 35px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #3fa292;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.25s ease,
+    box-shadow 0.2s ease;
+
+  box-shadow:
+    0 4px 12px rgba(63, 162, 146, 0.18);
+}
+
+.sign-in-button:hover {
+  background: #379484;
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 18px rgba(63, 162, 146, 0.22);
+}
+
+.sign-in-button:active {
+  transform: scale(0.99);
+}
+
+.link-button,
+.back-button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #667985;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.link-button {
+  margin-top: 18px;
+}
+
+.create-account {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #667985;
+}
+
+.create-account button {
+  border: none;
+  background: transparent;
+  color: #3fa292;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-button {
+  margin-top: 18px;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    max-width: 100%;
+  }
+
+  .login-header h1 {
+    font-size: 25px;
+  }
+}

@@ -1,0 +1,80 @@
+<app-auth-layout>
+  <div class="login-container">
+
+    <div class="login-header">
+      <h1>{{ 'login.title.' + role | translate }}</h1>
+      <p>{{ 'login.subtitle' | translate }}</p>
+    </div>
+
+    <div class="role-pill">
+      <i
+        class="bi"
+        [class.bi-person]="role === 'patient'"
+        [class.bi-heart]="role === 'caregiver'"
+        [class.bi-shield]="role === 'admin'"
+      ></i>
+
+      <span>{{ 'roles.' + role | translate }}</span>
+    </div>
+
+    <form class="login-form" (ngSubmit)="signIn()">
+
+      <label>
+        {{ 'login.email' | translate }}
+      </label>
+
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+      />
+
+      <div class="password-row">
+        <label>
+          {{ 'login.password' | translate }}
+        </label>
+
+        <button type="button">
+          {{ 'login.forgotPassword' | translate }}
+        </button>
+      </div>
+
+      <div class="password-input-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          [(ngModel)]="password"
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePasswordVisibility()"
+        >
+          <i
+            class="bi"
+            [class.bi-eye]="!showPassword"
+            [class.bi-eye-slash]="showPassword"
+          ></i>
+        </button>
+      </div>
+
+      <button class="sign-in-button" type="submit">
+        {{ 'login.signIn' | translate }}
+      </button>
+
+    </form>
+
+    <p class="create-account" *ngIf="role !== 'admin'">
+      {{ 'login.noAccount' | translate }}
+      <button type="button" (click)="goToCreateAccount()">
+        {{ 'login.createOne' | translate }}
+      </button>
+    </p>
+
+    <button class="back-button" type="button" (click)="goBack()">
+      ← {{ 'login.chooseDifferentRole' | translate }}
+    </button>
+
+  </div>
+</app-auth-layout>

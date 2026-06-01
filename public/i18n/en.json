@@ -1,0 +1,145 @@
+{
+  "auth": {
+    "brandTitle": "TukunTech",
+    "brandHeadline": "Real-time care for the people you love.",
+    "brandDescription": "Real-time vitals designed for patients, families and caregivers."
+  },
+  "welcome": {
+    "title": "Welcome to TukunTech",
+    "subtitle": "Choose your role to continue.",
+    "patientTitle": "I'm a Patient",
+    "patientDescription": "Access your personal vitals, device and subscription.",
+    "caregiverTitle": "I'm a Caregiver / Family member",
+    "caregiverDescription": "Monitor up to 5 loved ones under your care.",
+    "adminTitle": "I'm an Administrator",
+    "adminDescription": "Operational console — login only.",
+    "prototype": "Prototype mode — visual mockup only.",
+    "languageButton": "Español"
+  },
+  "roles": {
+    "patient": "Patient",
+    "caregiver": "Caregiver",
+    "admin": "Admin"
+  },
+  "login": {
+    "title": {
+      "patient": "Patient sign in",
+      "caregiver": "Caregiver sign in",
+      "admin": "Administrator sign in"
+    },
+    "subtitle": "Enter your credentials to continue.",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "simulateError": "Simulate login error",
+    "noAccount": "Don't have an account?",
+    "createOne": "Create one",
+    "chooseDifferentRole": "Choose a different role"
+  },
+  "register": {
+    "patient": {
+      "title": "Create your patient account",
+      "subtitle": "Subscribe to activate your TukunTech."
+    },
+    "family": {
+      "title": "Create your Family Pro account",
+      "subtitle": "Monitor up to 5 patients under your care.",
+      "patient": "Patient",
+      "registerPatientsInfo": "Register all 5 patients under your care.",
+      "previousPatient": "Previous patient",
+      "nextPatient": "Next patient",
+      "backToAccount": "Back to account",
+      "addPatient": "Add patient"
+    },
+    "steps": {
+      "plan": "Plan",
+      "account": "Account",
+      "personal": "Personal",
+      "address": "Address",
+      "delivery": "Delivery",
+      "payment": "Payment",
+      "done": "Done"
+    },
+    "plan": {
+      "recommended": "RECOMMENDED",
+      "personal": {
+        "title": "Individual plan",
+        "description": "1 TukunTech device · vitals · 50GB cloud storage · Mobile app and web access"
+      },
+      "family": {
+        "title": "Family Pro",
+        "description": "Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access"
+      }
+    },
+    "account": {
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordPlaceholder": "••••••••"
+    },
+    "actions": {
+      "continue": "Continue",
+      "back": "Back",
+      "chooseDifferentPlan": "Choose a different plan"
+    },
+    "personal": {
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your full name",
+      "age": "Age",
+      "agePlaceholder": "Enter your age",
+      "gender": "Gender",
+      "selectGender": "Select gender",
+      "female": "Female",
+      "male": "Male",
+      "bloodType": "Blood type",
+      "selectBloodType": "Select blood type",
+      "additionalNotes": "Additional notes",
+      "additionalNotesPlaceholder": "Allergies, conditions, anything we should know..."
+    },
+    "address": {
+      "street": "Address",
+      "streetPlaceholder": "Enter your address",
+      "city": "City",
+      "cityPlaceholder": "Enter your city",
+      "reference": "Reference",
+      "referencePlaceholder": "Apartment, floor, nearby place..."
+    },
+    "delivery": {
+      "phone": "Phone number",
+      "phonePlaceholder": "Add your phone number",
+      "instructions": "Delivery instructions",
+      "instructionsPlaceholder": "Add additional delivery instructions"
+    },
+    "payment": {
+      "title": "Payment",
+      "description": "This is a mock payment step. The real payment gateway will be connected later.",
+      "plan": "Individual plan",
+      "familyPlan": "Family Pro plan",
+      "mockPay": "Simulate payment and continue"
+    },
+    "done": {
+      "title": "Account created",
+      "description": "Your patient account has been created successfully.",
+      "familyTitle": "Family Pro account created",
+      "familyDescription": "Your caregiver account and patients were registered successfully.",
+      "goToDashboard": "Go to dashboard",
+      "goToWebsite": "Go to website"
+    }
+  },
+  "registerPlan": {
+    "title": "Create your account",
+    "subtitle": "Choose the plan that fits you. Accounts are created during checkout.",
+    "individual": {
+      "title": "Individual plan",
+      "description": "1 TukunTech device · vitals · 50GB cloud storage · Mobile app and web access"
+    },
+    "family": {
+      "title": "Family plan",
+      "description": "Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access"
+    },
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  }
+}

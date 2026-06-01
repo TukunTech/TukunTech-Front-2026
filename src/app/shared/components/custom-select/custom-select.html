@@ -1,0 +1,28 @@
+<div class="custom-select" (click)="stopPropagation($event)">
+  <button
+    type="button"
+    class="custom-select__control"
+    (click)="toggleDropdown()"
+  >
+    <span [ngClass]="{ 'custom-select__placeholder': !value }">
+      {{ selectedLabel }}
+    </span>
+
+    <i
+      class="bi bi-chevron-down custom-select__icon"
+      [ngClass]="{ 'custom-select__icon--open': isOpen }"
+    ></i>
+  </button>
+
+  <div class="custom-select__menu" *ngIf="isOpen">
+    <button
+      type="button"
+      class="custom-select__option"
+      *ngFor="let option of options"
+      [ngClass]="{ 'custom-select__option--selected': option.value === value }"
+      (click)="selectOption(option)"
+    >
+      {{ option.label }}
+    </button>
+  </div>
+</div>
