@@ -232,5 +232,17 @@
       "support": "Support",
       "settings": "Settings"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Personalize your web app!",
+    "save": "Save",
+    "savedSuccessfully": "Settings were saved successfully",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred app language",
+      "label": "App language",
+      "placeholder": "Select language"
+    }
   }
 }

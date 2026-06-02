@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthLayout } from '../../components/auth-layout/auth-layout';
+import { LanguageService } from '../../../../core/i18n/language.service';
 
 @Component({
   selector: 'app-welcome',
@@ -11,21 +12,16 @@ import { AuthLayout } from '../../components/auth-layout/auth-layout';
 })
 export class Welcome {
 
-  currentLang = 'en';
-
   constructor(
     private router: Router,
-    private translate: TranslateService
-  ) {
-    this.translate.use(this.currentLang);
-  }
+    private languageService: LanguageService
+  ) {}
 
   goToLogin(role: string) {
     this.router.navigate([`/login/${role}`]);
   }
 
   toggleLanguage() {
-    this.currentLang = this.currentLang === 'en' ? 'es' : 'en';
-    this.translate.use(this.currentLang);
+    this.languageService.toggleLanguage();
   }
 }
