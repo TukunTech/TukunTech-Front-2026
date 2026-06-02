@@ -238,6 +238,17 @@
       "support": "Soporte",
       "settings": "Configuración"
     }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu aplicación web",
+    "save": "Guardar",
+    "savedSuccessfully": "Configuración guardada correctamente",
+    "language": {
+      "title": "Idioma",
+      "description": "Elige el idioma de la aplicación",
+      "label": "Idioma de la app",
+      "placeholder": "Selecciona un idioma"
+    }
   }
-
 }
