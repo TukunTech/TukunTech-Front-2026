@@ -1,6 +1,7 @@
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: #f6faf9;
 }
 
@@ -18,6 +19,11 @@
   transition: 0.25s ease;
 }
 
+.sidebar {
+  flex-shrink: 0;
+  height: 100vh;
+  overflow: hidden;
+}
 .sidebar-top {
   display: flex;
   flex-direction: column;
@@ -128,8 +134,10 @@
 
 .dashboard-content {
   flex: 1;
+  height: 100vh;
   padding: 22px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .mobile-menu-button {

@@ -22,5 +22,10 @@ export const patientRoutes: Routes = [
     path: 'history',
     loadComponent: () =>
       import('./pages/history/history').then(m => m.History)
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./pages/profile/profile').then(m => m.Profile)
   }
 ];

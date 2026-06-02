@@ -190,6 +190,42 @@
       "heartRate": "Ritmo cardíaco",
       "oxygen": "Oxígeno",
       "temperature": "Temperatura"
+    },
+    "profile": {
+      "title": "Mi perfil",
+      "subtitle": "Información personal, suscripción y contactos de emergencia.",
+      "saveChanges": "Guardar cambios",
+
+      "yearsOld": "años",
+
+      "subscription": "Suscripción",
+      "renewsOn": "Renueva el",
+      "active": "Activo",
+      "plan": "Plan",
+
+      "renewSubscription": "Renovar suscripción",
+      "cancelSubscription": "Cancelar suscripción",
+
+      "personalInformation": "Información personal",
+
+      "fullName": "Nombre completo",
+      "age": "Edad",
+      "address": "Dirección",
+      "bloodType": "Tipo de sangre",
+      "gender": "Género",
+      "notes": "Notas",
+
+      "emergencyContacts": "Contactos de emergencia",
+      "emergencyDescription": "Personas a las que contactaremos en caso de emergencia.",
+
+      "add": "Agregar",
+      "addEmergencyContact": "Agregar contacto de emergencia",
+      "addEmergencyContactSubtitle": "Ingresa los datos del contacto para situaciones de emergencia.",
+      "cancel": "Cancelar",
+      "saveContact": "Guardar contacto",
+      "name": "Nombre",
+      "relation": "Relación",
+      "phone": "Teléfono"
     }
   },
   "sidebar": {

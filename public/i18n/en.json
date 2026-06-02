@@ -184,6 +184,42 @@
       "heartRate": "Heart rate",
       "oxygen": "Oxygen",
       "temperature": "Temperature"
+    },
+    "profile": {
+      "title": "My profile",
+      "subtitle": "Personal information, subscription, and emergency contacts.",
+      "saveChanges": "Save changes",
+
+      "yearsOld": "years old",
+
+      "subscription": "Subscription",
+      "renewsOn": "Renews on",
+      "active": "Active",
+      "plan": "Plan",
+
+      "renewSubscription": "Renew subscription",
+      "cancelSubscription": "Cancel subscription",
+
+      "personalInformation": "Personal information",
+
+      "fullName": "Full name",
+      "age": "Age",
+      "address": "Address",
+      "bloodType": "Blood Type",
+      "gender": "Gender",
+      "notes": "Notes",
+
+      "emergencyContacts": "Emergency contacts",
+      "emergencyDescription": "People we'll reach out to in an emergency.",
+      "addEmergencyContact": "Add emergency contact",
+      "addEmergencyContactSubtitle": "Enter the contact information for emergency situations.",
+      "cancel": "Cancel",
+      "saveContact": "Save contact",
+      "add": "Add",
+
+      "name": "Name",
+      "relation": "Relation",
+      "phone": "Phone"
     }
   },
   "sidebar": {
