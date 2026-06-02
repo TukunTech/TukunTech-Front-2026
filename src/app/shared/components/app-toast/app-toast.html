@@ -1,0 +1,11 @@
+<div class="toast" *ngIf="show" [class.toast--error]="type === 'error'">
+  <button class="toast-close" type="button">
+    <i class="bi bi-x-lg"></i>
+  </button>
+
+  <div class="toast-icon">
+    <i class="bi" [class.bi-check-lg]="type === 'success'" [class.bi-x-lg]="type === 'error'"></i>
+  </div>
+
+  <p>{{ message }}</p>
+</div>

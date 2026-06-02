@@ -1,0 +1,210 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'Patient'"
+  [email]="email"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessage"
+    type="success">
+  </app-toast>
+
+  <section class="profile-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'patient.profile.title' | translate }}</h1>
+        <p>{{ 'patient.profile.subtitle' | translate }}</p>
+      </div>
+
+      <button class="save-button" type="button" (click)="saveChanges()">
+        {{ 'patient.profile.saveChanges' | translate }}
+      </button>
+    </div>
+
+    <div class="profile-grid">
+
+      <section class="profile-summary-card">
+        <div class="avatar">
+          {{ profile.initials }}
+        </div>
+
+        <h2>{{ profile.fullName }}</h2>
+        <p>{{ profile.age }} {{ 'patient.profile.yearsOld' | translate }}</p>
+
+        <div class="subscription-block">
+          <h3>{{ 'patient.profile.subscription' | translate }}</h3>
+
+          <div class="subscription-card">
+            <div class="subscription-header">
+              <div class="subscription-icon">
+                <i class="bi bi-gem"></i>
+              </div>
+
+              <div>
+                <h4>TukunTech Premium</h4>
+                <p>{{ 'patient.profile.renewsOn' | translate }} June 9, 2026 · $19.99</p>
+              </div>
+
+              <span class="active-pill">
+                {{ 'patient.profile.active' | translate }}
+              </span>
+            </div>
+
+            <div class="plan-box">
+              <span>{{ 'patient.profile.plan' | translate }}</span>
+              <strong>Premium - monthly</strong>
+            </div>
+
+            <div class="subscription-actions">
+              <button class="renew-button" type="button">
+                <i class="bi bi-arrow-repeat"></i>
+                {{ 'patient.profile.renewSubscription' | translate }}
+              </button>
+
+              <button class="cancel-button" type="button">
+                <i class="bi bi-x-circle"></i>
+                {{ 'patient.profile.cancelSubscription' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="profile-right">
+
+        <section class="info-card">
+          <h2>{{ 'patient.profile.personalInformation' | translate }}</h2>
+
+          <div class="form-grid">
+            <div>
+              <label>{{ 'patient.profile.fullName' | translate }}</label>
+              <input type="text" [(ngModel)]="profile.fullName" />
+            </div>
+
+            <div>
+              <label>{{ 'patient.profile.age' | translate }}</label>
+              <input type="number" [(ngModel)]="profile.age" />
+            </div>
+          </div>
+
+          <label>{{ 'patient.profile.address' | translate }}</label>
+          <input type="text" [(ngModel)]="profile.address" />
+
+          <div class="form-grid">
+            <div>
+              <label>{{ 'patient.profile.bloodType' | translate }}</label>
+
+              <app-custom-select
+                [options]="bloodTypeOptions"
+                [(value)]="profile.bloodType"
+                [placeholder]="'patient.profile.bloodType' | translate">
+              </app-custom-select>
+            </div>
+
+            <div>
+              <label>{{ 'patient.profile.gender' | translate }}</label>
+
+              <app-custom-select
+                [options]="genderOptions"
+                [(value)]="profile.gender"
+                [placeholder]="'patient.profile.gender' | translate">
+              </app-custom-select>
+            </div>
+          </div>
+
+          <label>{{ 'patient.profile.notes' | translate }}</label>
+          <input type="text" [(ngModel)]="profile.notes" />
+        </section>
+
+        <section class="contacts-card">
+          <div class="contacts-header">
+            <div class="contacts-title">
+              <i class="bi bi-telephone"></i>
+
+              <div>
+                <h2>{{ 'patient.profile.emergencyContacts' | translate }}</h2>
+                <p>{{ 'patient.profile.emergencyDescription' | translate }}</p>
+              </div>
+            </div>
+
+            <button class="add-contact-button" type="button" (click)="addContact()">
+              <i class="bi bi-plus-lg"></i>
+              {{ 'patient.profile.add' | translate }}
+            </button>
+          </div>
+
+          <div
+            class="contact-row"
+            *ngFor="let contact of emergencyContacts; let i = index"
+          >
+            <div>
+              <label>{{ 'patient.profile.name' | translate }}</label>
+              <div class="readonly-field">
+                {{ contact.name }}
+              </div>
+            </div>
+
+            <div>
+              <label>{{ 'patient.profile.relation' | translate }}</label>
+              <div class="readonly-field">
+                {{ contact.relation }}
+              </div>
+            </div>
+
+            <div>
+              <label>{{ 'patient.profile.phone' | translate }}</label>
+              <div class="readonly-field">
+                {{ contact.phone }}
+              </div>
+            </div>
+
+            <button
+              class="delete-contact-button"
+              type="button"
+              (click)="removeContact(i)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <div class="modal-backdrop" *ngIf="showContactModal">
+    <div class="contact-modal">
+
+      <button class="modal-close" type="button" (click)="closeContactModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <h2>{{ 'patient.profile.addEmergencyContact' | translate }}</h2>
+      <p>{{ 'patient.profile.addEmergencyContactSubtitle' | translate }}</p>
+
+      <label>{{ 'patient.profile.name' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.name" />
+
+      <label>{{ 'patient.profile.relation' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.relation" />
+
+      <label>{{ 'patient.profile.phone' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.phone" />
+
+      <div class="modal-actions">
+        <button class="modal-cancel" type="button" (click)="closeContactModal()">
+          {{ 'patient.profile.cancel' | translate }}
+        </button>
+
+        <button class="modal-save" type="button" (click)="saveContact()">
+          {{ 'patient.profile.saveContact' | translate }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</app-dashboard-layout>
