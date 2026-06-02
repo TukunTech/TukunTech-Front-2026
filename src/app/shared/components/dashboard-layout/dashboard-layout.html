@@ -1,0 +1,75 @@
+<button class="mobile-menu-button" type="button" (click)="toggleSidebar()">
+  <i class="bi bi-list"></i>
+</button>
+
+<div
+  class="sidebar-backdrop"
+  [ngClass]="{ 'sidebar-backdrop--show': sidebarOpen }"
+  (click)="closeSidebar()">
+</div>
+
+<div class="dashboard-layout">
+
+  <aside
+    class="sidebar"
+    [ngClass]="{ 'sidebar--open': sidebarOpen }"
+  >
+
+    <div class="sidebar-top">
+
+      <div class="brand">
+        <img src="ic_logo2.png" alt="TukunTech logo" />
+
+        <div>
+          <h2>TukunTech</h2>
+          <span>{{ role }}</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <a
+          *ngFor="let item of menuItems"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="menu-item"
+          (click)="closeSidebar()"
+        >
+          <i class="bi menu-icon" [ngClass]="item.icon"></i>
+
+          <span>
+            {{ item.labelKey | translate }}
+          </span>
+        </a>
+
+      </nav>
+
+    </div>
+
+    <div class="sidebar-bottom">
+
+      <p class="user-email">
+        {{ email }}
+      </p>
+
+      <button
+        class="logout-button"
+        type="button"
+        (click)="logout()"
+      >
+        <i class="bi bi-box-arrow-left"></i>
+
+        <span>
+    {{ 'sidebar.signOut' | translate }}
+  </span>
+      </button>
+
+    </div>
+
+  </aside>
+
+  <main class="dashboard-content">
+    <ng-content></ng-content>
+  </main>
+
+</div>

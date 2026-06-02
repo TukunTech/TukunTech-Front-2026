@@ -147,5 +147,61 @@
     },
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "signIn": "Iniciar sesión"
+  },
+  "patient": {
+    "today": {
+      "hello": "Hola",
+      "status": "todo bien!",
+      "heartRate": "Ritmo cardíaco",
+      "heartStatus": "Reposo - normal",
+      "oxygen": "Oxígeno",
+      "temperature": "Temperatura",
+      "normal": "Normal",
+      "ecgTitle": "Ritmo cardíaco en vivo",
+      "ecgSubtitle": "Electrocardiograma en tiempo real desde el dispositivo tukuntech",
+      "statusPill": "Todo bien"
+    },
+    "device": {
+      "title": "Mi dispositivo",
+      "subtitle": "Estado y detalles de conexión de tu dispositivo TukunTech IoT",
+      "deviceLabel": "TukunTech IoT",
+      "version": "Versión",
+      "online": "En línea",
+      "battery": "Batería",
+      "wifi": "WiFi",
+      "sync": "Sincronización",
+      "strong": "Buena Conexion",
+      "good": "Correcto",
+      "alert": "Tu dispositivo está funcionando correctamente. Te notificaremos aquí si ocurre algún cambio."
+    },
+    "history": {
+      "title": "Mi historial",
+      "subtitle": "Tus signos vitales recientes: ritmo cardíaco, oxígeno y temperatura.",
+      "syncNow": "Sincronizar ahora",
+      "generateReport": "Generar reporte",
+      "exportSummary": "Exporta un resumen de tus signos vitales",
+      "period": "Periodo",
+      "weekly": "Semanal",
+      "biweekly": "Quincenal",
+      "monthly": "Mensual",
+      "generateButton": "Generar reporte",
+      "tableTitle": "Historial de signos vitales",
+      "date": "Fecha",
+      "heartRate": "Ritmo cardíaco",
+      "oxygen": "Oxígeno",
+      "temperature": "Temperatura"
+    }
+  },
+  "sidebar": {
+    "signOut": "Cerrar sesión",
+    "patient": {
+      "vitalSigns": "Signos vitales",
+      "device": "Dispositivo",
+      "history": "Historial",
+      "profile": "Perfil",
+      "support": "Soporte",
+      "settings": "Configuración"
+    }
   }
+
 }

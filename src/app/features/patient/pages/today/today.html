@@ -1,0 +1,72 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'Patient'"
+  [email]="email"
+>
+  <section class="today-page">
+
+    <div class="welcome-card">
+      <div class="welcome-left">
+        <div class="avatar">
+          {{ initials }}
+        </div>
+
+        <div class="welcome-text">
+          <p>{{ 'patient.today.hello' | translate }}</p>
+          <h1>{{ patientName }}</h1>
+          <span>{{ 'patient.today.status' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="status-pill">
+        <span></span>
+        {{ 'patient.today.statusPill' | translate }}
+      </div>
+    </div>
+
+    <div class="vitals-grid">
+
+      <article class="vital-card vital-card--heart">
+        <div>
+          <p>{{ 'patient.today.heartRate' | translate }}</p>
+          <h2>{{ vitals.heartRate }} bpm</h2>
+          <span>{{ 'patient.today.heartStatus' | translate }}</span>
+        </div>
+        <i class="bi bi-heart"></i>
+      </article>
+
+      <article class="vital-card vital-card--oxygen">
+        <div>
+          <p>{{ 'patient.today.oxygen' | translate }}</p>
+          <h2>{{ vitals.oxygen }}%</h2>
+          <span>SpO2</span>
+        </div>
+        <i class="bi bi-wind"></i>
+      </article>
+
+      <article class="vital-card vital-card--temperature">
+        <div>
+          <p>{{ 'patient.today.temperature' | translate }}</p>
+          <h2>{{ vitals.temperature }} °C</h2>
+          <span>{{ 'patient.today.normal' | translate }}</span>
+        </div>
+        <i class="bi bi-thermometer-half"></i>
+      </article>
+
+    </div>
+
+    <section class="ecg-card">
+      <div class="ecg-header">
+        <i class="bi bi-heart"></i>
+
+        <div>
+          <h2>{{ 'patient.today.ecgTitle' | translate }}</h2>
+          <p>{{ 'patient.today.ecgSubtitle' | translate }}</p>
+        </div>
+      </div>
+
+      <app-ecg-live-chart></app-ecg-live-chart>
+    </section>
+
+  </section>
+</app-dashboard-layout>

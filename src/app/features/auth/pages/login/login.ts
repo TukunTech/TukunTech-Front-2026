@@ -32,7 +32,7 @@ export class Login {
 
   signIn() {
     if (this.role === 'patient') {
-      this.router.navigate(['/patient']);
+      this.router.navigate(['/patient/today']);
       return;
     }
 

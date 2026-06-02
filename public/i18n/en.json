@@ -141,5 +141,60 @@
     },
     "alreadyHaveAccount": "Already have an account?",
     "signIn": "Sign in"
+  },
+  "patient": {
+    "today": {
+      "hello": "Hello",
+      "status": "all good!",
+      "heartRate": "Heart rate",
+      "heartStatus": "Resting - normal",
+      "oxygen": "Oxygen",
+      "temperature": "Temperature",
+      "normal": "Normal",
+      "ecgTitle": "Heart rate - live",
+      "ecgSubtitle": "Real-time electrocardiogram waveform from the tukuntech device",
+      "statusPill": "All good"
+    },
+    "device": {
+      "title": "My device",
+      "subtitle": "Status and connection details for your TukunTech IoT",
+      "deviceLabel": "TukunTech IoT",
+      "version": "Version",
+      "online": "Online",
+      "battery": "Battery",
+      "wifi": "WiFi",
+      "sync": "Sync",
+      "strong": "Strong",
+      "good": "Good",
+      "alert": "Your device is reporting normally. We'll notify you here if anything changes."
+    },
+    "history": {
+      "title": "My history",
+      "subtitle": "Your recent vital signs - heart rate, oxygen, and temperature.",
+      "syncNow": "Sync now",
+      "generateReport": "Generate report",
+      "exportSummary": "Export a vital signs summary report",
+      "period": "Period",
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "generateButton": "Generate Report",
+      "tableTitle": "Vital signs history",
+      "date": "Date",
+      "heartRate": "Heart rate",
+      "oxygen": "Oxygen",
+      "temperature": "Temperature"
+    }
+  },
+  "sidebar": {
+    "signOut": "Sign out",
+    "patient": {
+      "vitalSigns": "Vital Signs",
+      "device": "Device",
+      "history": "History",
+      "profile": "Profile",
+      "support": "Support",
+      "settings": "Settings"
+    }
   }
 }

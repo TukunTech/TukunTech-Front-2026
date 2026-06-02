@@ -1,0 +1,98 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'Patient'"
+  [email]="email"
+>
+  <section class="device-page">
+
+    <div class="page-header">
+      <h1>{{ 'patient.device.title' | translate }}</h1>
+      <p>{{ 'patient.device.subtitle' | translate }}</p>
+    </div>
+
+    <div class="device-card">
+
+      <div class="device-top">
+
+        <div class="device-info">
+
+          <div class="device-icon">
+            <i class="bi bi-cpu"></i>
+          </div>
+
+          <div>
+            <span class="device-label">
+              {{ 'patient.device.deviceLabel' | translate }}
+            </span>
+
+            <h2>CB-9F32-01</h2>
+
+            <p>{{ 'patient.device.version' | translate }} 1.0.5</p>
+          </div>
+
+        </div>
+
+        <div class="status-badge">
+          {{ 'patient.device.online' | translate }}
+        </div>
+
+      </div>
+
+      <div class="device-stats">
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>{{ 'patient.device.battery' | translate }}</span>
+            <i class="bi bi-battery-half"></i>
+          </div>
+
+          <h3>{{ battery }}%</h3>
+
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="battery"
+            ></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>{{ 'patient.device.wifi' | translate }}</span>
+            <i class="bi bi-wifi"></i>
+          </div>
+
+          <h3>{{ 'patient.device.strong' | translate }}</h3>
+
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 92%"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span>{{ 'patient.device.sync' | translate }}</span>
+            <i class="bi bi-check2-circle"></i>
+          </div>
+
+          <h3>{{ 'patient.device.good' | translate }}</h3>
+
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 95%"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="device-alert">
+      <i class="bi bi-check2-circle"></i>
+
+      <span>
+        {{ 'patient.device.alert' | translate }}
+      </span>
+    </div>
+
+  </section>
+</app-dashboard-layout>
