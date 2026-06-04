@@ -1,11 +1,14 @@
 <app-dashboard-layout
   [menuItems]="menuItems"
-  [role]="'Patient'"
+  [role]="'roles.patient' | translate"
   [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
 >
   <app-toast
     [show]="showToast"
-    [message]="toastMessage"
+    [message]="toastMessageKey | translate"
     type="success">
   </app-toast>
 
@@ -42,8 +45,8 @@
               </div>
 
               <div>
-                <h4>TukunTech Premium</h4>
-                <p>{{ 'patient.profile.renewsOn' | translate }} June 9, 2026 · $19.99</p>
+                <h4>{{ subscription.name }}</h4>
+                <p>{{ 'patient.profile.renewsOn' | translate }} {{ subscription.renewsOn }} · {{ subscription.priceLabel }}</p>
               </div>
 
               <span class="active-pill">
@@ -53,7 +56,7 @@
 
             <div class="plan-box">
               <span>{{ 'patient.profile.plan' | translate }}</span>
-              <strong>Premium - monthly</strong>
+              <strong>{{ subscription.planLabel }}</strong>
             </div>
 
             <div class="subscription-actions">
@@ -97,7 +100,8 @@
 
               <app-custom-select
                 [options]="bloodTypeOptions"
-                [(value)]="profile.bloodType"
+                [value]="profile.bloodType"
+                (valueChange)="changeBloodType($event)"
                 [placeholder]="'patient.profile.bloodType' | translate">
               </app-custom-select>
             </div>
@@ -107,7 +111,8 @@
 
               <app-custom-select
                 [options]="genderOptions"
-                [(value)]="profile.gender"
+                [value]="profile.gender"
+                (valueChange)="changeGender($event)"
                 [placeholder]="'patient.profile.gender' | translate">
               </app-custom-select>
             </div>
@@ -136,7 +141,7 @@
 
           <div
             class="contact-row"
-            *ngFor="let contact of emergencyContacts; let i = index"
+            *ngFor="let contact of emergencyContacts"
           >
             <div>
               <label>{{ 'patient.profile.name' | translate }}</label>
@@ -162,7 +167,7 @@
             <button
               class="delete-contact-button"
               type="button"
-              (click)="removeContact(i)"
+              (click)="removeContact(contact.id)"
             >
               <i class="bi bi-trash"></i>
             </button>

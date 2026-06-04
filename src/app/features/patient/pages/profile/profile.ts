@@ -14,12 +14,15 @@ import {
 } from '../../../../shared/components/custom-select/custom-select';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
-
-interface EmergencyContact {
-  name: string;
-  relation: string;
-  phone: string;
-}
+import { PatientAlertRepository } from '../../data/patient-alert.repository';
+import { PatientProfileRepository } from '../../data/patient-profile.repository';
+import {
+  EmergencyContact,
+  PatientBloodType,
+  PatientGender,
+  PatientProfile,
+  PatientSubscription
+} from '../../domain/patient-profile';
 
 @Component({
   selector: 'app-profile',
@@ -36,12 +39,16 @@ interface EmergencyContact {
   styleUrl: './profile.css',
 })
 export class Profile {
+  userId = 'patient-demo-user';
   email = 'demo.patient@tukuntech.app';
+  urgentAlertShow = false;
+  urgentAlertTitleKey = '';
+  urgentAlertMessageKey = '';
 
   showContactModal = false;
 
   showToast = false;
-  toastMessage = '';
+  toastMessageKey = '';
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.patient.vitalSigns', route: '/patient/today' },
@@ -52,30 +59,30 @@ export class Profile {
     { icon: 'bi-gear', labelKey: 'sidebar.patient.settings', route: '/patient/settings' }
   ];
 
-  profile = {
-    initials: 'EM',
-    fullName: 'Eleanor Marsh',
-    age: 68,
-    address: 'Av. siempre viva 235',
+  profile: PatientProfile = {
+    userId: this.userId,
+    email: this.email,
+    initials: '',
+    fullName: '',
+    age: 0,
+    address: '',
     bloodType: 'A+',
     gender: 'Female',
-    notes: 'no notes'
+    notes: ''
   };
 
-  emergencyContacts: EmergencyContact[] = [
-    {
-      name: 'Sarah Marsh',
-      relation: 'Daughter',
-      phone: '(503) 555-0184'
-    },
-    {
-      name: 'Dr. Patel',
-      relation: 'Family doctor',
-      phone: '(503) 555-0102'
-    }
-  ];
+  subscription: PatientSubscription = {
+    id: '',
+    name: '',
+    renewsOn: '',
+    priceLabel: '',
+    status: 'inactive',
+    planLabel: ''
+  };
 
-  newContact: EmergencyContact = {
+  emergencyContacts: EmergencyContact[] = [];
+
+  newContact = {
     name: '',
     relation: '',
     phone: ''
@@ -97,7 +104,15 @@ export class Profile {
     { label: 'Male', value: 'Male' }
   ];
 
-  addContact() {
+  constructor(
+    private patientProfileRepository: PatientProfileRepository,
+    private patientAlertRepository: PatientAlertRepository
+  ) {
+    this.loadProfile();
+    this.loadGlobalUrgentAlert();
+  }
+
+  addContact(): void {
     this.newContact = {
       name: '',
       relation: '',
@@ -107,32 +122,79 @@ export class Profile {
     this.showContactModal = true;
   }
 
-  closeContactModal() {
+  closeContactModal(): void {
     this.showContactModal = false;
   }
 
-  saveContact() {
+  saveContact(): void {
     if (!this.newContact.name.trim()) {
       return;
     }
 
-    this.emergencyContacts.push({ ...this.newContact });
-    this.closeContactModal();
-
-    this.showSuccessToast('Emergency contact added successfully');
+    this.patientProfileRepository
+      .createEmergencyContact(this.userId, {
+        name: this.newContact.name.trim(),
+        relation: this.newContact.relation.trim(),
+        phone: this.newContact.phone.trim()
+      })
+      .subscribe(contact => {
+        this.emergencyContacts = [...this.emergencyContacts, contact];
+        this.closeContactModal();
+        this.showSuccessToast('patient.profile.contactAddedSuccessfully');
+      });
   }
 
-  removeContact(index: number) {
-    this.emergencyContacts.splice(index, 1);
+  removeContact(contactId: string): void {
+    this.patientProfileRepository
+      .deleteEmergencyContact(this.userId, contactId)
+      .subscribe(() => {
+        this.emergencyContacts = this.emergencyContacts.filter(contact =>
+          contact.id !== contactId
+        );
+      });
   }
 
-  saveChanges() {
-    console.log('Profile saved', this.profile, this.emergencyContacts);
-    this.showSuccessToast('Changes were saved successfully');
+  saveChanges(): void {
+    this.patientProfileRepository
+      .updateProfile(this.userId, this.profile)
+      .subscribe(profile => {
+        this.profile = profile;
+        this.email = profile.email;
+        this.showSuccessToast('patient.profile.changesSavedSuccessfully');
+      });
   }
 
-  showSuccessToast(message: string) {
-    this.toastMessage = message;
+  changeBloodType(value: string): void {
+    this.profile.bloodType = value as PatientBloodType;
+  }
+
+  changeGender(value: string): void {
+    this.profile.gender = value as PatientGender;
+  }
+
+  private loadProfile(): void {
+    this.patientProfileRepository
+      .getProfilePageData(this.userId)
+      .subscribe(data => {
+        this.profile = data.profile;
+        this.email = data.profile.email;
+        this.subscription = data.subscription;
+        this.emergencyContacts = data.emergencyContacts;
+      });
+  }
+
+  private loadGlobalUrgentAlert(): void {
+    this.patientAlertRepository
+      .getGlobalUrgentAlert(this.userId)
+      .subscribe(alert => {
+        this.urgentAlertShow = !!alert;
+        this.urgentAlertTitleKey = alert?.titleKey || '';
+        this.urgentAlertMessageKey = alert?.messageKey || '';
+      });
+  }
+
+  private showSuccessToast(messageKey: string): void {
+    this.toastMessageKey = messageKey;
     this.showToast = true;
 
     setTimeout(() => {
