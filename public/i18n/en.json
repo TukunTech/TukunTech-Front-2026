@@ -146,14 +146,63 @@
     "today": {
       "hello": "Hello",
       "status": "all good!",
+      "statusOffline": "monitoring off",
       "heartRate": "Heart rate",
       "heartStatus": "Resting - normal",
       "oxygen": "Oxygen",
+      "oxygenMetric": "SpO2",
       "temperature": "Temperature",
       "normal": "Normal",
+      "noData": "No data",
       "ecgTitle": "Heart rate - live",
       "ecgSubtitle": "Real-time electrocardiogram waveform from the tukuntech device",
-      "statusPill": "All good"
+      "ecgOfflineSubtitle": "No live waveform is available while the device is disconnected",
+      "ecgOffline": "Monitoring off",
+      "ecgNoSignalSubtitle": "No live waveform is available because there is no heart rate signal",
+      "ecgNoSignal": "No heart rate signal",
+      "statusPill": "All good",
+      "statusPillOffline": "Off",
+      "statusPillAlert": "Alert",
+      "statusPillAlertWithCause": "Alert: {{causes}}",
+      "statusNotice": "needs attention",
+      "statusCritical": "critical alert",
+      "alertCauses": {
+        "heartRate": "heart rate",
+        "oxygen": "oxygen",
+        "temperature": "temperature"
+      },
+      "alerts": {
+        "heartRateLow": {
+          "title": "Low heart rate",
+          "notice": "Heart rate is below this patient's configured range. Keep monitoring.",
+          "critical": "Heart rate is critically low for this patient."
+        },
+        "heartRateHigh": {
+          "title": "Fast heart rate",
+          "notice": "Heart rate is above this patient's configured range.",
+          "critical": "Heart rate is critically high for this patient."
+        },
+        "oxygenLow": {
+          "title": "Low oxygen",
+          "notice": "Oxygen is below the configured observation range.",
+          "critical": "Oxygen is critically low."
+        },
+        "oxygenCritical": {
+          "title": "Critical oxygen",
+          "notice": "Oxygen is below the configured observation range.",
+          "critical": "Oxygen is critically low."
+        },
+        "temperatureFever": {
+          "title": "Fever",
+          "notice": "Temperature meets the configured fever threshold.",
+          "critical": "Temperature is critically high."
+        },
+        "temperatureHighFever": {
+          "title": "High fever",
+          "notice": "Temperature meets the configured fever threshold.",
+          "critical": "Temperature is critically high."
+        }
+      }
     },
     "device": {
       "title": "My device",
@@ -161,12 +210,21 @@
       "deviceLabel": "TukunTech IoT",
       "version": "Version",
       "online": "Online",
+      "offline": "Offline",
       "battery": "Battery",
       "wifi": "WiFi",
       "sync": "Sync",
       "strong": "Strong",
+      "medium": "Medium",
+      "weak": "Weak",
       "good": "Good",
-      "alert": "Your device is reporting normally. We'll notify you here if anything changes."
+      "pending": "Pending",
+      "failed": "Failed",
+      "connectedTitle": "Device connected",
+      "disconnectedTitle": "Device disconnected",
+      "alert": "Your device is reporting normally. We'll notify you here if anything changes.",
+      "disconnectedAlert": "Monitoring is disabled. Reconnect the device to resume patient status tracking.",
+      "disconnectedGlobalAlert": "Urgent: reconnect the device. Patient monitoring is disabled while the device is offline."
     },
     "history": {
       "title": "My history",
@@ -181,9 +239,20 @@
       "generateButton": "Generate Report",
       "tableTitle": "Vital signs history",
       "date": "Date",
+      "source": "Source",
       "heartRate": "Heart rate",
       "oxygen": "Oxygen",
-      "temperature": "Temperature"
+      "temperature": "Temperature",
+      "status": "Status",
+      "sources": {
+        "hourly-snapshot": "Hourly record",
+        "alert-event": "Alert event"
+      },
+      "severity": {
+        "normal": "Normal",
+        "notice": "Needs attention",
+        "critical": "Critical"
+      }
     },
     "profile": {
       "title": "My profile",
@@ -216,10 +285,47 @@
       "cancel": "Cancel",
       "saveContact": "Save contact",
       "add": "Add",
+      "changesSavedSuccessfully": "Changes were saved successfully",
+      "contactAddedSuccessfully": "Emergency contact added successfully",
 
       "name": "Name",
       "relation": "Relation",
       "phone": "Phone"
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "We're here whenever you need us.",
+      "ticketGenerated": "Ticket generated successfully",
+      "chat": {
+        "title": "Chat with support",
+        "description": "We will give you an answer as soon as possible."
+      },
+      "call": {
+        "title": "Call us",
+        "phone": "(51) 444-222-333"
+      },
+      "form": {
+        "title": "Send us a message",
+        "description": "If you have a problem, you can create a ticket.",
+        "subject": "Subject",
+        "describe": "Describe",
+        "send": "Send"
+      },
+      "history": {
+        "title": "History tickets",
+        "description": "Here you can see the history of your submitted tickets and their status",
+        "subject": "Subject",
+        "date": "Date",
+        "status": "Status"
+      },
+      "status": {
+        "done": "Done",
+        "outstanding": "Outstanding"
+      },
+      "emergency": {
+        "prefix": "In case of an emergency, Tukuntech will call the emergency numbers.",
+        "strong": "It needs that it is connected to the network to function correctly."
+      }
     }
   },
   "sidebar": {

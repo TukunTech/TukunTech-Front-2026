@@ -28,9 +28,14 @@ export const patientRoutes: Routes = [
     loadComponent: () =>
       import('./pages/profile/profile').then(m => m.Profile)
   },
-{
-  path: 'settings',
-  loadComponent: () =>
-    import('../../shared/pages/settings/settings').then(m => m.Settings)
-}
+  {
+    path: 'support',
+    loadComponent: () =>
+      import('./pages/support/support').then(m => m.Support)
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('../../shared/pages/settings/settings').then(m => m.Settings)
+  }
 ];

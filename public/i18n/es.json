@@ -152,14 +152,63 @@
     "today": {
       "hello": "Hola",
       "status": "todo bien!",
+      "statusOffline": "monitoreo apagado",
       "heartRate": "Ritmo cardíaco",
       "heartStatus": "Reposo - normal",
       "oxygen": "Oxígeno",
+      "oxygenMetric": "SpO2",
       "temperature": "Temperatura",
       "normal": "Normal",
+      "noData": "Sin datos",
       "ecgTitle": "Ritmo cardíaco en vivo",
       "ecgSubtitle": "Electrocardiograma en tiempo real desde el dispositivo tukuntech",
-      "statusPill": "Todo bien"
+      "ecgOfflineSubtitle": "No hay se\u00f1al en vivo mientras el dispositivo est\u00e1 desconectado",
+      "ecgOffline": "Monitoreo apagado",
+      "ecgNoSignalSubtitle": "No hay se\u00f1al en vivo porque no se detecta ritmo card\u00edaco",
+      "ecgNoSignal": "Sin se\u00f1al de ritmo card\u00edaco",
+      "statusPill": "Todo bien",
+      "statusPillOffline": "Off",
+      "statusPillAlert": "Alerta",
+      "statusPillAlertWithCause": "Alerta: {{causes}}",
+      "statusNotice": "requiere atención",
+      "statusCritical": "alerta crítica",
+      "alertCauses": {
+        "heartRate": "ritmo cardíaco",
+        "oxygen": "oxígeno",
+        "temperature": "temperatura"
+      },
+      "alerts": {
+        "heartRateLow": {
+          "title": "Ritmo cardíaco bajo",
+          "notice": "El ritmo cardíaco está por debajo del rango configurado para este paciente.",
+          "critical": "El ritmo cardíaco está críticamente bajo para este paciente."
+        },
+        "heartRateHigh": {
+          "title": "Ritmo cardíaco acelerado",
+          "notice": "El ritmo cardíaco está por encima del rango configurado para este paciente.",
+          "critical": "El ritmo cardíaco está críticamente alto para este paciente."
+        },
+        "oxygenLow": {
+          "title": "Oxigenación baja",
+          "notice": "La oxigenación está por debajo del rango de observación configurado.",
+          "critical": "La oxigenación está críticamente baja."
+        },
+        "oxygenCritical": {
+          "title": "Oxigenación crítica",
+          "notice": "La oxigenación está por debajo del rango de observación configurado.",
+          "critical": "La oxigenación está críticamente baja."
+        },
+        "temperatureFever": {
+          "title": "Fiebre",
+          "notice": "La temperatura cumple el umbral de fiebre configurado.",
+          "critical": "La temperatura está críticamente alta."
+        },
+        "temperatureHighFever": {
+          "title": "Fiebre alta",
+          "notice": "La temperatura cumple el umbral de fiebre configurado.",
+          "critical": "La temperatura está críticamente alta."
+        }
+      }
     },
     "device": {
       "title": "Mi dispositivo",
@@ -167,12 +216,21 @@
       "deviceLabel": "TukunTech IoT",
       "version": "Versión",
       "online": "En línea",
+      "offline": "Sin conexi\u00f3n",
       "battery": "Batería",
       "wifi": "WiFi",
       "sync": "Sincronización",
       "strong": "Buena Conexion",
+      "medium": "Media",
+      "weak": "D\u00e9bil",
       "good": "Correcto",
-      "alert": "Tu dispositivo está funcionando correctamente. Te notificaremos aquí si ocurre algún cambio."
+      "pending": "Pendiente",
+      "failed": "Fallida",
+      "connectedTitle": "Dispositivo conectado",
+      "disconnectedTitle": "Dispositivo desconectado",
+      "alert": "Tu dispositivo está funcionando correctamente. Te notificaremos aquí si ocurre algún cambio.",
+      "disconnectedAlert": "El monitoreo est\u00e1 desactivado. Reconecta el dispositivo para volver a conocer el estado del paciente.",
+      "disconnectedGlobalAlert": "Urgente: reconecta el dispositivo. El monitoreo del paciente está desactivado mientras el dispositivo esté sin conexión."
     },
     "history": {
       "title": "Mi historial",
@@ -187,9 +245,20 @@
       "generateButton": "Generar reporte",
       "tableTitle": "Historial de signos vitales",
       "date": "Fecha",
+      "source": "Origen",
       "heartRate": "Ritmo cardíaco",
       "oxygen": "Oxígeno",
-      "temperature": "Temperatura"
+      "temperature": "Temperatura",
+      "status": "Estado",
+      "sources": {
+        "hourly-snapshot": "Registro por hora",
+        "alert-event": "Evento de alerta"
+      },
+      "severity": {
+        "normal": "Normal",
+        "notice": "Requiere atención",
+        "critical": "Crítico"
+      }
     },
     "profile": {
       "title": "Mi perfil",
@@ -223,9 +292,46 @@
       "addEmergencyContactSubtitle": "Ingresa los datos del contacto para situaciones de emergencia.",
       "cancel": "Cancelar",
       "saveContact": "Guardar contacto",
+      "changesSavedSuccessfully": "Cambios guardados correctamente",
+      "contactAddedSuccessfully": "Contacto de emergencia agregado correctamente",
       "name": "Nombre",
       "relation": "Relación",
       "phone": "Teléfono"
+    },
+    "support": {
+      "title": "Soporte",
+      "subtitle": "Estamos aqu\u00ed siempre que nos necesites.",
+      "ticketGenerated": "Ticket generado correctamente",
+      "chat": {
+        "title": "Chat con soporte",
+        "description": "Te daremos una respuesta lo antes posible."
+      },
+      "call": {
+        "title": "Ll\u00e1manos",
+        "phone": "(51) 444-222-333"
+      },
+      "form": {
+        "title": "Env\u00edanos un mensaje",
+        "description": "Si tienes un problema, puedes crear un ticket.",
+        "subject": "Asunto",
+        "describe": "Describe",
+        "send": "Enviar"
+      },
+      "history": {
+        "title": "Historial de tickets",
+        "description": "Aqu\u00ed puedes ver el historial de tus tickets enviados y su estado",
+        "subject": "Asunto",
+        "date": "Fecha",
+        "status": "Estado"
+      },
+      "status": {
+        "done": "Resuelto",
+        "outstanding": "Pendiente"
+      },
+      "emergency": {
+        "prefix": "En caso de emergencia, Tukuntech llamar\u00e1 a los n\u00fameros de emergencia.",
+        "strong": "Debe estar conectado a la red para funcionar correctamente."
+      }
     }
   },
   "sidebar": {
