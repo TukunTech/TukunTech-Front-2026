@@ -1,0 +1,150 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.patient' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="'patient.support.ticketGenerated' | translate"
+    type="success">
+  </app-toast>
+
+  <section class="support-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'patient.support.title' | translate }}</h1>
+        <p>{{ 'patient.support.subtitle' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="support-actions-grid">
+      <article class="support-action-card">
+        <div class="support-action-icon">
+          <i class="bi bi-chat-dots"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'patient.support.chat.title' | translate }}</h2>
+          <p>{{ 'patient.support.chat.description' | translate }}</p>
+        </div>
+      </article>
+
+      <article class="support-action-card">
+        <div class="support-action-icon">
+          <i class="bi bi-telephone"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'patient.support.call.title' | translate }}</h2>
+          <p>{{ 'patient.support.call.phone' | translate }}</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="support-content-grid">
+      <section class="support-card message-card">
+        <div class="card-title-row">
+          <div>
+            <h2>{{ 'patient.support.form.title' | translate }}</h2>
+            <p>{{ 'patient.support.form.description' | translate }}</p>
+          </div>
+
+          <i class="bi bi-chat-right-text"></i>
+        </div>
+
+        <form (ngSubmit)="submitTicket()">
+          <label for="support-subject">
+            {{ 'patient.support.form.subject' | translate }}
+          </label>
+
+          <input
+            id="support-subject"
+            name="subject"
+            type="text"
+            [(ngModel)]="subject"
+          />
+
+          <label for="support-description">
+            {{ 'patient.support.form.describe' | translate }}
+          </label>
+
+          <textarea
+            id="support-description"
+            name="description"
+            [(ngModel)]="description">
+          </textarea>
+
+          <button
+            class="send-button"
+            type="submit"
+            [disabled]="!subject.trim() || !description.trim()"
+          >
+            <i class="bi bi-send"></i>
+            {{ 'patient.support.form.send' | translate }}
+          </button>
+        </form>
+      </section>
+
+      <section class="support-card tickets-card">
+        <div class="card-title-row">
+          <div>
+            <h2>{{ 'patient.support.history.title' | translate }}</h2>
+            <p>{{ 'patient.support.history.description' | translate }}</p>
+          </div>
+
+          <i class="bi bi-book"></i>
+        </div>
+
+        <div class="tickets-table">
+          <div class="ticket-head">
+            <span>{{ 'patient.support.history.subject' | translate }}</span>
+            <span>{{ 'patient.support.history.date' | translate }}</span>
+            <span>{{ 'patient.support.history.status' | translate }}</span>
+          </div>
+
+          <div class="ticket-row" *ngFor="let ticket of tickets">
+            <div>
+              <span class="mobile-label">
+                {{ 'patient.support.history.subject' | translate }}
+              </span>
+              <span class="ticket-subject">{{ ticket.subject }}</span>
+            </div>
+
+            <div>
+              <span class="mobile-label">
+                {{ 'patient.support.history.date' | translate }}
+              </span>
+              <span class="ticket-date">{{ formatTicketDate(ticket.createdAt) }}</span>
+            </div>
+
+            <div>
+              <span class="mobile-label">
+                {{ 'patient.support.history.status' | translate }}
+              </span>
+              <span
+                class="status-pill"
+                [ngClass]="'status-pill--' + ticket.status"
+              >
+                {{ getStatusLabelKey(ticket.status) | translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="emergency-alert">
+      <i class="bi bi-exclamation-triangle"></i>
+
+      <p>
+        {{ 'patient.support.emergency.prefix' | translate }}
+        <strong>{{ 'patient.support.emergency.strong' | translate }}</strong>
+      </p>
+    </section>
+
+  </section>
+</app-dashboard-layout>
