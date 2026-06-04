@@ -1,0 +1,52 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="role"
+  [email]="email"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="'settings.savedSuccessfully' | translate"
+    type="success">
+  </app-toast>
+
+  <section class="settings-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'settings.title' | translate }}</h1>
+        <p>{{ 'settings.subtitle' | translate }}</p>
+      </div>
+
+      <button class="save-button" type="button" (click)="saveSettings()">
+        {{ 'settings.save' | translate }}
+      </button>
+    </div>
+
+    <section class="settings-card">
+
+      <div class="settings-card-header">
+        <div class="settings-icon">
+          <i class="bi bi-globe2"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'settings.language.title' | translate }}</h2>
+          <p>{{ 'settings.language.description' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="settings-field">
+        <label>{{ 'settings.language.label' | translate }}</label>
+
+        <app-custom-select
+          [options]="languageOptions"
+          [value]="language"
+          (valueChange)="changeLanguage($event)"
+          [placeholder]="'settings.language.placeholder' | translate">
+        </app-custom-select>
+      </div>
+
+    </section>
+
+  </section>
+</app-dashboard-layout>
