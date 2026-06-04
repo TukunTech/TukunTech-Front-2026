@@ -1,7 +1,7 @@
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
-import { NgClass, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -9,28 +9,30 @@ import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
-
-type ReportPeriod = 'weekly' | 'biweekly' | 'monthly';
-type AlertType = 'heart' | 'temperature' | 'none';
-
-interface VitalHistoryItem {
-  date: string;
-  heartRate: string;
-  oxygen: string;
-  temperature: string;
-  alertType: AlertType;
-}
+import { PatientAlertRepository } from '../../data/patient-alert.repository';
+import { PatientHistoryRepository } from '../../data/patient-history.repository';
+import {
+  getHistorySeverity,
+  PatientHistoryPeriod,
+  PatientVitalHistoryRecord
+} from '../../domain/patient-history';
+import { PatientVitalAlert } from '../../domain/patient-vitals';
 
 @Component({
   selector: 'app-history',
-  imports: [DashboardLayout, TranslatePipe, FormsModule, NgFor, NgClass],
+  imports: [DashboardLayout, TranslatePipe, FormsModule, NgFor, NgIf, NgClass],
   templateUrl: './history.html',
   styleUrl: './history.css',
 })
 export class History {
+  userId = 'patient-demo-user';
   email = 'demo.patient@tukuntech.app';
+  urgentAlertShow = false;
+  urgentAlertTitleKey = '';
+  urgentAlertMessageKey = '';
 
-  selectedPeriod: ReportPeriod = 'weekly';
+  selectedPeriod: PatientHistoryPeriod = 'weekly';
+  history: PatientVitalHistoryRecord[] = [];
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.patient.vitalSigns', route: '/patient/today' },
@@ -41,39 +43,61 @@ export class History {
     { icon: 'bi-gear', labelKey: 'sidebar.patient.settings', route: '/patient/settings' }
   ];
 
-  history: VitalHistoryItem[] = [
-    {
-      date: 'May 9',
-      heartRate: '72 bpm avg. 60-98',
-      oxygen: '98% avg. 95-99',
-      temperature: '36.7 °C - normal',
-      alertType: 'none'
-    },
-    {
-      date: 'May 8',
-      heartRate: '72 bpm avg. 60-98',
-      oxygen: '98% avg. 95-99',
-      temperature: '37 °C - fever',
-      alertType: 'temperature'
-    },
-    {
-      date: 'May 6',
-      heartRate: '72 bpm avg. 60-98',
-      oxygen: '98% avg. 95-99',
-      temperature: '36.7 °C - normal',
-      alertType: 'none'
-    },
-    {
-      date: 'May 5',
-      heartRate: '110 bpm avg. 60-98',
-      oxygen: '98% avg. 95-99',
-      temperature: '36.7 °C - normal',
-      alertType: 'heart'
-    }
-  ];
+  constructor(
+    private patientAlertRepository: PatientAlertRepository,
+    private patientHistoryRepository: PatientHistoryRepository,
+    private translateService: TranslateService
+  ) {
+    this.loadHistory();
+    this.loadGlobalUrgentAlert();
+  }
 
-  getRowClass(item: VitalHistoryItem): string {
-    return `history-row--${item.alertType}`;
+  syncNow(): void {
+    this.patientHistoryRepository
+      .recordHourlySnapshot(this.userId)
+      .subscribe(() => this.loadHistory());
+  }
+
+  changePeriod(period: string): void {
+    this.selectedPeriod = period as PatientHistoryPeriod;
+    this.loadHistory();
+  }
+
+  getRowClass(item: PatientVitalHistoryRecord): string {
+    return `history-row--${getHistorySeverity(item)}`;
+  }
+
+  getSourceLabelKey(item: PatientVitalHistoryRecord): string {
+    return `patient.history.sources.${item.source}`;
+  }
+
+  getSeverityLabelKey(item: PatientVitalHistoryRecord): string {
+    return `patient.history.severity.${getHistorySeverity(item)}`;
+  }
+
+  getAlertPillClass(alert: PatientVitalAlert): string {
+    return `alert-pill--${alert.severity}`;
+  }
+
+  formatDateTime(value: string): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(value));
+  }
+
+  formatHeartRate(item: PatientVitalHistoryRecord): string {
+    return `${item.vitals.heartRate} bpm`;
+  }
+
+  formatOxygen(item: PatientVitalHistoryRecord): string {
+    return `${item.vitals.oxygen}%`;
+  }
+
+  formatTemperature(item: PatientVitalHistoryRecord): string {
+    return `${item.vitals.temperature} \u00b0C`;
   }
 
   generateReport(): void {
@@ -88,15 +112,45 @@ export class History {
 
     autoTable(doc, {
       startY: 46,
-      head: [['Date', 'Heart rate', 'Oxygen', 'Temperature']],
+      head: [['Date', 'Source', 'Heart rate', 'Oxygen', 'Temperature', 'Status']],
       body: this.history.map(item => [
-        item.date,
-        item.heartRate,
-        item.oxygen,
-        item.temperature
+        this.formatDateTime(item.recordedAt),
+        this.translateService.instant(this.getSourceLabelKey(item)),
+        this.formatHeartRate(item),
+        this.formatOxygen(item),
+        this.formatTemperature(item),
+        this.getReportStatus(item)
       ])
     });
 
     doc.save(`tukuntech-${this.selectedPeriod}-report.pdf`);
+  }
+
+  private loadHistory(): void {
+    this.patientHistoryRepository
+      .getHistory(this.userId, this.selectedPeriod)
+      .subscribe(history => {
+        this.history = history;
+      });
+  }
+
+  private loadGlobalUrgentAlert(): void {
+    this.patientAlertRepository
+      .getGlobalUrgentAlert(this.userId)
+      .subscribe(alert => {
+        this.urgentAlertShow = !!alert;
+        this.urgentAlertTitleKey = alert?.titleKey || '';
+        this.urgentAlertMessageKey = alert?.messageKey || '';
+      });
+  }
+
+  private getReportStatus(item: PatientVitalHistoryRecord): string {
+    if (!item.alerts.length) {
+      return this.translateService.instant(this.getSeverityLabelKey(item));
+    }
+
+    return item.alerts
+      .map(alert => this.translateService.instant(alert.titleKey))
+      .join(', ');
   }
 }

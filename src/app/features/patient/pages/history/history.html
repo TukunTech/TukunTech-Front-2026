@@ -1,7 +1,10 @@
 <app-dashboard-layout
   [menuItems]="menuItems"
-  [role]="'Patient'"
+  [role]="'roles.patient' | translate"
   [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
 >
   <section class="history-page">
 
@@ -11,7 +14,7 @@
         <p>{{ 'patient.history.subtitle' | translate }}</p>
       </div>
 
-      <button class="sync-button" type="button">
+      <button class="sync-button" type="button" (click)="syncNow()">
         <i class="bi bi-arrow-clockwise"></i>
         {{ 'patient.history.syncNow' | translate }}
       </button>
@@ -34,7 +37,10 @@
           {{ 'patient.history.period' | translate }}
         </label>
 
-        <select [(ngModel)]="selectedPeriod">
+        <select
+          [ngModel]="selectedPeriod"
+          (ngModelChange)="changePeriod($event)"
+        >
           <option value="weekly">{{ 'patient.history.weekly' | translate }}</option>
           <option value="biweekly">{{ 'patient.history.biweekly' | translate }}</option>
           <option value="monthly">{{ 'patient.history.monthly' | translate }}</option>
@@ -61,9 +67,11 @@
 
         <div class="history-table-head">
           <span>{{ 'patient.history.date' | translate }}</span>
+          <span>{{ 'patient.history.source' | translate }}</span>
           <span><i class="bi bi-heart"></i> {{ 'patient.history.heartRate' | translate }}</span>
           <span><i class="bi bi-wind"></i> {{ 'patient.history.oxygen' | translate }}</span>
           <span><i class="bi bi-thermometer-half"></i> {{ 'patient.history.temperature' | translate }}</span>
+          <span>{{ 'patient.history.status' | translate }}</span>
         </div>
 
         <div
@@ -71,10 +79,29 @@
           *ngFor="let item of history"
           [ngClass]="getRowClass(item)"
         >
-          <span>{{ item.date }}</span>
-          <span>{{ item.heartRate }}</span>
-          <span>{{ item.oxygen }}</span>
-          <span>{{ item.temperature }}</span>
+          <span>{{ formatDateTime(item.recordedAt) }}</span>
+          <span>{{ getSourceLabelKey(item) | translate }}</span>
+          <span>{{ formatHeartRate(item) }}</span>
+          <span>{{ formatOxygen(item) }}</span>
+          <span>{{ formatTemperature(item) }}</span>
+
+          <span class="history-status">
+            <ng-container *ngIf="item.alerts.length; else normalStatus">
+              <span
+                class="alert-pill"
+                *ngFor="let alert of item.alerts"
+                [ngClass]="getAlertPillClass(alert)"
+              >
+                {{ alert.titleKey | translate }}
+              </span>
+            </ng-container>
+
+            <ng-template #normalStatus>
+              <span class="status-normal">
+                {{ getSeverityLabelKey(item) | translate }}
+              </span>
+            </ng-template>
+          </span>
         </div>
 
       </div>
