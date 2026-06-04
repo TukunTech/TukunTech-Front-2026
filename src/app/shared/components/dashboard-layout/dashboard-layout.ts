@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { NgClass, NgFor } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ export interface DashboardMenuItem {
 
 @Component({
   selector: 'app-dashboard-layout',
-  imports: [NgFor, NgClass, RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [NgFor, NgIf, NgClass, RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
@@ -26,6 +26,9 @@ export class DashboardLayout {
   @Input() menuItems: DashboardMenuItem[] = [];
   @Input() role = '';
   @Input() email = '';
+  @Input() urgentAlertShow = false;
+  @Input() urgentAlertTitleKey = '';
+  @Input() urgentAlertMessageKey = '';
 
   sidebarOpen = false;
 

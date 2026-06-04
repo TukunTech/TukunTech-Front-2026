@@ -148,6 +148,80 @@
   display: none;
 }
 
+.urgent-alert-toast {
+  position: fixed;
+  top: 20px;
+  left: calc(50% + 120px);
+  z-index: 3000;
+
+  width: min(420px, calc(100vw - 32px));
+
+  border-radius: 16px;
+  border: 1.5px solid #ff9a9a;
+
+  background: #fff1f1;
+  color: #9f1f1f;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  padding: 16px 18px;
+
+  box-shadow: 0 16px 36px rgba(201, 42, 42, 0.16);
+
+  animation: urgentAlertIn 0.22s ease;
+  transform: translateX(-50%);
+}
+
+.urgent-alert-icon {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 999px;
+
+  background: #ff3b45;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.urgent-alert-icon i {
+  font-size: 16px;
+}
+
+.urgent-alert-toast h2 {
+  margin: 0 0 4px;
+
+  color: #c92a2a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.urgent-alert-toast p {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@keyframes urgentAlertIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 @media (max-width: 768px) {
   .mobile-menu-button {
     position: fixed;
