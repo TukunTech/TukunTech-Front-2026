@@ -2,6 +2,9 @@
   [menuItems]="menuItems"
   [role]="role"
   [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
 >
   <app-toast
     [show]="showToast"
@@ -16,10 +19,6 @@
         <h1>{{ 'settings.title' | translate }}</h1>
         <p>{{ 'settings.subtitle' | translate }}</p>
       </div>
-
-      <button class="save-button" type="button" (click)="saveSettings()">
-        {{ 'settings.save' | translate }}
-      </button>
     </div>
 
     <section class="settings-card">

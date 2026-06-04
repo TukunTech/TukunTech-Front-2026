@@ -13,6 +13,7 @@ import {
 
 import { AppToast } from '../../components/app-toast/app-toast';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { PatientAlertRepository } from '../../../features/patient/data/patient-alert.repository';
 
 @Component({
   selector: 'app-settings',
@@ -26,8 +27,12 @@ import { LanguageService } from '../../../core/i18n/language.service';
   styleUrl: './settings.css',
 })
 export class Settings {
+  userId = 'patient-demo-user';
   email = 'demo.patient@tukuntech.app';
   role = 'Patient';
+  urgentAlertShow = false;
+  urgentAlertTitleKey = '';
+  urgentAlertMessageKey = '';
 
   showToast = false;
 
@@ -47,8 +52,12 @@ export class Settings {
     { label: 'Español', value: 'es' }
   ];
 
-  constructor(private languageService: LanguageService) {
+  constructor(
+    private languageService: LanguageService,
+    private patientAlertRepository: PatientAlertRepository
+  ) {
     this.language = this.languageService.currentLanguage;
+    this.loadGlobalUrgentAlert();
   }
 
   changeLanguage(language: string) {
@@ -63,5 +72,15 @@ export class Settings {
     setTimeout(() => {
       this.showToast = false;
     }, 3000);
+  }
+
+  private loadGlobalUrgentAlert(): void {
+    this.patientAlertRepository
+      .getGlobalUrgentAlert(this.userId)
+      .subscribe(alert => {
+        this.urgentAlertShow = !!alert;
+        this.urgentAlertTitleKey = alert?.titleKey || '';
+        this.urgentAlertMessageKey = alert?.messageKey || '';
+      });
   }
 }
