@@ -77,6 +77,14 @@
   overflow: hidden;
 }
 
+.welcome-card--offline {
+  border-color: #d7dddd;
+
+  background:
+    radial-gradient(circle at top left, rgba(226, 232, 232, 0.72) 0%, rgba(226, 232, 232, 0.18) 40%, transparent 62%),
+    linear-gradient(175deg, #f8fafa 8%, #eef2f2 58%, #e2e8e8 100%);
+}
+
 .welcome-left {
   display: flex;
   align-items: center;
@@ -90,7 +98,8 @@
 }
 
 .status-pill {
-  height: 38px;
+  min-height: 38px;
+  max-width: min(460px, 100%);
   padding: 0 18px;
 
   border-radius: 999px;
@@ -104,13 +113,42 @@
 
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.25;
+}
+
+.status-pill--offline {
+  background: rgba(123, 135, 144, 0.16);
+  color: #7b8790;
+}
+
+.status-pill--notice {
+  background: rgba(96, 165, 250, 0.16);
+  color: #2563eb;
+}
+
+.status-pill--critical {
+  background: rgba(255, 98, 104, 0.16);
+  color: #c92a2a;
 }
 
 .status-pill span {
+  flex: 0 0 auto;
   width: 9px;
   height: 9px;
   border-radius: 999px;
   background: #48bd78;
+}
+
+.status-pill--offline span {
+  background: #9aa5aa;
+}
+
+.status-pill--notice span {
+  background: #60a5fa;
+}
+
+.status-pill--critical span {
+  background: #ff3b45;
 }
 
 .avatar {
@@ -124,6 +162,10 @@
   justify-content: center;
   font-size: 22px;
   font-weight: 500;
+}
+
+.welcome-card--offline .avatar {
+  background: #8d9a9f;
 }
 
 .welcome-card p {
@@ -142,6 +184,128 @@
 .welcome-card span {
   font-size: 13px;
   color: #667985;
+}
+
+.welcome-card .status-pill {
+  color: #3fa292;
+}
+
+.welcome-card .status-pill--offline {
+  color: #7b8790;
+}
+
+.welcome-card .status-pill--notice {
+  color: #2563eb;
+}
+
+.welcome-card .status-pill--critical {
+  color: #c92a2a;
+}
+
+.vital-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.vital-alert {
+  width: 100%;
+  min-height: 96px;
+  padding: 24px 34px;
+
+  border-radius: 32px;
+  border: 1px solid transparent;
+
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.vital-alert > i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-size: 32px;
+}
+
+.vital-alert-content {
+  width: 100%;
+  min-width: 0;
+}
+
+.vital-alert-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 4px;
+}
+
+.vital-alert h2 {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 600;
+  color: #10232b;
+}
+
+.vital-alert-heading span {
+  flex: 0 0 auto;
+
+  border-radius: 999px;
+  padding: 6px 12px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vital-alert p {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.vital-alert--notice {
+  background: #eaf6ff;
+  border-color: #b8ddff;
+  color: #245a85;
+}
+
+.vital-alert--notice > i {
+  color: #2563eb;
+}
+
+.vital-alert--notice h2 {
+  color: #2563eb;
+}
+
+.vital-alert--notice .vital-alert-heading span {
+  background: rgba(96, 165, 250, 0.16);
+  color: #2563eb;
+}
+
+.vital-alert--critical {
+  background: #fff1f1;
+  border-color: #ffb3b3;
+  color: #9f1f1f;
+}
+
+.vital-alert--critical > i {
+  color: #ff3b45;
+}
+
+.vital-alert--critical h2 {
+  color: #c92a2a;
+}
+
+.vital-alert--critical .vital-alert-heading span {
+  background: rgba(255, 98, 104, 0.16);
+  color: #c92a2a;
 }
 
 .vitals-grid {
@@ -174,6 +338,18 @@
   background: #f8f1df;
 }
 
+.vital-card--offline {
+  background: #f3f6f6;
+}
+
+.vital-card--notice {
+  background: #eaf6fb;
+}
+
+.vital-card--critical {
+  background: #fff1f1;
+}
+
 .vital-card p {
   font-size: 14px;
   color: #667985;
@@ -187,6 +363,22 @@
   margin-bottom: 6px;
 }
 
+.vital-card--offline h2 {
+  color: #7b8790;
+}
+
+.vital-card--notice h2,
+.vital-card--notice i,
+.vital-card--temperature.vital-card--notice i {
+  color: #2563eb;
+}
+
+.vital-card--critical h2,
+.vital-card--critical i,
+.vital-card--temperature.vital-card--critical i {
+  color: #c92a2a;
+}
+
 .vital-card span {
   font-size: 13px;
   color: #667985;
@@ -195,6 +387,11 @@
 .vital-card i {
   font-size: 24px;
   color: #3fa292;
+}
+
+.vital-card--offline i,
+.vital-card--temperature.vital-card--offline i {
+  color: #9aa5aa;
 }
 
 .vital-card--temperature i {
@@ -208,6 +405,11 @@
   padding: 28px 36px;
 }
 
+.ecg-card--offline {
+  background: #f8fafa;
+  border-color: #d7dddd;
+}
+
 .ecg-header {
   display: flex;
   align-items: center;
@@ -218,6 +420,10 @@
 .ecg-header i {
   font-size: 30px;
   color: #0b5f57;
+}
+
+.ecg-card--offline .ecg-header i {
+  color: #7b8790;
 }
 
 .ecg-header h2 {
@@ -240,6 +446,31 @@
   .welcome-card,
   .ecg-card {
     padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .welcome-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .status-pill {
+    align-self: flex-start;
+    border-radius: 18px;
+    padding: 10px 14px;
+  }
+
+  .vital-alert {
+    align-items: flex-start;
+    border-radius: 22px;
+    padding: 18px;
+  }
+
+  .vital-alert-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 }
 

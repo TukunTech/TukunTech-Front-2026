@@ -1,11 +1,17 @@
 <app-dashboard-layout
   [menuItems]="menuItems"
-  [role]="'Patient'"
+  [role]="'roles.patient' | translate"
   [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
 >
   <section class="today-page">
 
-    <div class="welcome-card">
+    <div
+      class="welcome-card"
+      [class.welcome-card--offline]="deviceDisconnected"
+    >
       <div class="welcome-left">
         <div class="avatar">
           {{ initials }}
@@ -14,58 +20,106 @@
         <div class="welcome-text">
           <p>{{ 'patient.today.hello' | translate }}</p>
           <h1>{{ patientName }}</h1>
-          <span>{{ 'patient.today.status' | translate }}</span>
+          <span>{{ statusTextKey | translate }}</span>
         </div>
       </div>
 
-      <div class="status-pill">
+      <div
+        class="status-pill"
+        [class.status-pill--offline]="deviceDisconnected"
+        [class.status-pill--notice]="statusHasAlerts && statusAlertSeverity === 'notice'"
+        [class.status-pill--critical]="statusHasAlerts && statusAlertSeverity === 'critical'"
+      >
         <span></span>
-        {{ 'patient.today.statusPill' | translate }}
+        {{ statusPillLabel }}
       </div>
     </div>
 
     <div class="vitals-grid">
 
-      <article class="vital-card vital-card--heart">
+      <article
+        class="vital-card vital-card--heart"
+        [class.vital-card--offline]="deviceDisconnected"
+        [ngClass]="getVitalCardAlertClass('heart')"
+      >
         <div>
           <p>{{ 'patient.today.heartRate' | translate }}</p>
-          <h2>{{ vitals.heartRate }} bpm</h2>
-          <span>{{ 'patient.today.heartStatus' | translate }}</span>
+          <h2>{{ heartRateValue }}</h2>
+          <span>{{ heartStatusKey | translate }}</span>
         </div>
         <i class="bi bi-heart"></i>
       </article>
 
-      <article class="vital-card vital-card--oxygen">
+      <article
+        class="vital-card vital-card--oxygen"
+        [class.vital-card--offline]="deviceDisconnected"
+        [ngClass]="getVitalCardAlertClass('oxygen')"
+      >
         <div>
           <p>{{ 'patient.today.oxygen' | translate }}</p>
-          <h2>{{ vitals.oxygen }}%</h2>
-          <span>SpO2</span>
+          <h2>{{ oxygenValue }}</h2>
+          <span>{{ oxygenStatusKey | translate }}</span>
         </div>
         <i class="bi bi-wind"></i>
       </article>
 
-      <article class="vital-card vital-card--temperature">
+      <article
+        class="vital-card vital-card--temperature"
+        [class.vital-card--offline]="deviceDisconnected"
+        [ngClass]="getVitalCardAlertClass('temperature')"
+      >
         <div>
           <p>{{ 'patient.today.temperature' | translate }}</p>
-          <h2>{{ vitals.temperature }} °C</h2>
-          <span>{{ 'patient.today.normal' | translate }}</span>
+          <h2>{{ temperatureValue }}</h2>
+          <span>{{ temperatureStatusKey | translate }}</span>
         </div>
         <i class="bi bi-thermometer-half"></i>
       </article>
 
     </div>
 
-    <section class="ecg-card">
+    <section
+      class="ecg-card"
+      [class.ecg-card--offline]="!hasEcgSignal"
+    >
       <div class="ecg-header">
         <i class="bi bi-heart"></i>
 
         <div>
           <h2>{{ 'patient.today.ecgTitle' | translate }}</h2>
-          <p>{{ 'patient.today.ecgSubtitle' | translate }}</p>
+          <p>
+            {{ ecgSubtitleKey | translate }}
+          </p>
         </div>
       </div>
 
-      <app-ecg-live-chart></app-ecg-live-chart>
+      <app-ecg-live-chart
+        [active]="hasEcgSignal"
+        [heartRate]="heartRateForEcg"
+        [inactiveMessage]="ecgInactiveMessageKey | translate">
+      </app-ecg-live-chart>
+    </section>
+
+    <section class="vital-alerts" *ngIf="hasVitalAlerts">
+      <article
+        class="vital-alert"
+        *ngFor="let alert of vitalAlerts"
+        [ngClass]="'vital-alert--' + alert.severity"
+      >
+        <i
+          class="bi"
+          [ngClass]="alert.severity === 'critical' ? 'bi-exclamation-triangle' : 'bi-info-circle'"
+        ></i>
+
+        <div class="vital-alert-content">
+          <div class="vital-alert-heading">
+            <h2>{{ alert.titleKey | translate }}</h2>
+            <span>{{ getAlertValueLabel(alert) }}</span>
+          </div>
+
+          <p>{{ alert.messageKey | translate }}</p>
+        </div>
+      </article>
     </section>
 
   </section>
