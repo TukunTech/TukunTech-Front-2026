@@ -1,7 +1,10 @@
 <app-dashboard-layout
   [menuItems]="menuItems"
-  [role]="'Patient'"
+  [role]="'roles.patient' | translate"
   [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
 >
   <section class="device-page">
 
@@ -22,18 +25,25 @@
 
           <div>
             <span class="device-label">
-              {{ 'patient.device.deviceLabel' | translate }}
+              {{ device.label }}
             </span>
 
-            <h2>CB-9F32-01</h2>
+            <h2>{{ device.serialNumber }}</h2>
 
-            <p>{{ 'patient.device.version' | translate }} 1.0.5</p>
+            <p>{{ 'patient.device.version' | translate }} {{ device.firmwareVersion }}</p>
           </div>
 
         </div>
 
-        <div class="status-badge">
-          {{ 'patient.device.online' | translate }}
+        <div
+          class="status-badge"
+          [ngClass]="{
+            'status-badge--online': device.connectionStatus === 'online',
+            'status-badge--offline': device.connectionStatus === 'offline'
+          }"
+        >
+          <span class="status-dot"></span>
+          {{ getConnectionStatusLabelKey(device.connectionStatus) | translate }}
         </div>
 
       </div>
@@ -46,12 +56,13 @@
             <i class="bi bi-battery-half"></i>
           </div>
 
-          <h3>{{ battery }}%</h3>
+          <h3 [ngClass]="getBatteryLevelClass()">{{ device.batteryPercent }}%</h3>
 
           <div class="progress-bar">
             <div
               class="progress-fill"
-              [style.width.%]="battery"
+              [ngClass]="getBatteryLevelClass()"
+              [style.width.%]="getProgressWidth(device.batteryPercent)"
             ></div>
           </div>
         </div>
@@ -62,10 +73,13 @@
             <i class="bi bi-wifi"></i>
           </div>
 
-          <h3>{{ 'patient.device.strong' | translate }}</h3>
+          <h3>{{ getWifiSignalLabelKey(device.wifiSignalLevel) | translate }}</h3>
 
           <div class="progress-bar">
-            <div class="progress-fill" style="width: 92%"></div>
+            <div
+              class="progress-fill"
+              [style.width.%]="getProgressWidth(device.wifiSignalPercent)"
+            ></div>
           </div>
         </div>
 
@@ -75,10 +89,19 @@
             <i class="bi bi-check2-circle"></i>
           </div>
 
-          <h3>{{ 'patient.device.good' | translate }}</h3>
+          <h3 [ngClass]="getSyncLevelClass()">
+            {{ getSyncStatusLabelKey(device.syncStatus) | translate }}
+          </h3>
 
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 95%"></div>
+          <div
+            class="progress-bar"
+            [class.progress-bar--muted]="device.connectionStatus === 'offline'"
+          >
+            <div
+              class="progress-fill"
+              [ngClass]="getSyncLevelClass()"
+              [style.width.%]="getSyncProgressWidth()"
+            ></div>
           </div>
         </div>
 
@@ -86,12 +109,16 @@
 
     </div>
 
-    <div class="device-alert">
-      <i class="bi bi-check2-circle"></i>
+    <div
+      class="device-alert"
+      [ngClass]="getDeviceAlertClass()"
+    >
+      <i class="bi" [ngClass]="getDeviceAlertIcon()"></i>
 
-      <span>
-        {{ 'patient.device.alert' | translate }}
-      </span>
+      <div>
+        <h2>{{ getDeviceAlertTitleKey() | translate }}</h2>
+        <p>{{ getDeviceAlertMessageKey() | translate }}</p>
+      </div>
     </div>
 
   </section>

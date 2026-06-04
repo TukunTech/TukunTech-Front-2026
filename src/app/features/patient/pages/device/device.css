@@ -120,15 +120,36 @@
 
   border-radius: 999px;
 
-  background: rgba(76, 190, 133, 0.18);
-
-  color: #3fa292;
-
   font-size: 14px;
   font-weight: 600;
 
   display: flex;
   align-items: center;
+  gap: 9px;
+}
+
+.status-badge--online {
+  background: rgba(76, 190, 133, 0.2);
+  color: #0f8f3d;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 999px;
+
+  background: currentColor;
+  box-shadow: 0 0 0 4px rgba(22, 199, 90, 0.12);
+}
+
+.status-badge--offline {
+  background: rgba(255, 98, 104, 0.16);
+  color: #c92a2a;
+}
+
+.status-badge--offline .status-dot {
+  box-shadow: 0 0 0 4px rgba(255, 59, 69, 0.12);
 }
 
 .device-stats {
@@ -171,6 +192,18 @@
   color: #10232b;
 }
 
+.stat-card h3.stat-level--danger {
+  color: #c92a2a;
+}
+
+.stat-card h3.stat-level--warning {
+  color: #b77900;
+}
+
+.stat-card h3.stat-level--muted {
+  color: #7b8790;
+}
+
 .progress-bar {
   width: 100%;
   height: 12px;
@@ -190,27 +223,81 @@
   background: #3fa292;
 }
 
-.device-alert {
-  min-height: 62px;
+.progress-fill.stat-level--success {
+  background: #3fa292;
+}
 
-  padding: 0 30px;
+.progress-fill.stat-level--warning {
+  background: #d99a00;
+}
+
+.progress-fill.stat-level--danger {
+  background: #ff6268;
+}
+
+.progress-bar--muted {
+  background: #e2e8e8;
+}
+
+.progress-fill.stat-level--muted {
+  background: #aeb8bd;
+}
+
+.device-alert {
+  min-height: 72px;
+
+  padding: 16px 30px;
 
   border-radius: 24px;
-
-  background: #eaf6fb;
 
   display: flex;
   align-items: center;
   gap: 16px;
 
-  color: #667985;
-
-  font-size: 15px;
+  border: 1px solid transparent;
 }
 
 .device-alert i {
-  font-size: 26px;
+  font-size: 30px;
+  flex-shrink: 0;
+}
+
+.device-alert h2 {
+  margin: 0 0 3px;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #10232b;
+}
+
+.device-alert p {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.device-alert--normal {
+  background: #eaf6fb;
+  color: #667985;
+}
+
+.device-alert--normal i {
   color: #60a5fa;
+}
+
+.device-alert--danger {
+  background: #fff1f1;
+  border-color: #ffb3b3;
+  color: #9f1f1f;
+}
+
+.device-alert--danger i {
+  color: #ff3b45;
+}
+
+.device-alert--danger h2 {
+  color: #c92a2a;
 }
 
 @media (max-width: 1024px) {
