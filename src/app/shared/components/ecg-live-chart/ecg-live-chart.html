@@ -1,3 +1,8 @@
-<div class="ecg-chart">
+<div class="ecg-chart" [class.ecg-chart--inactive]="!isChartActive">
   <canvas #ecgCanvas></canvas>
+
+  <div class="ecg-offline-overlay" *ngIf="!isChartActive">
+    <i class="bi bi-power"></i>
+    <span>{{ inactiveMessage }}</span>
+  </div>
 </div>

@@ -2,27 +2,49 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  Input,
+  OnChanges,
   OnDestroy,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-ecg-live-chart',
-  imports: [],
+  imports: [NgIf],
   templateUrl: './ecg-live-chart.html',
   styleUrl: './ecg-live-chart.css',
 })
-export class EcgLiveChart implements AfterViewInit, OnDestroy {
+export class EcgLiveChart implements AfterViewInit, OnChanges, OnDestroy {
+  @Input() active = true;
+  @Input() heartRate = 74;
+  @Input() inactiveMessage = '';
+
   @ViewChild('ecgCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private animationId = 0;
   private offset = 0;
+  private viewReady = false;
+
+  get isChartActive(): boolean {
+    return this.active && this.heartRate > 0;
+  }
 
   ngAfterViewInit(): void {
+    this.viewReady = true;
     this.resizeCanvas();
-    this.animate();
+    this.renderChart();
 
     window.addEventListener('resize', this.resizeCanvas);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.viewReady || (!changes['active'] && !changes['heartRate'])) {
+      return;
+    }
+
+    this.renderChart();
   }
 
   ngOnDestroy(): void {
@@ -48,9 +70,27 @@ export class EcgLiveChart implements AfterViewInit, OnDestroy {
     if (ctx) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+
+    this.renderChart();
   };
 
+  private renderChart(): void {
+    cancelAnimationFrame(this.animationId);
+
+    if (this.isChartActive) {
+      this.animate();
+      return;
+    }
+
+    this.drawInactiveChart();
+  }
+
   private animate = (): void => {
+    if (!this.isChartActive) {
+      this.drawInactiveChart();
+      return;
+    }
+
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
 
@@ -71,12 +111,37 @@ export class EcgLiveChart implements AfterViewInit, OnDestroy {
     this.animationId = requestAnimationFrame(this.animate);
   };
 
+  private drawInactiveChart(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const centerY = height / 2;
+
+    ctx.clearRect(0, 0, width, height);
+    this.drawGrid(ctx, width, height, true);
+
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(width, centerY);
+    ctx.strokeStyle = '#aeb8bd';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
   private drawGrid(
     ctx: CanvasRenderingContext2D,
     width: number,
-    height: number
+    height: number,
+    muted = false
   ): void {
-    ctx.strokeStyle = 'rgba(63, 162, 146, 0.07)';
+    ctx.strokeStyle = muted
+      ? 'rgba(123, 135, 144, 0.08)'
+      : 'rgba(63, 162, 146, 0.07)';
     ctx.lineWidth = 1;
 
     for (let x = 0; x < width; x += 24) {
@@ -93,7 +158,9 @@ export class EcgLiveChart implements AfterViewInit, OnDestroy {
       ctx.stroke();
     }
 
-    ctx.strokeStyle = 'rgba(63, 162, 146, 0.12)';
+    ctx.strokeStyle = muted
+      ? 'rgba(123, 135, 144, 0.13)'
+      : 'rgba(63, 162, 146, 0.12)';
 
     for (let x = 0; x < width; x += 120) {
       ctx.beginPath();
@@ -110,23 +177,25 @@ export class EcgLiveChart implements AfterViewInit, OnDestroy {
   ): void {
     ctx.beginPath();
 
+    const beatSpacing = this.getBeatSpacing();
+
     for (let x = 0; x < width; x++) {
-      const phase = (x + this.offset) % 120;
+      const phase = (x + this.offset) % beatSpacing;
 
       let y = centerY;
 
       if (phase < 18) {
         y += Math.sin(phase / 18 * Math.PI) * -5;
-      } else if (phase < 26) {
-        y += 0;
       } else if (phase < 30) {
+        y += 0;
+      } else if (phase < 34) {
         y -= 44;
-      } else if (phase < 35) {
+      } else if (phase < 39) {
         y += 28;
-      } else if (phase < 42) {
+      } else if (phase < 46) {
         y -= 6;
-      } else if (phase < 65) {
-        y += Math.sin((phase - 42) / 23 * Math.PI) * -10;
+      } else if (phase < 74) {
+        y += Math.sin((phase - 46) / 28 * Math.PI) * -10;
       }
 
       if (x === 0) {
@@ -141,6 +210,13 @@ export class EcgLiveChart implements AfterViewInit, OnDestroy {
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     ctx.stroke();
+  }
+
+  private getBeatSpacing(): number {
+    const pixelsPerMinute = 10600;
+    const spacing = pixelsPerMinute / this.heartRate;
+
+    return Math.max(82, Math.min(2200, spacing));
   }
 
   private drawScanner(
