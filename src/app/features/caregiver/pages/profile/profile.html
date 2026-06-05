@@ -1,0 +1,184 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessageKey | translate"
+    type="success">
+  </app-toast>
+
+  <section class="caregiver-profile-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'caregiver.profile.title' | translate }}</h1>
+        <p>{{ 'caregiver.profile.subtitle' | translate }}</p>
+      </div>
+
+      <button class="save-button" type="button" (click)="saveChanges()">
+        {{ 'caregiver.profile.saveChanges' | translate }}
+      </button>
+    </div>
+
+    <div class="patient-tabs">
+      <button
+        class="patient-chip"
+        type="button"
+        *ngFor="let patient of patients"
+        [ngClass]="getPatientChipClass(patient)"
+        (click)="selectPatient(patient)"
+      >
+        <span>{{ patient.initials }}</span>
+        {{ patient.fullName }}
+      </button>
+    </div>
+
+    <div class="profile-grid">
+
+      <section class="profile-summary-card">
+        <div class="avatar">
+          {{ profile.initials }}
+        </div>
+
+        <h2>{{ profile.fullName }}</h2>
+        <p>{{ profile.age }} {{ 'caregiver.profile.yearsOld' | translate }}</p>
+      </section>
+
+      <div class="profile-right">
+
+        <section class="info-card">
+          <h2>{{ 'caregiver.profile.personalInformation' | translate }}</h2>
+
+          <div class="form-grid">
+            <div>
+              <label>{{ 'caregiver.profile.fullName' | translate }}</label>
+              <input type="text" [(ngModel)]="profile.fullName" />
+            </div>
+
+            <div>
+              <label>{{ 'caregiver.profile.age' | translate }}</label>
+              <input type="number" [(ngModel)]="profile.age" />
+            </div>
+          </div>
+
+          <label>{{ 'caregiver.profile.address' | translate }}</label>
+          <input type="text" [(ngModel)]="profile.address" />
+
+          <div class="form-grid">
+            <div>
+              <label>{{ 'caregiver.profile.bloodType' | translate }}</label>
+              <app-custom-select
+                [options]="bloodTypeOptions"
+                [value]="profile.bloodType"
+                (valueChange)="changeBloodType($event)"
+                [placeholder]="'caregiver.profile.bloodType' | translate">
+              </app-custom-select>
+            </div>
+
+            <div>
+              <label>{{ 'caregiver.profile.gender' | translate }}</label>
+              <app-custom-select
+                [options]="genderOptions"
+                [value]="profile.gender"
+                (valueChange)="changeGender($event)"
+                [placeholder]="'caregiver.profile.gender' | translate">
+              </app-custom-select>
+            </div>
+          </div>
+
+          <label>{{ 'caregiver.profile.notes' | translate }}</label>
+          <input type="text" [(ngModel)]="profile.notes" />
+        </section>
+
+        <section class="contacts-card">
+          <div class="contacts-header">
+            <div class="contacts-title">
+              <i class="bi bi-telephone"></i>
+
+              <div>
+                <h2>{{ 'caregiver.profile.emergencyContacts' | translate }}</h2>
+                <p>{{ 'caregiver.profile.emergencyDescription' | translate }}</p>
+              </div>
+            </div>
+
+            <button class="add-contact-button" type="button" (click)="addContact()">
+              <i class="bi bi-person-plus-fill"></i>
+              {{ 'caregiver.profile.add' | translate }}
+            </button>
+          </div>
+
+          <div
+            class="contact-row"
+            *ngFor="let contact of selectedPatientContacts"
+          >
+            <div>
+              <label>{{ 'caregiver.profile.name' | translate }}</label>
+              <div class="readonly-field">{{ contact.name }}</div>
+            </div>
+
+            <div>
+              <label>{{ 'caregiver.profile.relation' | translate }}</label>
+              <div class="readonly-field">{{ contact.relation }}</div>
+            </div>
+
+            <div>
+              <label>{{ 'caregiver.profile.phone' | translate }}</label>
+              <div class="readonly-field">{{ contact.phone }}</div>
+            </div>
+
+            <button
+              class="delete-contact-button"
+              type="button"
+              (click)="removeContact(contact.id)"
+              [attr.aria-label]="'caregiver.profile.deleteContact' | translate"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <div class="modal-backdrop" *ngIf="showContactModal">
+    <div class="contact-modal">
+
+      <button class="modal-close" type="button" (click)="closeContactModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <h2>{{ 'caregiver.profile.addEmergencyContact' | translate }}</h2>
+      <p>{{ 'caregiver.profile.addEmergencyContactSubtitle' | translate }}</p>
+
+      <label>{{ 'caregiver.profile.name' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.name" />
+
+      <label>{{ 'caregiver.profile.relation' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.relation" />
+
+      <label>{{ 'caregiver.profile.phone' | translate }}</label>
+      <input type="text" [(ngModel)]="newContact.phone" />
+
+      <div class="modal-actions">
+        <button class="modal-cancel" type="button" (click)="closeContactModal()">
+          {{ 'caregiver.profile.cancel' | translate }}
+        </button>
+
+        <button class="modal-save" type="button" (click)="saveContact()">
+          {{ 'caregiver.profile.saveContact' | translate }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</app-dashboard-layout>
