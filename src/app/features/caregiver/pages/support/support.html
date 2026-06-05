@@ -1,0 +1,151 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="'caregiver.support.ticketGenerated' | translate"
+    type="success">
+  </app-toast>
+
+  <section class="support-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'caregiver.support.title' | translate }}</h1>
+        <p>{{ 'caregiver.support.subtitle' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="support-actions-grid">
+      <article class="support-action-card">
+        <div class="support-action-icon">
+          <i class="bi bi-chat-dots"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'caregiver.support.chat.title' | translate }}</h2>
+          <p>{{ 'caregiver.support.chat.description' | translate }}</p>
+        </div>
+      </article>
+
+      <article class="support-action-card">
+        <div class="support-action-icon">
+          <i class="bi bi-telephone"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'caregiver.support.call.title' | translate }}</h2>
+          <p>{{ 'caregiver.support.call.phone' | translate }}</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="support-content-grid">
+      <section class="support-card message-card">
+        <div class="card-title-row">
+          <div>
+            <h2>{{ 'caregiver.support.form.title' | translate }}</h2>
+            <p>{{ 'caregiver.support.form.description' | translate }}</p>
+          </div>
+
+          <i class="bi bi-chat-right-text"></i>
+        </div>
+
+        <form (ngSubmit)="submitTicket()">
+          <label for="caregiver-support-subject">
+            {{ 'caregiver.support.form.subject' | translate }}
+          </label>
+
+          <input
+            id="caregiver-support-subject"
+            name="subject"
+            type="text"
+            [(ngModel)]="subject"
+          />
+
+          <label for="caregiver-support-description">
+            {{ 'caregiver.support.form.describe' | translate }}
+          </label>
+
+          <textarea
+            id="caregiver-support-description"
+            name="description"
+            [(ngModel)]="description">
+          </textarea>
+
+          <button
+            class="send-button"
+            type="submit"
+            [disabled]="!subject.trim() || !description.trim()"
+          >
+            <i class="bi bi-send"></i>
+            {{ 'caregiver.support.form.send' | translate }}
+          </button>
+        </form>
+      </section>
+
+      <section class="support-card tickets-card">
+        <div class="card-title-row">
+          <div>
+            <h2>{{ 'caregiver.support.history.title' | translate }}</h2>
+            <p>{{ 'caregiver.support.history.description' | translate }}</p>
+          </div>
+
+          <i class="bi bi-book"></i>
+        </div>
+
+        <div class="tickets-table">
+          <div class="ticket-head">
+            <span>{{ 'caregiver.support.history.subject' | translate }}</span>
+            <span>{{ 'caregiver.support.history.date' | translate }}</span>
+            <span>{{ 'caregiver.support.history.status' | translate }}</span>
+          </div>
+
+          <div class="ticket-row" *ngFor="let ticket of tickets">
+            <div>
+              <span class="mobile-label">
+                {{ 'caregiver.support.history.subject' | translate }}
+              </span>
+              <span class="ticket-subject">{{ ticket.subject }}</span>
+            </div>
+
+            <div>
+              <span class="mobile-label">
+                {{ 'caregiver.support.history.date' | translate }}
+              </span>
+              <span class="ticket-date">{{ formatTicketDate(ticket.createdAt) }}</span>
+            </div>
+
+            <div>
+              <span class="mobile-label">
+                {{ 'caregiver.support.history.status' | translate }}
+              </span>
+              <span
+                class="status-pill"
+                [ngClass]="'status-pill--' + ticket.status"
+              >
+                {{ getStatusLabelKey(ticket.status) | translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="emergency-alert">
+      <i class="bi bi-exclamation-triangle"></i>
+
+      <p>
+        {{ 'caregiver.support.emergency.prefix' | translate }}
+        <strong>{{ 'caregiver.support.emergency.strong' | translate }}</strong>
+      </p>
+    </section>
+
+  </section>
+</app-dashboard-layout>
