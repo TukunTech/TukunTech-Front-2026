@@ -211,14 +211,12 @@
 
 .vital-alert {
   width: 100%;
-  min-height: 96px;
-  padding: 24px 34px;
-
+  min-height: 40px;
+  padding: 10px 34px;
   border-radius: 32px;
   border: 1px solid transparent;
-
   display: flex;
-  align-items: center;
+  align-items: center; /* centra verticalmente todo */
   gap: 22px;
 }
 
