@@ -258,26 +258,20 @@
       "title": "My profile",
       "subtitle": "Personal information, subscription, and emergency contacts.",
       "saveChanges": "Save changes",
-
       "yearsOld": "years old",
-
       "subscription": "Subscription",
       "renewsOn": "Renews on",
       "active": "Active",
       "plan": "Plan",
-
       "renewSubscription": "Renew subscription",
       "cancelSubscription": "Cancel subscription",
-
       "personalInformation": "Personal information",
-
       "fullName": "Full name",
       "age": "Age",
       "address": "Address",
       "bloodType": "Blood Type",
       "gender": "Gender",
       "notes": "Notes",
-
       "emergencyContacts": "Emergency contacts",
       "emergencyDescription": "People we'll reach out to in an emergency.",
       "addEmergencyContact": "Add emergency contact",
@@ -287,7 +281,6 @@
       "add": "Add",
       "changesSavedSuccessfully": "Changes were saved successfully",
       "contactAddedSuccessfully": "Emergency contact added successfully",
-
       "name": "Name",
       "relation": "Relation",
       "phone": "Phone"
@@ -337,6 +330,14 @@
       "profile": "Profile",
       "support": "Support",
       "settings": "Settings"
+    },
+    "caregiver": {
+      "vitalSigns": "Vital Signs",
+      "device": "Device",
+      "history": "History",
+      "profile": "Profile",
+      "support": "Support",
+      "settings": "Settings"
     }
   },
   "settings": {
@@ -349,6 +350,213 @@
       "description": "Choose your preferred app language",
       "label": "App language",
       "placeholder": "Select language"
+    }
+  },
+  "caregiver": {
+    "globalAlert": {
+      "title": "Critical patient alert",
+      "message": "Urgent: {{patients}} needs immediate attention."
+    },
+    "vitalSigns": {
+      "title": "Vital signs",
+      "subtitle": "Detail view of today's activity",
+      "heartRate": "Heart rate",
+      "heart": "Heart",
+      "heartStatus": "Resting - normal",
+      "oxygen": "Oxygen",
+      "oxygenMetric": "SpO2",
+      "temperature": "Temperature",
+      "normal": "Normal",
+      "noData": "No data",
+      "years": "years",
+      "allGood": "All good",
+      "offline": "Offline",
+      "alertWithCause": "Alert: {{cause}}",
+      "streaming": "Streaming",
+      "monitoringOff": "Monitoring off",
+      "noHeartSignal": "No heart rate signal",
+      "device": "Device",
+      "patientOfflineTitle": "Device disconnected",
+      "patientOfflineAlert": "This patient's monitoring is disabled while the device is offline.",
+      "alertCauses": {
+        "heartRate": "heart rate",
+        "oxygen": "oxygen",
+        "temperature": "temperature"
+      },
+      "wifi": {
+        "strong": "Strong",
+        "medium": "Medium",
+        "weak": "Weak"
+      },
+      "alerts": {
+        "heartRateLow": {
+          "title": "Low heart rate",
+          "notice": "Heart rate is below this patient's configured range. Keep monitoring.",
+          "critical": "Heart rate is critically low for this patient."
+        },
+        "heartRateHigh": {
+          "title": "Fast heart rate",
+          "notice": "Heart rate is above this patient's configured range.",
+          "critical": "Heart rate is critically high for this patient."
+        },
+        "oxygenLow": {
+          "title": "Low oxygen",
+          "notice": "Oxygen is below the configured observation range.",
+          "critical": "Oxygen is critically low."
+        },
+        "oxygenCritical": {
+          "title": "Critical oxygen",
+          "notice": "Oxygen is below the configured observation range.",
+          "critical": "Oxygen is critically low."
+        },
+        "temperatureFever": {
+          "title": "Fever",
+          "notice": "Temperature meets the configured fever threshold.",
+          "critical": "Temperature is critically high."
+        },
+        "temperatureHighFever": {
+          "title": "High fever",
+          "notice": "Temperature meets the configured fever threshold.",
+          "critical": "Temperature is critically high."
+        }
+      }
+    },
+    "device": {
+      "title": "Device",
+      "subtitle": "Devices connected - 5 patients.",
+      "version": "Version",
+      "online": "Online",
+      "offline": "Offline",
+      "battery": "Battery",
+      "wifi": "WiFi",
+      "sync": "Sync",
+      "strong": "Strong",
+      "medium": "Medium",
+      "weak": "Weak",
+      "good": "Good",
+      "pending": "Pending",
+      "failed": "Failed",
+      "offlineAlertTitle": "Device disconnected",
+      "offlineAlertMessage": "Urgent: reconnect the device for {{patients}}. Monitoring is disabled while offline."
+    },
+    "history": {
+      "title": "Patient History",
+      "subtitle": "Here you will find the history of all registered patients.",
+      "generateReport": "Generate report",
+      "exportSummary": "Export a vital signs summary report",
+      "patient": "Patient",
+      "patientPlaceholder": "Select patient",
+      "period": "Period",
+      "periodPlaceholder": "Select period",
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "generateButton": "Generate Report",
+      "tableTitle": "Vital signs history",
+      "date": "Date",
+      "heartRate": "Heart rate",
+      "oxygen": "Oxygen",
+      "temperature": "Temperature",
+      "status": "Status",
+      "normal": "Normal",
+      "info": "You can view and download each patient's history independently.",
+      "reportTitle": "TukunTech - Caregiver Vital Signs Report",
+      "heartRateSummary": "{{value}} bpm avg. {{min}}-{{max}}",
+      "oxygenSummary": "{{value}}% avg. {{min}}-{{max}}",
+      "temperatureSummary": "{{value}} \u00b0C - {{status}}",
+      "severity": {
+        "normal": "Normal",
+        "notice": "Needs attention",
+        "critical": "Critical"
+      }
+    },
+    "profile": {
+      "title": "Profiles",
+      "subtitle": "Personal information, subscription, and emergency contacts.",
+      "saveChanges": "Save changes",
+      "yearsOld": "years old",
+      "personalInformation": "Personal information",
+      "fullName": "Full name",
+      "age": "Age",
+      "address": "Address",
+      "bloodType": "Blood Type",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "notes": "Notes",
+      "emergencyContacts": "Emergency contacts",
+      "emergencyDescription": "Here you can add your emergency contacts",
+      "add": "Add",
+      "name": "Name",
+      "relation": "Relation",
+      "phone": "Phone",
+      "deleteContact": "Delete contact",
+      "addEmergencyContact": "Add emergency contact",
+      "addEmergencyContactSubtitle": "This contact will be linked to the selected patient.",
+      "cancel": "Cancel",
+      "saveContact": "Save contact",
+      "contactAddedSuccessfully": "Emergency contact saved correctly",
+      "changesSavedSuccessfully": "Patient profile saved correctly"
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Personalize your web app!",
+      "save": "Save",
+      "savedSuccessfully": "Settings were saved successfully",
+      "subscriptionRenewed": "Subscription renewed successfully",
+      "subscriptionCanceled": "Subscription canceled successfully",
+      "language": {
+        "title": "Language",
+        "description": "Choose your preferred app language",
+        "label": "App language",
+        "placeholder": "Select language"
+      },
+      "subscription": {
+        "renewsOn": "Renews on",
+        "plan": "Plan",
+        "renew": "Renew subscription",
+        "cancel": "Cancel subscription",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive",
+          "canceled": "Canceled"
+        }
+      }
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "We're here whenever you need us.",
+      "ticketGenerated": "Ticket generated successfully",
+      "chat": {
+        "title": "Chat with support",
+        "description": "We will give you an answer as soon as possible."
+      },
+      "call": {
+        "title": "Call us",
+        "phone": "(51) 444-222-333"
+      },
+      "form": {
+        "title": "Send us a message",
+        "description": "If you have a problem, you can create a ticket.",
+        "subject": "Subject",
+        "describe": "Describe",
+        "send": "Send"
+      },
+      "history": {
+        "title": "History tickets",
+        "description": "Here you can see the history of your submitted tickets and their status",
+        "subject": "Subject",
+        "date": "Date",
+        "status": "Status"
+      },
+      "status": {
+        "done": "Done",
+        "outstanding": "Outstanding"
+      },
+      "emergency": {
+        "prefix": "In case of an emergency, Tukuntech will call the emergency numbers.",
+        "strong": "It needs that it is connected to the network to function correctly."
+      }
     }
   }
 }

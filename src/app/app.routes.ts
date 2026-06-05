@@ -12,6 +12,19 @@ export const routes: Routes = [
   },
 
   {
+    path: 'caregiver',
+    loadChildren: () =>
+      import('./features/caregiver/caregiver-routes')
+        .then(m => m.caregiverRoutes)
+  },
+
+  {
+    path: 'carebridge',
+    redirectTo: 'caregiver/vital-signs',
+    pathMatch: 'full'
+  },
+
+  {
     path: '**',
     redirectTo: ''
   }

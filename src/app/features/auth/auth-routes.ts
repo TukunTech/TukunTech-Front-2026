@@ -8,6 +8,7 @@ import {RegisterCaregiver} from './pages/register-caregiver/register-caregiver';
 export const authRoutes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     component: Welcome
   },
   {
@@ -15,16 +16,17 @@ export const authRoutes: Routes = [
     component: Login
   },
   {
+    path: 'register/caregiver',
+    component: RegisterCaregiver
+  },
+  {
     path: 'register/patient',
     component: RegisterPatient
   },
   {
     path: 'register',
+    pathMatch: 'full',
     component: RegisterPlan
-  },
-  {
-    path: 'register/caregiver',
-    component: RegisterCaregiver
   }
 
 ];

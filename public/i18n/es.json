@@ -65,16 +65,11 @@
     "family": {
       "title": "Crea tu cuenta Family Pro",
       "subtitle": "Monitorea hasta 5 pacientes bajo tu cuidado.",
-
       "patient": "Paciente",
-
       "registerPatientsInfo": "Registra a los 5 pacientes bajo tu cuidado.",
-
       "previousPatient": "Paciente anterior",
       "nextPatient": "Siguiente paciente",
-
       "backToAccount": "Volver a cuenta",
-
       "addPatient": "Agregar paciente"
     },
     "account": {
@@ -127,10 +122,8 @@
     "done": {
       "title": "Cuenta creada",
       "description": "Tu cuenta de paciente fue creada correctamente.",
-
       "familyTitle": "Cuenta Family Pro creada",
       "familyDescription": "Tu cuenta de cuidador y pacientes fue registrada correctamente.",
-
       "goToWebsite": "Ir a la página web"
     }
   },
@@ -162,10 +155,10 @@
       "noData": "Sin datos",
       "ecgTitle": "Ritmo cardíaco en vivo",
       "ecgSubtitle": "Electrocardiograma en tiempo real desde el dispositivo tukuntech",
-      "ecgOfflineSubtitle": "No hay se\u00f1al en vivo mientras el dispositivo est\u00e1 desconectado",
+      "ecgOfflineSubtitle": "No hay señal en vivo mientras el dispositivo está desconectado",
       "ecgOffline": "Monitoreo apagado",
-      "ecgNoSignalSubtitle": "No hay se\u00f1al en vivo porque no se detecta ritmo card\u00edaco",
-      "ecgNoSignal": "Sin se\u00f1al de ritmo card\u00edaco",
+      "ecgNoSignalSubtitle": "No hay señal en vivo porque no se detecta ritmo cardíaco",
+      "ecgNoSignal": "Sin señal de ritmo cardíaco",
       "statusPill": "Todo bien",
       "statusPillOffline": "Off",
       "statusPillAlert": "Alerta",
@@ -216,20 +209,20 @@
       "deviceLabel": "TukunTech IoT",
       "version": "Versión",
       "online": "En línea",
-      "offline": "Sin conexi\u00f3n",
+      "offline": "Sin conexión",
       "battery": "Batería",
       "wifi": "WiFi",
       "sync": "Sincronización",
       "strong": "Buena Conexion",
       "medium": "Media",
-      "weak": "D\u00e9bil",
+      "weak": "Débil",
       "good": "Correcto",
       "pending": "Pendiente",
       "failed": "Fallida",
       "connectedTitle": "Dispositivo conectado",
       "disconnectedTitle": "Dispositivo desconectado",
       "alert": "Tu dispositivo está funcionando correctamente. Te notificaremos aquí si ocurre algún cambio.",
-      "disconnectedAlert": "El monitoreo est\u00e1 desactivado. Reconecta el dispositivo para volver a conocer el estado del paciente.",
+      "disconnectedAlert": "El monitoreo está desactivado. Reconecta el dispositivo para volver a conocer el estado del paciente.",
       "disconnectedGlobalAlert": "Urgente: reconecta el dispositivo. El monitoreo del paciente está desactivado mientras el dispositivo esté sin conexión."
     },
     "history": {
@@ -264,29 +257,22 @@
       "title": "Mi perfil",
       "subtitle": "Información personal, suscripción y contactos de emergencia.",
       "saveChanges": "Guardar cambios",
-
       "yearsOld": "años",
-
       "subscription": "Suscripción",
       "renewsOn": "Renueva el",
       "active": "Activo",
       "plan": "Plan",
-
       "renewSubscription": "Renovar suscripción",
       "cancelSubscription": "Cancelar suscripción",
-
       "personalInformation": "Información personal",
-
       "fullName": "Nombre completo",
       "age": "Edad",
       "address": "Dirección",
       "bloodType": "Tipo de sangre",
       "gender": "Género",
       "notes": "Notas",
-
       "emergencyContacts": "Contactos de emergencia",
       "emergencyDescription": "Personas a las que contactaremos en caso de emergencia.",
-
       "add": "Agregar",
       "addEmergencyContact": "Agregar contacto de emergencia",
       "addEmergencyContactSubtitle": "Ingresa los datos del contacto para situaciones de emergencia.",
@@ -297,6 +283,244 @@
       "name": "Nombre",
       "relation": "Relación",
       "phone": "Teléfono"
+    },
+    "support": {
+      "title": "Soporte",
+      "subtitle": "Estamos aquí siempre que nos necesites.",
+      "ticketGenerated": "Ticket generado correctamente",
+      "chat": {
+        "title": "Chat con soporte",
+        "description": "Te daremos una respuesta lo antes posible."
+      },
+      "call": {
+        "title": "Llámanos",
+        "phone": "(51) 444-222-333"
+      },
+      "form": {
+        "title": "Envíanos un mensaje",
+        "description": "Si tienes un problema, puedes crear un ticket.",
+        "subject": "Asunto",
+        "describe": "Describe",
+        "send": "Enviar"
+      },
+      "history": {
+        "title": "Historial de tickets",
+        "description": "Aquí puedes ver el historial de tus tickets enviados y su estado",
+        "subject": "Asunto",
+        "date": "Fecha",
+        "status": "Estado"
+      },
+      "status": {
+        "done": "Resuelto",
+        "outstanding": "Pendiente"
+      },
+      "emergency": {
+        "prefix": "En caso de emergencia, Tukuntech llamará a los números de emergencia.",
+        "strong": "Debe estar conectado a la red para funcionar correctamente."
+      }
+    }
+  },
+  "sidebar": {
+    "signOut": "Cerrar sesión",
+    "patient": {
+      "vitalSigns": "Signos vitales",
+      "device": "Dispositivo",
+      "history": "Historial",
+      "profile": "Perfil",
+      "support": "Soporte",
+      "settings": "Configuración"
+    },
+    "caregiver": {
+      "vitalSigns": "Signos vitales",
+      "device": "Dispositivo",
+      "history": "Historial",
+      "profile": "Perfil",
+      "support": "Soporte",
+      "settings": "Configuración"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu aplicación web",
+    "save": "Guardar",
+    "savedSuccessfully": "Configuración guardada correctamente",
+    "language": {
+      "title": "Idioma",
+      "description": "Elige el idioma de la aplicación",
+      "label": "Idioma de la app",
+      "placeholder": "Selecciona un idioma"
+    }
+  },
+  "caregiver": {
+    "globalAlert": {
+      "title": "Alerta cr\u00edtica de paciente",
+      "message": "Urgente: {{patients}} requiere atenci\u00f3n inmediata."
+    },
+    "vitalSigns": {
+      "title": "Signos vitales",
+      "subtitle": "Vista detallada de la actividad de hoy",
+      "heartRate": "Ritmo cardíaco",
+      "heart": "Corazón",
+      "heartStatus": "Reposo - normal",
+      "oxygen": "Oxígeno",
+      "oxygenMetric": "SpO2",
+      "temperature": "Temperatura",
+      "normal": "Normal",
+      "noData": "Sin datos",
+      "years": "años",
+      "allGood": "Todo bien",
+      "offline": "Sin conexión",
+      "alertWithCause": "Alerta: {{cause}}",
+      "streaming": "Transmitiendo",
+      "monitoringOff": "Monitoreo apagado",
+      "noHeartSignal": "Sin señal de ritmo cardíaco",
+      "device": "Dispositivo",
+      "patientOfflineTitle": "Dispositivo desconectado",
+      "patientOfflineAlert": "El monitoreo de este paciente está desactivado mientras el dispositivo está sin conexión.",
+      "alertCauses": {
+        "heartRate": "ritmo cardíaco",
+        "oxygen": "oxígeno",
+        "temperature": "temperatura"
+      },
+      "wifi": {
+        "strong": "Fuerte",
+        "medium": "Media",
+        "weak": "Débil"
+      },
+      "alerts": {
+        "heartRateLow": {
+          "title": "Ritmo cardíaco bajo",
+          "notice": "El ritmo cardíaco está por debajo del rango configurado para este paciente.",
+          "critical": "El ritmo cardíaco está críticamente bajo para este paciente."
+        },
+        "heartRateHigh": {
+          "title": "Ritmo cardíaco acelerado",
+          "notice": "El ritmo cardíaco está por encima del rango configurado para este paciente.",
+          "critical": "El ritmo cardíaco está críticamente alto para este paciente."
+        },
+        "oxygenLow": {
+          "title": "Oxigenación baja",
+          "notice": "La oxigenación está por debajo del rango de observación configurado.",
+          "critical": "La oxigenación está críticamente baja."
+        },
+        "oxygenCritical": {
+          "title": "Oxigenación crítica",
+          "notice": "La oxigenación está por debajo del rango de observación configurado.",
+          "critical": "La oxigenación está críticamente baja."
+        },
+        "temperatureFever": {
+          "title": "Fiebre",
+          "notice": "La temperatura cumple el umbral de fiebre configurado.",
+          "critical": "La temperatura está críticamente alta."
+        },
+        "temperatureHighFever": {
+          "title": "Fiebre alta",
+          "notice": "La temperatura cumple el umbral de fiebre configurado.",
+          "critical": "La temperatura está críticamente alta."
+        }
+      }
+    },
+    "device": {
+      "title": "Dispositivo",
+      "subtitle": "Dispositivos conectados - 5 pacientes.",
+      "version": "Versión",
+      "online": "En línea",
+      "offline": "Sin conexión",
+      "battery": "Batería",
+      "wifi": "WiFi",
+      "sync": "Sincronización",
+      "strong": "Fuerte",
+      "medium": "Media",
+      "weak": "Débil",
+      "good": "Correcto",
+      "pending": "Pendiente",
+      "failed": "Fallida",
+      "offlineAlertTitle": "Dispositivo desconectado",
+      "offlineAlertMessage": "Urgente: reconecta el dispositivo de {{patients}}. El monitoreo está desactivado mientras está sin conexión."
+    },
+    "history": {
+      "title": "Historial de pacientes",
+      "subtitle": "Aquí encontrarás el historial de todos los pacientes registrados.",
+      "generateReport": "Generar reporte",
+      "exportSummary": "Exporta un resumen de signos vitales",
+      "patient": "Paciente",
+      "patientPlaceholder": "Selecciona paciente",
+      "period": "Periodo",
+      "periodPlaceholder": "Selecciona periodo",
+      "weekly": "Semanal",
+      "biweekly": "Quincenal",
+      "monthly": "Mensual",
+      "generateButton": "Generar reporte",
+      "tableTitle": "Historial de signos vitales",
+      "date": "Fecha",
+      "heartRate": "Ritmo cardíaco",
+      "oxygen": "Oxígeno",
+      "temperature": "Temperatura",
+      "status": "Estado",
+      "normal": "Normal",
+      "info": "Puedes ver y descargar el historial de cada paciente de forma independiente.",
+      "reportTitle": "TukunTech - Reporte de signos vitales del cuidador",
+      "heartRateSummary": "{{value}} bpm prom. {{min}}-{{max}}",
+      "oxygenSummary": "{{value}}% prom. {{min}}-{{max}}",
+      "temperatureSummary": "{{value}} °C - {{status}}",
+      "severity": {
+        "normal": "Normal",
+        "notice": "Requiere atención",
+        "critical": "Crítico"
+      }
+    },
+    "profile": {
+      "title": "Perfiles",
+      "subtitle": "Informaci\u00f3n personal, suscripci\u00f3n y contactos de emergencia.",
+      "saveChanges": "Guardar cambios",
+      "yearsOld": "a\u00f1os",
+      "personalInformation": "Informaci\u00f3n personal",
+      "fullName": "Nombre completo",
+      "age": "Edad",
+      "address": "Direcci\u00f3n",
+      "bloodType": "Tipo de sangre",
+      "gender": "G\u00e9nero",
+      "genderFemale": "Femenino",
+      "genderMale": "Masculino",
+      "notes": "Notas",
+      "emergencyContacts": "Contactos de emergencia",
+      "emergencyDescription": "Aqu\u00ed puedes agregar contactos de emergencia",
+      "add": "Agregar",
+      "name": "Nombre",
+      "relation": "Relaci\u00f3n",
+      "phone": "Tel\u00e9fono",
+      "deleteContact": "Eliminar contacto",
+      "addEmergencyContact": "Agregar contacto de emergencia",
+      "addEmergencyContactSubtitle": "Este contacto quedar\u00e1 vinculado al paciente seleccionado.",
+      "cancel": "Cancelar",
+      "saveContact": "Guardar contacto",
+      "contactAddedSuccessfully": "Contacto de emergencia guardado correctamente",
+      "changesSavedSuccessfully": "Perfil del paciente guardado correctamente"
+    },
+    "settings": {
+      "title": "Configuraci\u00f3n",
+      "subtitle": "Personaliza tu aplicaci\u00f3n web",
+      "save": "Guardar",
+      "savedSuccessfully": "Configuraci\u00f3n guardada correctamente",
+      "subscriptionRenewed": "Suscripci\u00f3n renovada correctamente",
+      "subscriptionCanceled": "Suscripci\u00f3n cancelada correctamente",
+      "language": {
+        "title": "Idioma",
+        "description": "Elige el idioma de la aplicaci\u00f3n",
+        "label": "Idioma de la app",
+        "placeholder": "Selecciona un idioma"
+      },
+      "subscription": {
+        "renewsOn": "Renueva el",
+        "plan": "Plan",
+        "renew": "Renovar suscripci\u00f3n",
+        "cancel": "Cancelar suscripci\u00f3n",
+        "status": {
+          "active": "Activo",
+          "inactive": "Inactivo",
+          "canceled": "Cancelado"
+        }
+      }
     },
     "support": {
       "title": "Soporte",
@@ -332,29 +556,6 @@
         "prefix": "En caso de emergencia, Tukuntech llamar\u00e1 a los n\u00fameros de emergencia.",
         "strong": "Debe estar conectado a la red para funcionar correctamente."
       }
-    }
-  },
-  "sidebar": {
-    "signOut": "Cerrar sesión",
-    "patient": {
-      "vitalSigns": "Signos vitales",
-      "device": "Dispositivo",
-      "history": "Historial",
-      "profile": "Perfil",
-      "support": "Soporte",
-      "settings": "Configuración"
-    }
-  },
-  "settings": {
-    "title": "Configuración",
-    "subtitle": "Personaliza tu aplicación web",
-    "save": "Guardar",
-    "savedSuccessfully": "Configuración guardada correctamente",
-    "language": {
-      "title": "Idioma",
-      "description": "Elige el idioma de la aplicación",
-      "label": "Idioma de la app",
-      "placeholder": "Selecciona un idioma"
     }
   }
 }
