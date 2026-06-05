@@ -1,0 +1,312 @@
+.caregiver-settings-page {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding-top: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+
+  color: #10232b;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.page-header p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 15px;
+}
+
+.save-button {
+  height: 42px;
+  padding: 0 30px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #3fa292;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(63, 162, 146, 0.22);
+  transition: 0.2s ease;
+}
+
+.save-button:hover {
+  background: #379484;
+  transform: translateY(-1px);
+}
+
+.settings-card,
+.subscription-card {
+  border-radius: 30px;
+  border: 1px solid #dbe6e5;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 1px rgba(219, 230, 229, 0.3),
+    0 10px 28px rgba(15, 23, 42, 0.03);
+}
+
+.settings-card {
+  min-height: 206px;
+  padding: 34px;
+}
+
+.settings-card-header {
+  margin-bottom: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-icon,
+.subscription-icon {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 999px;
+
+  background: #dff5ef;
+  color: #0b5f57;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+}
+
+.settings-card-header h2,
+.subscription-main h2 {
+  margin: 0 0 2px;
+
+  color: #10232b;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.settings-card-header p,
+.subscription-main p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 13px;
+}
+
+.settings-field {
+  width: 310px;
+  margin-left: 64px;
+}
+
+.settings-field label {
+  display: block;
+  margin-bottom: 10px;
+
+  color: #10232b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-field ::ng-deep .custom-select {
+  margin-bottom: 0;
+}
+
+.settings-field ::ng-deep .custom-select__control {
+  height: 48px;
+  border-radius: 999px;
+  background: white;
+  box-shadow:
+    inset 0 0 0 1px #dbe6e5,
+    0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.subscription-card {
+  min-height: 150px;
+  padding: 24px 28px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) auto;
+  grid-template-areas:
+    "main status"
+    "plan actions";
+  align-items: center;
+  gap: 18px 26px;
+
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+    linear-gradient(135deg, #f9fffd 0%, #e8faf6 48%, #d2eee7 100%);
+}
+
+.subscription-main {
+  grid-area: main;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.subscription-icon {
+  background: #3fa292;
+  color: white;
+}
+
+.active-pill {
+  grid-area: status;
+  justify-self: end;
+
+  min-height: 34px;
+  padding: 0 24px;
+
+  border-radius: 999px;
+
+  background: #4cbe85;
+  color: white;
+
+  display: inline-flex;
+  align-items: center;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  box-shadow: 0 8px 18px rgba(22, 149, 75, 0.25);
+}
+
+.plan-box {
+  grid-area: plan;
+  min-height: 58px;
+  padding: 10px 26px;
+
+  border-radius: 999px;
+
+  background: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.plan-box span {
+  color: #667985;
+  font-size: 13px;
+}
+
+.plan-box strong {
+  color: #10232b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.subscription-actions {
+  grid-area: actions;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.renew-button,
+.cancel-button {
+  height: 40px;
+  padding: 0 24px;
+
+  border: none;
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.renew-button {
+  background: #3fa292;
+  color: white;
+}
+
+.cancel-button {
+  background: #ff6268;
+  color: #10232b;
+}
+
+.renew-button:hover,
+.cancel-button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 980px) {
+  .subscription-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "status"
+      "plan"
+      "actions";
+  }
+
+  .active-pill,
+  .subscription-actions {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .caregiver-settings-page {
+    padding-top: 0;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .save-button,
+  .settings-field,
+  .renew-button,
+  .cancel-button {
+    width: 100%;
+  }
+
+  .settings-field {
+    margin-left: 0;
+  }
+
+  .settings-card,
+  .subscription-card {
+    padding: 24px;
+  }
+
+  .subscription-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,93 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessageKey | translate"
+    type="success">
+  </app-toast>
+
+  <section class="caregiver-settings-page">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ 'caregiver.settings.title' | translate }}</h1>
+        <p>{{ 'caregiver.settings.subtitle' | translate }}</p>
+      </div>
+
+      <button class="save-button" type="button" (click)="saveSettings()">
+        {{ 'caregiver.settings.save' | translate }}
+      </button>
+    </div>
+
+    <section class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-icon">
+          <i class="bi bi-globe2"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'caregiver.settings.language.title' | translate }}</h2>
+          <p>{{ 'caregiver.settings.language.description' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="settings-field">
+        <label>{{ 'caregiver.settings.language.label' | translate }}</label>
+
+        <app-custom-select
+          [options]="languageOptions"
+          [value]="language"
+          (valueChange)="changeLanguage($event)"
+          [placeholder]="'caregiver.settings.language.placeholder' | translate">
+        </app-custom-select>
+      </div>
+    </section>
+
+    <section class="subscription-card">
+      <div class="subscription-main">
+        <div class="subscription-icon">
+          <i class="bi bi-gem"></i>
+        </div>
+
+        <div>
+          <h2>{{ subscription.name }}</h2>
+          <p>
+            {{ 'caregiver.settings.subscription.renewsOn' | translate }}
+            {{ formatRenewalDate(subscription.renewsOn) }}
+            -
+            {{ subscription.priceLabel }}
+          </p>
+        </div>
+      </div>
+
+      <span class="active-pill">
+        {{ getStatusLabelKey() | translate }}
+      </span>
+
+      <div class="plan-box">
+        <span>{{ 'caregiver.settings.subscription.plan' | translate }}</span>
+        <strong>{{ subscription.planLabel }}</strong>
+      </div>
+
+      <div class="subscription-actions">
+        <button class="renew-button" type="button" (click)="renewSubscription()">
+          <i class="bi bi-arrow-repeat"></i>
+          {{ 'caregiver.settings.subscription.renew' | translate }}
+        </button>
+
+        <button class="cancel-button" type="button" (click)="cancelSubscription()">
+          <i class="bi bi-x-circle"></i>
+          {{ 'caregiver.settings.subscription.cancel' | translate }}
+        </button>
+      </div>
+    </section>
+
+  </section>
+</app-dashboard-layout>
