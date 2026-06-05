@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthLayout } from '../../components/auth-layout/auth-layout';
-import { LanguageService } from '../../../../core/i18n/language.service';
+import { AppLanguage, LanguageService } from '../../../../core/i18n/language.service';
 
 @Component({
   selector: 'app-welcome',
@@ -19,6 +19,10 @@ export class Welcome {
 
   goToLogin(role: string) {
     this.router.navigate([`/login/${role}`]);
+  }
+
+  get currentLanguage(): AppLanguage {
+    return this.languageService.currentLanguage;
   }
 
   toggleLanguage() {

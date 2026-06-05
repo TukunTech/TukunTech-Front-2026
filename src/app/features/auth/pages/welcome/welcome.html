@@ -77,11 +77,19 @@
 
         <span class="role-arrow">→</span>
       </button>
-      <button class="language-button" (click)="toggleLanguage()">
-        {{ 'welcome.languageButton' | translate }}
-      </button>
-
     </div>
+
+    <button
+      class="language-toggle"
+      type="button"
+      [class.language-toggle--es]="currentLanguage === 'es'"
+      (click)="toggleLanguage()"
+    >
+      <span class="language-toggle__thumb"></span>
+      <span class="language-toggle__option">EN</span>
+      <span class="language-toggle__option">ES</span>
+      <i class="bi bi-translate"></i>
+    </button>
 
 
   </div>
