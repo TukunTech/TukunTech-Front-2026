@@ -1,0 +1,139 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <section class="caregiver-device-page">
+    <div class="page-header">
+      <h1>{{ 'caregiver.device.title' | translate }}</h1>
+      <p>{{ 'caregiver.device.subtitle' | translate }}</p>
+    </div>
+
+    <section
+      class="offline-alert"
+      *ngIf="hasOfflineDevices"
+    >
+      <i class="bi bi-exclamation-triangle"></i>
+
+      <div>
+        <h2>{{ 'caregiver.device.offlineAlertTitle' | translate }}</h2>
+        <p>
+          {{ 'caregiver.device.offlineAlertMessage' | translate:{ patients: getOfflinePatientNames() } }}
+        </p>
+      </div>
+    </section>
+
+    <section class="devices-list">
+      <article
+        class="device-card"
+        *ngFor="let device of devices"
+        [ngClass]="getDeviceCardClass(device)"
+      >
+        <div class="device-top">
+          <div class="device-info">
+            <div class="device-icon">
+              <i class="bi bi-cpu"></i>
+            </div>
+
+            <div>
+              <span class="device-label">
+                {{ device.label }}
+              </span>
+
+              <h2>{{ device.serialNumber }}</h2>
+
+              <p>{{ 'caregiver.device.version' | translate }} {{ device.firmwareVersion }}</p>
+            </div>
+          </div>
+
+          <div class="device-person-status">
+            <div class="patient-pill">
+              <span>{{ device.patient.initials }}</span>
+              {{ device.patient.fullName }}
+            </div>
+
+            <div
+              class="status-badge"
+              [ngClass]="getStatusBadgeClass(device)"
+            >
+              <span class="status-dot"></span>
+              {{ getConnectionStatusLabelKey(device.connectionStatus) | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="device-stats">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>{{ 'caregiver.device.battery' | translate }}</span>
+              <i class="bi bi-battery-half" [ngClass]="getBatteryLevelClass(device)"></i>
+            </div>
+
+            <h3 [ngClass]="getBatteryLevelClass(device)">
+              {{ getBatteryLabel(device) }}
+            </h3>
+
+            <div
+              class="progress-bar"
+              [class.progress-bar--muted]="isOffline(device)"
+            >
+              <div
+                class="progress-fill"
+                [ngClass]="getBatteryLevelClass(device)"
+                [style.width.%]="getBatteryProgressWidth(device)"
+              ></div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>{{ 'caregiver.device.wifi' | translate }}</span>
+              <i class="bi bi-wifi" [ngClass]="getWifiLevelClass(device)"></i>
+            </div>
+
+            <h3 [ngClass]="getWifiLevelClass(device)">
+              {{ getWifiSignalLabelKey(device) | translate }}
+            </h3>
+
+            <div
+              class="progress-bar"
+              [class.progress-bar--muted]="isOffline(device)"
+            >
+              <div
+                class="progress-fill"
+                [ngClass]="getWifiLevelClass(device)"
+                [style.width.%]="getWifiProgressWidth(device)"
+              ></div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>{{ 'caregiver.device.sync' | translate }}</span>
+              <i class="bi bi-check2-circle" [ngClass]="getSyncLevelClass(device)"></i>
+            </div>
+
+            <h3 [ngClass]="getSyncLevelClass(device)">
+              {{ getSyncStatusLabelKey(device) | translate }}
+            </h3>
+
+            <div
+              class="progress-bar"
+              [class.progress-bar--muted]="isOffline(device)"
+            >
+              <div
+                class="progress-fill"
+                [ngClass]="getSyncLevelClass(device)"
+                [style.width.%]="getSyncProgressWidth(device)"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </section>
+</app-dashboard-layout>
