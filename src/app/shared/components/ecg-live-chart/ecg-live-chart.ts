@@ -20,6 +20,7 @@ export class EcgLiveChart implements AfterViewInit, OnChanges, OnDestroy {
   @Input() active = true;
   @Input() heartRate = 74;
   @Input() inactiveMessage = '';
+  @Input() height = 170;
 
   @ViewChild('ecgCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -40,7 +41,15 @@ export class EcgLiveChart implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this.viewReady || (!changes['active'] && !changes['heartRate'])) {
+    if (
+      !this.viewReady ||
+      (!changes['active'] && !changes['heartRate'] && !changes['height'])
+    ) {
+      return;
+    }
+
+    if (changes['height']) {
+      this.resizeCanvas();
       return;
     }
 
@@ -61,10 +70,10 @@ export class EcgLiveChart implements AfterViewInit, OnChanges, OnDestroy {
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = parent.clientWidth * dpr;
-    canvas.height = 170 * dpr;
+    canvas.height = this.height * dpr;
 
     canvas.style.width = `${parent.clientWidth}px`;
-    canvas.style.height = '170px';
+    canvas.style.height = `${this.height}px`;
 
     const ctx = canvas.getContext('2d');
     if (ctx) {

@@ -23,6 +23,10 @@ export class Login {
   ) {
     const currentRole = this.route.snapshot.paramMap.get('role');
 
+    if (currentRole === 'carebridge') {
+      this.role = 'caregiver';
+    }
+
     if (currentRole === 'caregiver' || currentRole === 'admin' || currentRole === 'patient') {
       this.role = currentRole;
     }
@@ -37,7 +41,7 @@ export class Login {
     }
 
     if (this.role === 'caregiver') {
-      this.router.navigate(['/caregiver']);
+      this.router.navigate(['/caregiver/vital-signs']);
       return;
     }
 

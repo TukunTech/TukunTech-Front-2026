@@ -1,4 +1,8 @@
-<div class="ecg-chart" [class.ecg-chart--inactive]="!isChartActive">
+<div
+  class="ecg-chart"
+  [class.ecg-chart--inactive]="!isChartActive"
+  [style.height.px]="height"
+>
   <canvas #ecgCanvas></canvas>
 
   <div class="ecg-offline-overlay" *ngIf="!isChartActive">
