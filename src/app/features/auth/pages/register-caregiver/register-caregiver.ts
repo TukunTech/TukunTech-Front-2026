@@ -95,6 +95,10 @@ export class RegisterCaregiver {
     this.router.navigate(['/register']);
   }
 
+  goToDashboard() {
+    this.router.navigate(['/caregiver/vital-signs']);
+  }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
