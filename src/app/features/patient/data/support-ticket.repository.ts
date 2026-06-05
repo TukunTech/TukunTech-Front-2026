@@ -30,6 +30,26 @@ export class SupportTicketRepository {
       description: 'The history page did not update immediately.',
       createdAt: '2026-03-24T12:30:00.000Z',
       status: 'outstanding'
+    },
+    {
+      id: 'ticket-caregiver-demo-1',
+      userId: 'caregiver-demo-user',
+      userEmail: 'demo.caregiver@tukuntech.app',
+      requesterRole: 'caregiver',
+      subject: 'Patient device offline',
+      description: 'Robert Silva device appears offline in the dashboard.',
+      createdAt: '2026-03-24T10:00:00.000Z',
+      status: 'outstanding'
+    },
+    {
+      id: 'ticket-caregiver-demo-2',
+      userId: 'caregiver-demo-user',
+      userEmail: 'demo.caregiver@tukuntech.app',
+      requesterRole: 'caregiver',
+      subject: 'Report download question',
+      description: 'Need help downloading a weekly report.',
+      createdAt: '2026-03-24T12:30:00.000Z',
+      status: 'done'
     }
   ];
 
