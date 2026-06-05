@@ -1,0 +1,126 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <section class="caregiver-history-page">
+
+    <div class="page-header">
+      <h1>{{ 'caregiver.history.title' | translate }}</h1>
+      <p>{{ 'caregiver.history.subtitle' | translate }}</p>
+    </div>
+
+    <section class="report-card">
+      <div class="report-left">
+        <i class="bi bi-file-earmark-arrow-down"></i>
+
+        <div>
+          <h2>{{ 'caregiver.history.generateReport' | translate }}</h2>
+          <p>{{ 'caregiver.history.exportSummary' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="report-actions">
+        <div class="report-field">
+          <label>{{ 'caregiver.history.patient' | translate }}</label>
+          <app-custom-select
+            [options]="patientOptions"
+            [value]="selectedReportPatientId"
+            (valueChange)="changeReportPatient($event)"
+            [placeholder]="'caregiver.history.patientPlaceholder' | translate">
+          </app-custom-select>
+        </div>
+
+        <div class="report-field">
+          <label>{{ 'caregiver.history.period' | translate }}</label>
+          <app-custom-select
+            [options]="periodOptions"
+            [value]="selectedPeriod"
+            (valueChange)="changePeriod($event)"
+            [placeholder]="'caregiver.history.periodPlaceholder' | translate">
+          </app-custom-select>
+        </div>
+
+        <button class="generate-button" type="button" (click)="generateReport()">
+          <i class="bi bi-download"></i>
+          {{ 'caregiver.history.generateButton' | translate }}
+        </button>
+      </div>
+    </section>
+
+    <div class="patient-tabs">
+      <button
+        class="patient-chip"
+        type="button"
+        *ngFor="let patient of patients"
+        [ngClass]="getPatientChipClass(patient)"
+        (click)="selectPatient(patient)"
+      >
+        <span>{{ patient.initials }}</span>
+        {{ patient.fullName }}
+      </button>
+    </div>
+
+    <section class="history-card">
+      <div class="history-card-header">
+        <div class="history-icon">
+          <i class="bi bi-activity"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'caregiver.history.tableTitle' | translate }}</h2>
+          <p *ngIf="selectedPatient">{{ selectedPatient.fullName }}</p>
+        </div>
+      </div>
+
+      <div class="history-table">
+        <div class="history-table-head">
+          <span>{{ 'caregiver.history.date' | translate }}</span>
+          <span><i class="bi bi-heart"></i> {{ 'caregiver.history.heartRate' | translate }}</span>
+          <span><i class="bi bi-wind"></i> {{ 'caregiver.history.oxygen' | translate }}</span>
+          <span><i class="bi bi-thermometer-half"></i> {{ 'caregiver.history.temperature' | translate }}</span>
+          <span>{{ 'caregiver.history.status' | translate }}</span>
+        </div>
+
+        <div
+          class="history-row"
+          *ngFor="let item of history"
+          [ngClass]="getRowClass(item)"
+        >
+          <span>{{ formatDate(item.recordedAt) }}</span>
+          <span>{{ formatHeartRate(item) }}</span>
+          <span>{{ formatOxygen(item) }}</span>
+          <span>{{ formatTemperature(item) }}</span>
+
+          <span class="history-status">
+            <ng-container *ngIf="item.alerts.length; else normalStatus">
+              <span
+                class="alert-pill"
+                *ngFor="let alert of item.alerts"
+                [ngClass]="getAlertPillClass(alert)"
+              >
+                {{ alert.titleKey | translate }}
+              </span>
+            </ng-container>
+
+            <ng-template #normalStatus>
+              <span class="status-normal">
+                {{ getSeverityLabelKey(item) | translate }}
+              </span>
+            </ng-template>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-banner">
+      <i class="bi bi-check2-circle"></i>
+      <p>{{ 'caregiver.history.info' | translate }}</p>
+    </section>
+
+  </section>
+</app-dashboard-layout>

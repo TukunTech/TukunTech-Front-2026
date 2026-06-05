@@ -1,0 +1,398 @@
+.caregiver-history-page {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding-top: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+
+  color: #10232b;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.page-header p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 15px;
+}
+
+.report-card {
+  min-height: 84px;
+  padding: 18px 28px;
+
+  border-radius: 28px;
+  background: #d4f3ed;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.report-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.report-left > i {
+  color: #0b5f57;
+  font-size: 32px;
+}
+
+.report-left h2 {
+  margin: 0 0 2px;
+
+  color: #10232b;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.report-left p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 14px;
+}
+
+.report-actions {
+  display: grid;
+  grid-template-columns: 190px 170px auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.report-field label {
+  display: block;
+  margin-bottom: 4px;
+
+  color: #667985;
+  font-size: 14px;
+}
+
+.report-field ::ng-deep .custom-select {
+  margin-bottom: 0;
+}
+
+.report-field ::ng-deep .custom-select__control {
+  height: 40px;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.generate-button {
+  height: 40px;
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #3fa292;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(63, 162, 146, 0.22);
+  transition: 0.2s ease;
+}
+
+.generate-button:hover {
+  background: #379484;
+  transform: translateY(-1px);
+}
+
+.patient-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.patient-chip {
+  min-height: 48px;
+  padding: 8px 16px;
+
+  border: 1px solid #e1e9e7;
+  border-radius: 999px;
+
+  background: white;
+  color: #667985;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.patient-chip:hover  {
+  transform: translateY(-2px);
+  border: 1.5px solid #3fa292;
+}
+
+.patient-chip span {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 999px;
+
+  background: #3fa292;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.patient-chip--selected {
+  border-color: #0b5f57;
+  background: #dff5ef;
+  color: #10232b;
+}
+
+.history-card {
+  padding: 34px 38px;
+
+  border-radius: 34px;
+  border: 1px solid #dbe6e5;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 1px rgba(219, 230, 229, 0.3),
+    0 10px 28px rgba(15, 23, 42, 0.03);
+}
+
+.history-card-header {
+  margin-bottom: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.history-icon {
+  width: 54px;
+  height: 54px;
+
+  border-radius: 999px;
+  background: #edf4f3;
+  color: #0b5f57;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 27px;
+}
+
+.history-card-header h2 {
+  margin: 0 0 2px;
+
+  color: #10232b;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.history-card-header p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 14px;
+}
+
+.history-table {
+  width: 100%;
+}
+
+.history-table-head,
+.history-row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.35fr 1.35fr 1.35fr 1.4fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.history-table-head {
+  padding: 0 22px 14px;
+
+  color: #667985;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.history-table-head span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-table-head i:first-child,
+.history-row i:first-child {
+  color: #6aa826;
+}
+
+.history-table-head span:nth-child(3) i {
+  color: #2f8cff;
+}
+
+.history-table-head span:nth-child(4) i {
+  color: #f2a100;
+}
+
+.history-row {
+  min-height: 58px;
+  padding: 10px 22px;
+
+  border-top: 1px solid #e7efed;
+
+  color: #10232b;
+  font-size: 15px;
+}
+
+.history-row--notice {
+  margin-top: 8px;
+  border-top: none;
+  border-radius: 24px;
+  background: #eaf6ff;
+}
+
+.history-row--critical {
+  margin-top: 8px;
+  border-top: none;
+  border-radius: 24px;
+  background: #fff1f1;
+}
+
+.history-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alert-pill,
+.status-normal {
+  min-height: 28px;
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.alert-pill--notice {
+  background: rgba(96, 165, 250, 0.18);
+  color: #2563eb;
+}
+
+.alert-pill--critical {
+  background: rgba(255, 98, 104, 0.18);
+  color: #c92a2a;
+}
+
+.status-normal {
+  background: rgba(76, 190, 133, 0.16);
+  color: #3fa292;
+}
+
+.info-banner {
+  min-height: 70px;
+  padding: 16px 28px;
+
+  border-radius: 28px;
+  background: #e8f7ff;
+  color: #667985;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.info-banner i {
+  color: #5eb3ff;
+  font-size: 30px;
+}
+
+.info-banner p {
+  margin: 0;
+  font-size: 15px;
+}
+
+@media (max-width: 1100px) {
+  .report-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .report-actions {
+    width: 100%;
+    grid-template-columns: 1fr 1fr auto;
+  }
+
+  .patient-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .history-table {
+    overflow-x: auto;
+  }
+
+  .history-table-head,
+  .history-row {
+    min-width: 980px;
+  }
+}
+
+@media (max-width: 768px) {
+  .caregiver-history-page {
+    padding-top: 0;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .report-actions,
+  .patient-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .generate-button {
+    width: 100%;
+  }
+
+  .history-card {
+    padding: 24px;
+  }
+}
