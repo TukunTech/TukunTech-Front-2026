@@ -73,7 +73,17 @@ export class Device {
   }
 
   getWifiSignalLabelKey(signalLevel: PatientDeviceSignalLevel): string {
+    if (this.deviceDisconnected) {
+      return 'patient.device.offline';
+    }
+
     return `patient.device.${signalLevel}`;
+  }
+
+  getBatteryLabel(): string {
+    return this.deviceDisconnected
+      ? '-'
+      : `${this.device.batteryPercent}%`;
   }
 
   getSyncStatusLabelKey(syncStatus: PatientDeviceSyncStatus): string {
@@ -89,6 +99,10 @@ export class Device {
   }
 
   getBatteryLevelClass(): string {
+    if (this.deviceDisconnected) {
+      return 'stat-level--muted';
+    }
+
     if (this.device.batteryPercent <= 30) {
       return 'stat-level--danger';
     }
@@ -98,6 +112,24 @@ export class Device {
     }
 
     return 'stat-level--success';
+  }
+
+  getWifiLevelClass(): string {
+    return this.deviceDisconnected
+      ? 'stat-level--muted'
+      : 'stat-level--success';
+  }
+
+  getBatteryProgressWidth(): number {
+    return this.deviceDisconnected
+      ? 100
+      : this.getProgressWidth(this.device.batteryPercent);
+  }
+
+  getWifiProgressWidth(): number {
+    return this.deviceDisconnected
+      ? 100
+      : this.getProgressWidth(this.device.wifiSignalPercent);
   }
 
   getSyncLevelClass(): string {

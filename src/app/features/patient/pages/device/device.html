@@ -53,16 +53,19 @@
         <div class="stat-card">
           <div class="stat-header">
             <span>{{ 'patient.device.battery' | translate }}</span>
-            <i class="bi bi-battery-half"></i>
+            <i class="bi bi-battery-half" [ngClass]="getBatteryLevelClass()"></i>
           </div>
 
-          <h3 [ngClass]="getBatteryLevelClass()">{{ device.batteryPercent }}%</h3>
+          <h3 [ngClass]="getBatteryLevelClass()">{{ getBatteryLabel() }}</h3>
 
-          <div class="progress-bar">
+          <div
+            class="progress-bar"
+            [class.progress-bar--muted]="deviceDisconnected"
+          >
             <div
               class="progress-fill"
               [ngClass]="getBatteryLevelClass()"
-              [style.width.%]="getProgressWidth(device.batteryPercent)"
+              [style.width.%]="getBatteryProgressWidth()"
             ></div>
           </div>
         </div>
@@ -70,15 +73,21 @@
         <div class="stat-card">
           <div class="stat-header">
             <span>{{ 'patient.device.wifi' | translate }}</span>
-            <i class="bi bi-wifi"></i>
+            <i class="bi bi-wifi" [ngClass]="getWifiLevelClass()"></i>
           </div>
 
-          <h3>{{ getWifiSignalLabelKey(device.wifiSignalLevel) | translate }}</h3>
+          <h3 [ngClass]="getWifiLevelClass()">
+            {{ getWifiSignalLabelKey(device.wifiSignalLevel) | translate }}
+          </h3>
 
-          <div class="progress-bar">
+          <div
+            class="progress-bar"
+            [class.progress-bar--muted]="deviceDisconnected"
+          >
             <div
               class="progress-fill"
-              [style.width.%]="getProgressWidth(device.wifiSignalPercent)"
+              [ngClass]="getWifiLevelClass()"
+              [style.width.%]="getWifiProgressWidth()"
             ></div>
           </div>
         </div>

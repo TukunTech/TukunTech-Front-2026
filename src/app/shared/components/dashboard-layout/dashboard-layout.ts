@@ -29,6 +29,7 @@ export class DashboardLayout {
   @Input() urgentAlertShow = false;
   @Input() urgentAlertTitleKey = '';
   @Input() urgentAlertMessageKey = '';
+  @Input() urgentAlertMessageParams: Record<string, string> = {};
 
   sidebarOpen = false;
 

@@ -204,6 +204,22 @@
   color: #7b8790;
 }
 
+.stat-header i.stat-level--muted {
+  color: #7b8790;
+}
+
+.stat-header i.stat-level--danger {
+  color: #c92a2a;
+}
+
+.stat-header i.stat-level--warning {
+  color: #b77900;
+}
+
+.stat-header i.stat-level--success {
+  color: #0b5f57;
+}
+
 .progress-bar {
   width: 100%;
   height: 12px;
