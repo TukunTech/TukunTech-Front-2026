@@ -1,0 +1,151 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.caregiver' | translate"
+  [email]="email"
+  [urgentAlertShow]="urgentAlertShow"
+  [urgentAlertTitleKey]="urgentAlertTitleKey"
+  [urgentAlertMessageKey]="urgentAlertMessageKey"
+  [urgentAlertMessageParams]="urgentAlertMessageParams"
+>
+  <section class="caregiver-vitals-page">
+    <header class="page-header">
+      <div>
+        <h1>{{ 'caregiver.vitalSigns.title' | translate }}</h1>
+        <p>{{ 'caregiver.vitalSigns.subtitle' | translate }}</p>
+      </div>
+    </header>
+
+    <section class="selected-vitals-grid" *ngIf="selectedPatient">
+      <article
+        class="selected-vital-card selected-vital-card--heart"
+        [class.selected-vital-card--offline]="selectedPatientOffline"
+      >
+        <div>
+          <p>{{ 'caregiver.vitalSigns.heartRate' | translate }}</p>
+          <h2>{{ selectedHeartRate }}</h2>
+          <span>{{ selectedHeartStatusKey | translate }}</span>
+        </div>
+        <i class="bi bi-heart"></i>
+      </article>
+
+      <article
+        class="selected-vital-card selected-vital-card--oxygen"
+        [class.selected-vital-card--offline]="selectedPatientOffline"
+      >
+        <div>
+          <p>{{ 'caregiver.vitalSigns.oxygen' | translate }}</p>
+          <h2>{{ selectedOxygen }}</h2>
+          <span>{{ selectedOxygenStatusKey | translate }}</span>
+        </div>
+        <i class="bi bi-wind"></i>
+      </article>
+
+      <article
+        class="selected-vital-card selected-vital-card--temperature"
+        [class.selected-vital-card--offline]="selectedPatientOffline"
+      >
+        <div>
+          <p>{{ 'caregiver.vitalSigns.temperature' | translate }}</p>
+          <h2>{{ selectedTemperature }}</h2>
+          <span>{{ selectedTemperatureStatusKey | translate }}</span>
+        </div>
+        <i class="bi bi-thermometer-half"></i>
+      </article>
+    </section>
+
+    <section class="caregiver-alerts" *ngIf="hasCaregiverAlerts">
+      <article
+        class="caregiver-alert"
+        *ngFor="let item of caregiverAlerts"
+        [ngClass]="getAlertRowClass(item.alert)"
+      >
+        <i class="bi" [ngClass]="getAlertIcon(item.alert)"></i>
+
+        <div class="caregiver-alert-body">
+          <div class="caregiver-alert-heading">
+            <h2>{{ item.patient.fullName }}</h2>
+            <span>{{ getAlertTitleKey(item.alert) | translate }}</span>
+          </div>
+
+          <p>{{ getAlertMessageKey(item.alert) | translate }}</p>
+        </div>
+
+        <strong *ngIf="item.alert">{{ getAlertValue(item.alert) }}</strong>
+      </article>
+    </section>
+
+    <section class="patients-grid">
+      <button
+        class="patient-card"
+        type="button"
+        *ngFor="let patient of patients"
+        [ngClass]="getPatientCardClass(patient)"
+        (click)="selectPatient(patient)"
+      >
+        <div class="patient-card-top">
+          <div class="patient-identity">
+            <div class="patient-avatar">
+              {{ patient.initials }}
+            </div>
+
+            <div>
+              <span>{{ patient.age }} {{ 'caregiver.vitalSigns.years' | translate }}</span>
+              <h2>{{ patient.fullName }}</h2>
+            </div>
+          </div>
+
+          <div
+            class="status-badge"
+            [ngClass]="getPatientBadgeClass(patient)"
+          >
+            <span></span>
+            {{ getPatientBadgeLabel(patient) }}
+          </div>
+        </div>
+
+        <div class="patient-vitals-row">
+          <div>
+            <span><i class="bi bi-heart"></i> {{ 'caregiver.vitalSigns.heart' | translate }}</span>
+            <strong>{{ getPatientHeartRate(patient) }}</strong>
+          </div>
+
+          <div>
+            <span><i class="bi bi-wind"></i> {{ 'caregiver.vitalSigns.oxygen' | translate }}</span>
+            <strong>{{ getPatientOxygen(patient) }}</strong>
+          </div>
+
+          <div>
+            <span><i class="bi bi-thermometer-half"></i> {{ 'caregiver.vitalSigns.temperature' | translate }}</span>
+            <strong>{{ getPatientTemperature(patient) }}</strong>
+          </div>
+        </div>
+
+        <div class="patient-ecg-wrap">
+
+
+          <app-ecg-live-chart
+            [active]="patient.device.connectionStatus === 'online'"
+            [heartRate]="getPatientHeartRateForEcg(patient)"
+            [height]="86"
+            [inactiveMessage]="getPatientEcgMessageKey(patient) | translate">
+          </app-ecg-live-chart>
+        </div>
+
+        <div class="patient-device-row">
+          <span>{{ 'caregiver.vitalSigns.device' | translate }}</span>
+          <strong>{{ patient.device.id }}</strong>
+
+          <div class="device-metric" [ngClass]="getBatteryClass(patient)">
+            <i class="bi bi-battery-half"></i>
+            {{ patient.device.battery }}%
+          </div>
+
+          <div class="device-metric">
+            <i class="bi bi-wifi"></i>
+            {{ getWifiLabelKey(patient) | translate }}
+          </div>
+        </div>
+      </button>
+    </section>
+  </section>
+</app-dashboard-layout>
