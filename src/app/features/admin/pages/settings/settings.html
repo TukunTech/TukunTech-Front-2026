@@ -1,0 +1,53 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="'admin.settings.savedSuccessfully' | translate"
+    type="success">
+  </app-toast>
+
+  <section class="admin-settings-page">
+
+    <header class="page-header">
+      <div>
+        <h1>{{ 'admin.settings.title' | translate }}</h1>
+        <p>{{ 'admin.settings.subtitle' | translate }}</p>
+      </div>
+
+      <button class="save-button" type="button" (click)="saveSettings()">
+        {{ 'admin.settings.save' | translate }}
+      </button>
+    </header>
+
+    <section class="settings-card">
+
+      <div class="settings-card-header">
+        <div class="settings-icon">
+          <i class="bi bi-globe2"></i>
+        </div>
+
+        <div>
+          <h2>{{ 'admin.settings.language.title' | translate }}</h2>
+          <p>{{ 'admin.settings.language.description' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="settings-field">
+        <label>{{ 'admin.settings.language.label' | translate }}</label>
+
+        <app-custom-select
+          [options]="languageOptions"
+          [value]="language"
+          (valueChange)="changeLanguage($event)"
+          [placeholder]="'admin.settings.language.placeholder' | translate">
+        </app-custom-select>
+      </div>
+
+    </section>
+
+  </section>
+</app-dashboard-layout>
