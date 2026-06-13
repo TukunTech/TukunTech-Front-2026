@@ -1,0 +1,65 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <section class="admin-analytics-page">
+
+    <header class="page-header">
+      <div>
+        <h1>{{ 'admin.analytics.title' | translate }}</h1>
+        <p>{{ 'admin.analytics.subtitle' | translate }}</p>
+      </div>
+
+      <div class="month-filter">
+        <label>{{ 'admin.common.month' | translate }}</label>
+        <app-custom-select
+          [options]="monthOptions"
+          [value]="selectedMonth"
+          (valueChange)="changeMonth($event)"
+          [placeholder]="'admin.common.monthPlaceholder' | translate">
+        </app-custom-select>
+      </div>
+    </header>
+
+    <section class="metrics-grid">
+      <article
+        class="metric-card"
+        *ngFor="let metric of metrics"
+        [ngClass]="getMetricClass(metric)"
+      >
+        <span>{{ metric.labelKey | translate }}</span>
+        <strong>{{ metric.value }}</strong>
+      </article>
+    </section>
+
+    <section class="chart-card">
+      <h2>{{ 'admin.analytics.chartTitle' | translate }}</h2>
+
+      <div class="chart-shell">
+        <div class="y-axis">
+          <span>1400</span>
+          <span>1050</span>
+          <span>700</span>
+          <span>350</span>
+          <span>0</span>
+        </div>
+
+        <div class="bar-chart">
+          <div class="bar-column" *ngFor="let item of usersChart">
+            <div class="bar-track">
+              <span
+                class="bar"
+                [style.height]="getBarHeight(item.value)"
+                [title]="item.value">
+              </span>
+            </div>
+            <small>{{ item.label }}</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </section>
+</app-dashboard-layout>
