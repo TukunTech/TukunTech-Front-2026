@@ -5,6 +5,8 @@ export type VitalAlertType =
   | 'heartRateHigh'
   | 'oxygenLow'
   | 'oxygenCritical'
+  | 'temperatureLow'
+  | 'temperatureCriticalLow'
   | 'temperatureFever'
   | 'temperatureHighFever';
 
@@ -99,6 +101,14 @@ function evaluateTemperature(
   temperature: number,
   threshold: VitalRangeThreshold
 ): PatientVitalAlert[] {
+  if (threshold.criticalLow !== undefined && temperature <= threshold.criticalLow) {
+    return [createAlert('temperatureCriticalLow', 'critical', temperature)];
+  }
+
+  if (threshold.noticeLow !== undefined && temperature <= threshold.noticeLow) {
+    return [createAlert('temperatureLow', 'notice', temperature)];
+  }
+
   if (threshold.criticalHigh !== undefined && temperature >= threshold.criticalHigh) {
     return [createAlert('temperatureHighFever', 'critical', temperature)];
   }

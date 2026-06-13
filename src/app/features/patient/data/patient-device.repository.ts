@@ -14,10 +14,10 @@ export class PatientDeviceRepository {
     serialNumber: 'CB-9F32-01',
     firmwareVersion: '1.0.5',
     connectionStatus: 'online',
-    batteryPercent: 45,
+    batteryPercent: 90,
     wifiSignalPercent: 77,
     wifiSignalLevel: 'strong',
-    syncPercent: 95,
+    syncPercent: 44,
     syncStatus: 'good',
     lastSyncedAt: '2026-06-04T09:00:00.000Z'
   };

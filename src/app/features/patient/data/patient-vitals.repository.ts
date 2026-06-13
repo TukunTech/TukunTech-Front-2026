@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import {
+  DeviceAlertParameters,
+  DeviceAlertParametersStore
+} from '../../../core/device-parameters/device-alert-parameters.store';
+import {
   PatientVitalAlertSettings,
   PatientVitals,
   PatientVitalsPageData
@@ -19,25 +23,11 @@ export class PatientVitalsRepository {
     temperature: 37.7
   };
 
-  private alertSettings: PatientVitalAlertSettings = {
-    patientUserId: 'patient-demo-user',
-    heartRate: {
-      criticalLow: 50,
-      noticeLow: 60,
-      noticeHigh: 100,
-      criticalHigh: 120
-    },
-    oxygen: {
-      noticeLow: 95,
-      criticalLow: 90
-    },
-    temperature: {
-      noticeHigh: 38,
-      criticalHigh: 39
-    }
-  };
+  constructor(private parametersStore: DeviceAlertParametersStore) {}
 
   getVitalsPageData(userId: string): Observable<PatientVitalsPageData> {
+    const alertSettings = this.createAlertSettings(userId);
+
     return of({
       patientName: 'Eleanor Marsh',
       initials: 'EM',
@@ -47,28 +37,54 @@ export class PatientVitalsRepository {
         patientUserId: userId
       },
       alertSettings: {
-        ...this.alertSettings,
-        patientUserId: userId
+        ...alertSettings
       }
     });
   }
 
   getDefaultAlertSettings(userId: string): PatientVitalAlertSettings {
-    return {
-      ...this.alertSettings,
-      patientUserId: userId
-    };
+    return this.createAlertSettings(userId);
   }
 
   updateAlertSettings(
     userId: string,
     settings: PatientVitalAlertSettings
   ): Observable<PatientVitalAlertSettings> {
-    this.alertSettings = {
+    const nextSettings = {
       ...settings,
       patientUserId: userId
     };
 
-    return of({ ...this.alertSettings });
+    return of(nextSettings);
+  }
+
+  private createAlertSettings(userId: string): PatientVitalAlertSettings {
+    return this.mapParametersToAlertSettings(
+      this.parametersStore.getParameters(userId)
+    );
+  }
+
+  private mapParametersToAlertSettings(
+    parameters: DeviceAlertParameters
+  ): PatientVitalAlertSettings {
+    return {
+      patientUserId: parameters.patientUserId,
+      heartRate: {
+        noticeLow: parameters.heartRateMin,
+        criticalLow: Math.max(1, parameters.heartRateMin - 10),
+        noticeHigh: parameters.heartRateMax,
+        criticalHigh: parameters.heartRateMax + 20
+      },
+      oxygen: {
+        noticeLow: parameters.oxygenSaturation,
+        criticalLow: Math.max(1, parameters.oxygenSaturation - 5)
+      },
+      temperature: {
+        noticeLow: parameters.temperatureMin,
+        criticalLow: parameters.temperatureMin - 1,
+        noticeHigh: parameters.temperatureMax,
+        criticalHigh: parameters.temperatureMax + 1
+      }
+    };
   }
 }
