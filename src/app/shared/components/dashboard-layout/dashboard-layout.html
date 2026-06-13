@@ -23,7 +23,10 @@
 
   <aside
     class="sidebar"
-    [ngClass]="{ 'sidebar--open': sidebarOpen }"
+    [ngClass]="{
+      'sidebar--open': sidebarOpen,
+      'sidebar--admin': variant === 'admin'
+    }"
   >
 
     <div class="sidebar-top">

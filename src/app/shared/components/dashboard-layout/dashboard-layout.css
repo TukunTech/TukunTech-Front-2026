@@ -92,6 +92,21 @@
   font-weight: 600;
 }
 
+.sidebar--admin .menu-item.active {
+  background: #122125;
+  color: white;
+}
+
+.sidebar--admin .menu-item:hover {
+  background: rgba(18, 33, 37, 0.08);
+  border-color: rgba(18, 33, 37, 0.18);
+}
+
+.sidebar--admin .menu-item.active:hover {
+  background: #122125;
+  border-color: transparent;
+}
+
 .menu-icon {
   font-size: 20px;
   line-height: 1;

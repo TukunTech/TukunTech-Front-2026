@@ -30,6 +30,7 @@ export class DashboardLayout {
   @Input() urgentAlertTitleKey = '';
   @Input() urgentAlertMessageKey = '';
   @Input() urgentAlertMessageParams: Record<string, string> = {};
+  @Input() variant: 'default' | 'admin' = 'default';
 
   sidebarOpen = false;
 

@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import {
+  DeviceAlertParameters,
+  DeviceAlertParametersStore
+} from '../../../core/device-parameters/device-alert-parameters.store';
+import {
   CaregiverPatientSummary,
   CaregiverVitalAlertSettings,
   CaregiverVitalSignsDashboard
@@ -11,73 +15,11 @@ import {
   providedIn: 'root'
 })
 export class CaregiverVitalSignsRepository {
-  private patients: CaregiverPatientSummary[] = [
-    this.createPatient(
-      'patient-eleanor',
-      'Eleanor Marsh',
-      'EM',
-      82,
-      74,
-      98,
-      36.6,
-      'CB-8DF3-01',
-      86,
-      'strong',
-      'online'
-    ),
-    this.createPatient(
-      'patient-charls',
-      'Charls March',
-      'CM',
-      72,
-      99,
-      97,
-      36.7,
-      'CZ-K230-01',
-      45,
-      'strong',
-      'online'
-    ),
-    this.createPatient(
-      'patient-miguel',
-      'Miguel Montana',
-      'MM',
-      78,
-      92,
-      99,
-      37.2,
-      'CX-771A-04',
-      64,
-      'medium',
-      'online'
-    ),
-    this.createPatient(
-      'patient-marian',
-      'Marian Medilla',
-      'MM',
-      88,
-      76,
-      97,
-      36.8,
-      'CM-660E-12',
-      78,
-      'strong',
-      'online'
-    ),
-    this.createPatient(
-      'patient-robert',
-      'Robert Silva',
-      'RS',
-      69,
-      0,
-      0,
-      0,
-      'CR-520F-08',
-      22,
-      'weak',
-      'offline'
-    )
-  ];
+  private patients: CaregiverPatientSummary[] = [];
+
+  constructor(private parametersStore: DeviceAlertParametersStore) {
+    this.patients = this.createPatients();
+  }
 
   getDashboard(caregiverUserId: string): Observable<CaregiverVitalSignsDashboard> {
     return of({
@@ -181,35 +123,117 @@ export class CaregiverVitalSignsRepository {
     };
   }
 
+  private createPatients(): CaregiverPatientSummary[] {
+    return [
+      this.createPatient(
+        'patient-eleanor',
+        'Eleanor Marsh',
+        'EM',
+        82,
+        74,
+        90,
+        36.6,
+        'CB-8DF3-01',
+        86,
+        'strong',
+        'online'
+      ),
+      this.createPatient(
+        'patient-charls',
+        'Charls March',
+        'CM',
+        72,
+        99,
+        97,
+        36.7,
+        'CZ-K230-01',
+        45,
+        'strong',
+        'online'
+      ),
+      this.createPatient(
+        'patient-miguel',
+        'Miguel Montana',
+        'MM',
+        78,
+        92,
+        99,
+        37.2,
+        'CX-771A-04',
+        64,
+        'medium',
+        'online'
+      ),
+      this.createPatient(
+        'patient-marian',
+        'Marian Medilla',
+        'MM',
+        88,
+        76,
+        97,
+        36.8,
+        'CM-660E-12',
+        78,
+        'strong',
+        'online'
+      ),
+      this.createPatient(
+        'patient-robert',
+        'Robert Silva',
+        'RS',
+        69,
+        0,
+        0,
+        0,
+        'CR-520F-08',
+        22,
+        'weak',
+        'offline'
+      )
+    ];
+  }
+
   private createDefaultAlertSettings(patientUserId: string): CaregiverVitalAlertSettings {
+    const parameters = this.parametersStore.getParameters(patientUserId);
+
+    return this.mapParametersToAlertSettings(parameters);
+  }
+
+  private mapParametersToAlertSettings(
+    parameters: DeviceAlertParameters
+  ): CaregiverVitalAlertSettings {
     return {
-      patientUserId,
+      patientUserId: parameters.patientUserId,
       heartRate: {
-        criticalLow: 50,
-        noticeLow: 60,
-        noticeHigh: 100,
-        criticalHigh: 120
+        noticeLow: parameters.heartRateMin,
+        criticalLow: Math.max(1, parameters.heartRateMin - 10),
+        noticeHigh: parameters.heartRateMax,
+        criticalHigh: parameters.heartRateMax + 20
       },
       oxygen: {
-        noticeLow: 95,
-        criticalLow: 90
+        noticeLow: parameters.oxygenSaturation,
+        criticalLow: Math.max(1, parameters.oxygenSaturation - 5)
       },
       temperature: {
-        noticeHigh: 38,
-        criticalHigh: 39
+        noticeLow: parameters.temperatureMin,
+        criticalLow: parameters.temperatureMin - 1,
+        noticeHigh: parameters.temperatureMax,
+        criticalHigh: parameters.temperatureMax + 1
       }
     };
   }
 
   private clonePatient(patient: CaregiverPatientSummary): CaregiverPatientSummary {
+    const alertSettings = this.createDefaultAlertSettings(patient.userId);
+
     return {
       ...patient,
       vitals: { ...patient.vitals },
       alertSettings: {
-        ...patient.alertSettings,
-        heartRate: { ...patient.alertSettings.heartRate },
-        oxygen: { ...patient.alertSettings.oxygen },
-        temperature: { ...patient.alertSettings.temperature }
+        ...alertSettings,
+        heartRate: { ...alertSettings.heartRate },
+        oxygen: { ...alertSettings.oxygen },
+        temperature: { ...alertSettings.temperature }
       },
       device: { ...patient.device }
     };
