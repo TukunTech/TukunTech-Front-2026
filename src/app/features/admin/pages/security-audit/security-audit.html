@@ -1,0 +1,145 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessageKey | translate"
+    [type]="toastType">
+  </app-toast>
+
+  <section class="admin-security-page">
+
+    <header class="page-header">
+      <h1>{{ 'admin.securityAudit.title' | translate }}</h1>
+      <p>{{ 'admin.securityAudit.subtitle' | translate }}</p>
+    </header>
+
+    <section class="users-card">
+      <div class="table-toolbar">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            [placeholder]="'admin.securityAudit.searchPlaceholder' | translate"
+          />
+        </div>
+
+        <span>
+          {{ 'admin.securityAudit.total' | translate:{ total: filteredUsers.length } }}
+        </span>
+      </div>
+
+      <div class="users-table">
+        <div class="users-table-head">
+          <span>{{ 'admin.securityAudit.table.name' | translate }}</span>
+          <span>{{ 'admin.securityAudit.table.email' | translate }}</span>
+          <span>{{ 'admin.securityAudit.table.role' | translate }}</span>
+          <span>{{ 'admin.securityAudit.table.status' | translate }}</span>
+          <span>{{ 'admin.securityAudit.table.joined' | translate }}</span>
+          <span></span>
+        </div>
+
+        <div class="users-row" *ngFor="let user of filteredUsers">
+          <span>{{ user.fullName }}</span>
+          <span>{{ user.email }}</span>
+          <span>
+            <span class="role-pill" [ngClass]="getRoleClass(user.role)">
+              {{ getRoleLabelKey(user.role) | translate }}
+            </span>
+          </span>
+          <span>
+            <span class="status-pill" [ngClass]="getStatusClass(user.status)">
+              {{ getStatusLabelKey(user.status) | translate }}
+            </span>
+          </span>
+          <span class="joined-date">{{ user.joinedAt }}</span>
+          <span>
+            <button class="edit-button" type="button" (click)="openEditModal(user)">
+              <i class="bi bi-pencil-square"></i>
+              {{ 'admin.securityAudit.edit' | translate }}
+            </button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+  </section>
+
+  <div class="modal-backdrop" *ngIf="editModel">
+    <section class="edit-modal">
+      <button class="modal-close" type="button" (click)="closeEditModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <h2>{{ 'admin.securityAudit.modal.title' | translate }}</h2>
+      <p>{{ 'admin.securityAudit.modal.subtitle' | translate }}</p>
+
+      <div class="modal-grid">
+        <div>
+          <label>{{ 'admin.securityAudit.modal.fullName' | translate }}</label>
+          <input type="text" [(ngModel)]="editModel.fullName" />
+        </div>
+
+        <div>
+          <label>{{ 'admin.securityAudit.modal.email' | translate }}</label>
+          <input type="email" [(ngModel)]="editModel.email" />
+        </div>
+
+        <div>
+          <label>{{ 'admin.securityAudit.modal.phone' | translate }}</label>
+          <input
+            type="tel"
+            inputmode="numeric"
+            [ngModel]="editModel.phone"
+            (ngModelChange)="changePhone($event)"
+            placeholder="+51 999 999 999"
+          />
+        </div>
+
+        <div>
+          <label>{{ 'admin.securityAudit.modal.joined' | translate }}</label>
+          <input
+            class="readonly-input"
+            type="text"
+            [value]="editModel.joinedAt"
+            readonly
+          />
+        </div>
+
+        <div>
+          <label>{{ 'admin.securityAudit.modal.role' | translate }}</label>
+          <app-custom-select
+            [options]="roleOptions"
+            [value]="editModel.role"
+            (valueChange)="changeRole($event)"
+            [placeholder]="'admin.securityAudit.modal.role' | translate">
+          </app-custom-select>
+        </div>
+
+        <div>
+          <label>{{ 'admin.securityAudit.modal.status' | translate }}</label>
+          <app-custom-select
+            [options]="statusOptions"
+            [value]="editModel.status"
+            (valueChange)="changeStatus($event)"
+            [placeholder]="'admin.securityAudit.modal.status' | translate">
+          </app-custom-select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-button" type="button" (click)="closeEditModal()">
+          {{ 'admin.securityAudit.modal.cancel' | translate }}
+        </button>
+
+        <button class="save-changes-button" type="button" (click)="saveUser()">
+          {{ 'admin.securityAudit.modal.saveChanges' | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+</app-dashboard-layout>
