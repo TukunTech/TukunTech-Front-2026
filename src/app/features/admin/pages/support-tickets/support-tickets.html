@@ -1,0 +1,100 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessageKey | translate"
+    [type]="toastType">
+  </app-toast>
+
+  <section class="admin-support-page">
+
+    <header class="page-header">
+      <h1>{{ 'admin.supportTickets.title' | translate }}</h1>
+      <p>{{ 'admin.supportTickets.subtitle' | translate }}</p>
+    </header>
+
+    <section class="tickets-workspace">
+      <aside class="ticket-list-card">
+        <button
+          class="ticket-item"
+          type="button"
+          *ngFor="let ticket of tickets"
+          [ngClass]="{ 'ticket-item--active': ticket.id === selectedTicketId }"
+          (click)="selectTicket(ticket.id)"
+        >
+          <div>
+            <span class="ticket-code">{{ ticket.code }}</span>
+            <strong>{{ ticket.subject }}</strong>
+            <small>{{ ticket.requesterEmail }} - {{ ticket.createdAgo }}</small>
+          </div>
+
+          <span class="status-pill" [ngClass]="getStatusClass(ticket.status)">
+            {{ getStatusLabelKey(ticket.status) | translate }}
+          </span>
+        </button>
+      </aside>
+
+      <section class="conversation-card" *ngIf="selectedTicket as ticket">
+        <header class="conversation-header">
+          <div>
+            <span>{{ ticket.code }}</span>
+            <h2>{{ ticket.subject }}</h2>
+            <p>{{ ticket.requesterEmail }}</p>
+          </div>
+
+          <div class="conversation-icon">
+            <i class="bi bi-chat-dots"></i>
+          </div>
+        </header>
+
+        <div class="messages-area">
+          <div
+            class="message-bubble"
+            *ngFor="let message of ticket.messages"
+            [ngClass]="{ 'message-bubble--admin': message.fromAdmin }"
+          >
+            <small>{{ message.authorName }} - {{ message.createdAt }}</small>
+            <p>{{ message.message }}</p>
+          </div>
+        </div>
+
+        <footer class="reply-area">
+          <textarea
+            [(ngModel)]="replyMessage"
+            [placeholder]="'admin.supportTickets.replyPlaceholder' | translate">
+          </textarea>
+
+          <div class="reply-actions">
+            <button
+              class="done-button"
+              type="button"
+              *ngIf="ticket.status === 'pending'"
+              (click)="markDone()"
+            >
+              {{ 'admin.supportTickets.markDone' | translate }}
+            </button>
+
+            <button
+              class="pending-button"
+              type="button"
+              *ngIf="ticket.status === 'done'"
+              (click)="markPending()"
+            >
+              {{ 'admin.supportTickets.markPending' | translate }}
+            </button>
+
+            <button class="send-button" type="button" (click)="sendReply()">
+              <i class="bi bi-send"></i>
+              {{ 'admin.supportTickets.sendReply' | translate }}
+            </button>
+          </div>
+        </footer>
+      </section>
+    </section>
+
+  </section>
+</app-dashboard-layout>
