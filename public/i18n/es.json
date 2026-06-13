@@ -200,6 +200,16 @@
           "title": "Fiebre alta",
           "notice": "La temperatura cumple el umbral de fiebre configurado.",
           "critical": "La temperatura está críticamente alta."
+        },
+        "temperatureLow": {
+          "title": "Temperatura baja",
+          "notice": "La temperatura est? por debajo del rango configurado.",
+          "critical": "La temperatura est? cr?ticamente baja."
+        },
+        "temperatureCriticalLow": {
+          "title": "Temperatura cr?tica baja",
+          "notice": "La temperatura est? por debajo del rango configurado.",
+          "critical": "La temperatura est? cr?ticamente baja."
         }
       }
     },
@@ -337,6 +347,14 @@
       "profile": "Perfil",
       "support": "Soporte",
       "settings": "Configuración"
+    },
+    "admin": {
+      "securityAudit": "Seguridad y auditoría",
+      "devices": "Dispositivos",
+      "subscriptions": "Suscripciones",
+      "supportTickets": "Tickets de soporte",
+      "analytics": "Analítica",
+      "settings": "Configuración"
     }
   },
   "settings": {
@@ -353,8 +371,8 @@
   },
   "caregiver": {
     "globalAlert": {
-      "title": "Alerta cr\u00edtica de paciente",
-      "message": "Urgente: {{patients}} requiere atenci\u00f3n inmediata."
+      "title": "Alerta crítica de paciente",
+      "message": "Urgente: {{patients}} requiere atención inmediata."
     },
     "vitalSigns": {
       "title": "Signos vitales",
@@ -417,6 +435,16 @@
           "title": "Fiebre alta",
           "notice": "La temperatura cumple el umbral de fiebre configurado.",
           "critical": "La temperatura está críticamente alta."
+        },
+        "temperatureLow": {
+          "title": "Temperatura baja",
+          "notice": "La temperatura est? por debajo del rango configurado.",
+          "critical": "La temperatura est? cr?ticamente baja."
+        },
+        "temperatureCriticalLow": {
+          "title": "Temperatura cr?tica baja",
+          "notice": "La temperatura est? por debajo del rango configurado.",
+          "critical": "La temperatura est? cr?ticamente baja."
         }
       }
     },
@@ -471,50 +499,50 @@
     },
     "profile": {
       "title": "Perfiles",
-      "subtitle": "Informaci\u00f3n personal, suscripci\u00f3n y contactos de emergencia.",
+      "subtitle": "Información personal, suscripción y contactos de emergencia.",
       "saveChanges": "Guardar cambios",
-      "yearsOld": "a\u00f1os",
-      "personalInformation": "Informaci\u00f3n personal",
+      "yearsOld": "años",
+      "personalInformation": "Información personal",
       "fullName": "Nombre completo",
       "age": "Edad",
-      "address": "Direcci\u00f3n",
+      "address": "Dirección",
       "bloodType": "Tipo de sangre",
-      "gender": "G\u00e9nero",
+      "gender": "Género",
       "genderFemale": "Femenino",
       "genderMale": "Masculino",
       "notes": "Notas",
       "emergencyContacts": "Contactos de emergencia",
-      "emergencyDescription": "Aqu\u00ed puedes agregar contactos de emergencia",
+      "emergencyDescription": "Aquí puedes agregar contactos de emergencia",
       "add": "Agregar",
       "name": "Nombre",
-      "relation": "Relaci\u00f3n",
-      "phone": "Tel\u00e9fono",
+      "relation": "Relación",
+      "phone": "Teléfono",
       "deleteContact": "Eliminar contacto",
       "addEmergencyContact": "Agregar contacto de emergencia",
-      "addEmergencyContactSubtitle": "Este contacto quedar\u00e1 vinculado al paciente seleccionado.",
+      "addEmergencyContactSubtitle": "Este contacto quedará vinculado al paciente seleccionado.",
       "cancel": "Cancelar",
       "saveContact": "Guardar contacto",
       "contactAddedSuccessfully": "Contacto de emergencia guardado correctamente",
       "changesSavedSuccessfully": "Perfil del paciente guardado correctamente"
     },
     "settings": {
-      "title": "Configuraci\u00f3n",
-      "subtitle": "Personaliza tu aplicaci\u00f3n web",
+      "title": "Configuración",
+      "subtitle": "Personaliza tu aplicación web",
       "save": "Guardar",
-      "savedSuccessfully": "Configuraci\u00f3n guardada correctamente",
-      "subscriptionRenewed": "Suscripci\u00f3n renovada correctamente",
-      "subscriptionCanceled": "Suscripci\u00f3n cancelada correctamente",
+      "savedSuccessfully": "Configuración guardada correctamente",
+      "subscriptionRenewed": "Suscripción renovada correctamente",
+      "subscriptionCanceled": "Suscripción cancelada correctamente",
       "language": {
         "title": "Idioma",
-        "description": "Elige el idioma de la aplicaci\u00f3n",
+        "description": "Elige el idioma de la aplicación",
         "label": "Idioma de la app",
         "placeholder": "Selecciona un idioma"
       },
       "subscription": {
         "renewsOn": "Renueva el",
         "plan": "Plan",
-        "renew": "Renovar suscripci\u00f3n",
-        "cancel": "Cancelar suscripci\u00f3n",
+        "renew": "Renovar suscripción",
+        "cancel": "Cancelar suscripción",
         "status": {
           "active": "Activo",
           "inactive": "Inactivo",
@@ -524,18 +552,18 @@
     },
     "support": {
       "title": "Soporte",
-      "subtitle": "Estamos aqu\u00ed siempre que nos necesites.",
+      "subtitle": "Estamos aquí siempre que nos necesites.",
       "ticketGenerated": "Ticket generado correctamente",
       "chat": {
         "title": "Chat con soporte",
         "description": "Te daremos una respuesta lo antes posible."
       },
       "call": {
-        "title": "Ll\u00e1manos",
+        "title": "Llámanos",
         "phone": "(51) 444-222-333"
       },
       "form": {
-        "title": "Env\u00edanos un mensaje",
+        "title": "Envíanos un mensaje",
         "description": "Si tienes un problema, puedes crear un ticket.",
         "subject": "Asunto",
         "describe": "Describe",
@@ -543,7 +571,7 @@
       },
       "history": {
         "title": "Historial de tickets",
-        "description": "Aqu\u00ed puedes ver el historial de tus tickets enviados y su estado",
+        "description": "Aquí puedes ver el historial de tus tickets enviados y su estado",
         "subject": "Asunto",
         "date": "Fecha",
         "status": "Estado"
@@ -553,8 +581,155 @@
         "outstanding": "Pendiente"
       },
       "emergency": {
-        "prefix": "En caso de emergencia, Tukuntech llamar\u00e1 a los n\u00fameros de emergencia.",
+        "prefix": "En caso de emergencia, Tukuntech llamará a los números de emergencia.",
         "strong": "Debe estar conectado a la red para funcionar correctamente."
+      }
+    }
+  },
+  "admin": {
+    "securityAudit": {
+      "title": "Seguridad y auditoría",
+      "subtitle": "Administra cuidadores, familias y administradores,",
+      "searchPlaceholder": "Buscar usuarios...",
+      "total": "total: {{total}}",
+      "edit": "Editar",
+      "savedSuccessfully": "Cambios guardados correctamente",
+      "saveError": "No se pudieron guardar los cambios. Revisa los campos obligatorios.",
+      "invalidPhone": "Ingresa un número de Perú válido. Ejemplo: +51 999 999 999.",
+      "table": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "joined": "Ingreso"
+      },
+      "roles": {
+        "caregiver": "Cuidador",
+        "admin": "Admin",
+        "patient": "Paciente"
+      },
+      "status": {
+        "active": "Activo",
+        "suspended": "Suspendido"
+      },
+      "modal": {
+        "title": "Editar usuario",
+        "subtitle": "Actualiza rol, estado y permisos de este usuario,",
+        "fullName": "Nombre completo",
+        "email": "Correo",
+        "phone": "Teléfono",
+        "joined": "Ingreso",
+        "role": "Rol",
+        "status": "Estado",
+        "cancel": "Cancelar",
+        "saveChanges": "Guardar cambios"
+      }
+    },
+    "devices": {
+      "title": "Dispositivos",
+      "subtitle": "Estado de todos los dispositivos.",
+      "searchPlaceholder": "Buscar dispositivos...",
+      "total": "total: {{total}}",
+      "edit": "Editar",
+      "savedSuccessfully": "Configuración del dispositivo guardada correctamente",
+      "saveError": "No se pudo guardar la configuración del dispositivo.",
+      "invalidParameters": "Revisa los parámetros del dispositivo. Los máximos deben ser mayores que los mínimos.",
+      "summary": {
+        "total": "Total",
+        "online": "En línea",
+        "offline": "Sin conexión",
+        "errors": "Errores"
+      },
+      "table": {
+        "serial": "Serial",
+        "owner": "Propietario",
+        "id": "Id",
+        "status": "Estado",
+        "version": "Versión"
+      },
+      "status": {
+        "online": "En línea",
+        "offline": "Sin conexión",
+        "error": "Error"
+      },
+      "modal": {
+        "title": "Editar configuración del dispositivo",
+        "subtitle": "Actualiza parámetros.",
+        "serial": "Serial",
+        "owner": "Propietario",
+        "ownerId": "ID propietario",
+        "status": "Estado",
+        "version": "Versión",
+        "ownerEmail": "Correo del propietario",
+        "parameters": "Parámetros",
+        "heartRateMin": "Ritmo cardíaco MIN",
+        "heartRateMax": "Ritmo cardíaco MAX",
+        "temperatureMin": "Temperatura MIN",
+        "temperatureMax": "Temperatura MAX",
+        "oxygenSaturation": "Saturación de oxígeno",
+        "cancel": "Cancelar",
+        "saveChanges": "Guardar cambios"
+      }
+    },
+    "common": {
+      "month": "Mes",
+      "monthPlaceholder": "Selecciona mes"
+    },
+    "subscriptions": {
+      "title": "Suscripciones",
+      "subtitle": "Resumen mensual de suscripciones.",
+      "summary": {
+        "active": "Activas",
+        "new": "Nuevas",
+        "canceled": "Canceladas"
+      },
+      "table": {
+        "user": "Usuario",
+        "plan": "Plan",
+        "status": "Estado",
+        "renews": "Renueva",
+        "amount": "Monto"
+      },
+      "status": {
+        "active": "Activa",
+        "canceled": "Cancelada"
+      }
+    },
+    "supportTickets": {
+      "title": "Tickets de soporte",
+      "subtitle": "Conversaciones de soporte con usuarios.",
+      "replyPlaceholder": "Escribe una respuesta...",
+      "sendReply": "Enviar respuesta",
+      "markDone": "marcar resuelto",
+      "markPending": "marcar pendiente",
+      "replySent": "Respuesta enviada correctamente",
+      "replyError": "No se pudieron guardar los cambios del ticket.",
+      "statusSaved": "Estado del ticket actualizado correctamente",
+      "status": {
+        "pending": "Pendiente",
+        "done": "Resuelto"
+      }
+    },
+    "analytics": {
+      "title": "Analítica",
+      "subtitle": "análisis del sistema con métricas",
+      "chartTitle": "Número de usuarios",
+      "metrics": {
+        "users": "Usuarios",
+        "subscriptions": "Suscripciones",
+        "canceled": "Canceladas"
+      }
+    },
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Personaliza tu aplicación web",
+      "save": "Guardar",
+      "savedSuccessfully": "Configuración guardada correctamente",
+      "language": {
+        "title": "Idioma",
+        "description": "Elige el idioma de la aplicación",
+        "label": "Idioma de la app",
+        "placeholder": "Selecciona un idioma"
       }
     }
   }

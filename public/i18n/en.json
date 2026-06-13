@@ -201,6 +201,16 @@
           "title": "High fever",
           "notice": "Temperature meets the configured fever threshold.",
           "critical": "Temperature is critically high."
+        },
+        "temperatureLow": {
+          "title": "Low temperature",
+          "notice": "Temperature is below the configured range.",
+          "critical": "Temperature is critically low."
+        },
+        "temperatureCriticalLow": {
+          "title": "Critical low temperature",
+          "notice": "Temperature is below the configured range.",
+          "critical": "Temperature is critically low."
         }
       }
     },
@@ -338,6 +348,14 @@
       "profile": "Profile",
       "support": "Support",
       "settings": "Settings"
+    },
+    "admin": {
+      "securityAudit": "Security & Audit",
+      "devices": "Devices",
+      "subscriptions": "Subscriptions",
+      "supportTickets": "Support Tickets",
+      "analytics": "Analytics",
+      "settings": "Settings"
     }
   },
   "settings": {
@@ -418,6 +436,16 @@
           "title": "High fever",
           "notice": "Temperature meets the configured fever threshold.",
           "critical": "Temperature is critically high."
+        },
+        "temperatureLow": {
+          "title": "Low temperature",
+          "notice": "Temperature is below the configured range.",
+          "critical": "Temperature is critically low."
+        },
+        "temperatureCriticalLow": {
+          "title": "Critical low temperature",
+          "notice": "Temperature is below the configured range.",
+          "critical": "Temperature is critically low."
         }
       }
     },
@@ -463,7 +491,7 @@
       "reportTitle": "TukunTech - Caregiver Vital Signs Report",
       "heartRateSummary": "{{value}} bpm avg. {{min}}-{{max}}",
       "oxygenSummary": "{{value}}% avg. {{min}}-{{max}}",
-      "temperatureSummary": "{{value}} \u00b0C - {{status}}",
+      "temperatureSummary": "{{value}} °C - {{status}}",
       "severity": {
         "normal": "Normal",
         "notice": "Needs attention",
@@ -556,6 +584,153 @@
       "emergency": {
         "prefix": "In case of an emergency, Tukuntech will call the emergency numbers.",
         "strong": "It needs that it is connected to the network to function correctly."
+      }
+    }
+  },
+  "admin": {
+    "securityAudit": {
+      "title": "Security & Audit",
+      "subtitle": "Manage caregivers, families and admins,",
+      "searchPlaceholder": "Search users...",
+      "total": "total: {{total}}",
+      "edit": "Edit",
+      "savedSuccessfully": "Changes were saved successfully",
+      "saveError": "We could not save the changes. Please check the required fields.",
+      "invalidPhone": "Enter a valid Peru phone number. Example: +51 999 999 999.",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "joined": "Joined"
+      },
+      "roles": {
+        "caregiver": "Caregiver",
+        "admin": "Admin",
+        "patient": "Patient"
+      },
+      "status": {
+        "active": "Active",
+        "suspended": "Suspended"
+      },
+      "modal": {
+        "title": "Edit user",
+        "subtitle": "Update role, status, and permissions for this user,",
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "joined": "Joined",
+        "role": "Role",
+        "status": "Status",
+        "cancel": "Cancel",
+        "saveChanges": "Save changes"
+      }
+    },
+    "devices": {
+      "title": "Devices",
+      "subtitle": "Status of all devices.",
+      "searchPlaceholder": "Search devices...",
+      "total": "total: {{total}}",
+      "edit": "Edit",
+      "savedSuccessfully": "Device settings were saved successfully",
+      "saveError": "We could not save the device settings.",
+      "invalidParameters": "Check the device parameters. Maximum values must be greater than minimum values.",
+      "summary": {
+        "total": "Total",
+        "online": "Online",
+        "offline": "Offline",
+        "errors": "Errors"
+      },
+      "table": {
+        "serial": "Serial",
+        "owner": "Owner",
+        "id": "Id",
+        "status": "Status",
+        "version": "Version"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "error": "Error"
+      },
+      "modal": {
+        "title": "Edit device settings",
+        "subtitle": "Update parameters.",
+        "serial": "Serial",
+        "owner": "Owner",
+        "ownerId": "Owner ID",
+        "status": "Status",
+        "version": "Version",
+        "ownerEmail": "Owner email",
+        "parameters": "Parameters",
+        "heartRateMin": "Heart rate MIN",
+        "heartRateMax": "Heart rate MAX",
+        "temperatureMin": "Temperature MIN",
+        "temperatureMax": "Temperature MAX",
+        "oxygenSaturation": "Oxygen saturation",
+        "cancel": "Cancel",
+        "saveChanges": "Save changes"
+      }
+    },
+    "common": {
+      "month": "Month",
+      "monthPlaceholder": "Select month"
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Monthly subscription overview.",
+      "summary": {
+        "active": "Active",
+        "new": "New",
+        "canceled": "Canceled"
+      },
+      "table": {
+        "user": "User",
+        "plan": "Plan",
+        "status": "Status",
+        "renews": "Renews",
+        "amount": "Amount"
+      },
+      "status": {
+        "active": "Active",
+        "canceled": "Canceled"
+      }
+    },
+    "supportTickets": {
+      "title": "Support Tickets",
+      "subtitle": "Inbox conversations with users.",
+      "replyPlaceholder": "Type a reply...",
+      "sendReply": "Send reply",
+      "markDone": "mark done",
+      "markPending": "mark pending",
+      "replySent": "Reply sent successfully",
+      "replyError": "We could not save the ticket changes.",
+      "statusSaved": "Ticket status updated successfully",
+      "status": {
+        "pending": "Pending",
+        "done": "Done"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "system analysis with metrics",
+      "chartTitle": "Number of users",
+      "metrics": {
+        "users": "User",
+        "subscriptions": "Subscriptions",
+        "canceled": "Canceled"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Personalize your web app!",
+      "save": "Save",
+      "savedSuccessfully": "Settings were saved successfully",
+      "language": {
+        "title": "Language",
+        "description": "Choose your preferred app language",
+        "label": "App language",
+        "placeholder": "Select language"
       }
     }
   }
