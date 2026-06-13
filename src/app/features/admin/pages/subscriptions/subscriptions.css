@@ -1,0 +1,211 @@
+.admin-subscriptions-page {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding-top: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+
+  color: #0d1f25;
+  font-size: 31px;
+  font-weight: 600;
+}
+
+.page-header p {
+  margin: 0;
+
+  color: #667985;
+  font-size: 14px;
+}
+
+.month-filter {
+  width: 210px;
+}
+
+.month-filter label {
+  display: block;
+  margin: 0 0 8px 8px;
+
+  color: #10232b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 830px;
+}
+
+.summary-card {
+  min-height: 82px;
+  padding: 16px 30px;
+
+  border-radius: 28px;
+  border: 1px solid #dfe8e7;
+
+  background: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow:
+    0 0 0 1px rgba(219, 230, 229, 0.3),
+    0 10px 28px rgba(15, 23, 42, 0.03);
+}
+
+.summary-card--new {
+  background: #e5f6ec;
+}
+
+.summary-card--canceled {
+  background: #fbf4e2;
+}
+
+.summary-card span {
+  display: block;
+  color: #667985;
+  font-size: 14px;
+}
+
+.summary-card strong {
+  color: #10232b;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.summary-card i {
+  color: #0c9d56;
+  font-size: 16px;
+}
+
+.subscriptions-card {
+  overflow: hidden;
+
+  border-radius: 28px;
+  border: 1px solid #dfe8e7;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 1px rgba(219, 230, 229, 0.3),
+    0 10px 28px rgba(15, 23, 42, 0.03);
+}
+
+.subscriptions-table {
+  width: 100%;
+}
+
+.subscriptions-table-head,
+.subscriptions-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1.25fr 1fr 1.15fr 0.95fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.subscriptions-table-head {
+  min-height: 52px;
+  padding: 0 52px;
+
+  border-bottom: 1px solid #e2e9e8;
+  background: #f8fbfa;
+
+  color: #10232b;
+  font-size: 14px;
+}
+
+.subscriptions-row {
+  min-height: 60px;
+  padding: 0 52px;
+
+  border-bottom: 1px solid #edf1f0;
+
+  color: #2f383d;
+  font-size: 14px;
+}
+
+.subscriptions-row:last-child {
+  border-bottom: none;
+}
+
+.status-pill {
+  min-width: 84px;
+  min-height: 24px;
+  padding: 4px 16px;
+
+  border-radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  line-height: 1.1;
+}
+
+.status-pill--active {
+  background: #4cbe85;
+  color: white;
+}
+
+.status-pill--canceled {
+  background: #ffdddd;
+  color: #cf3434;
+  font-weight: 600;
+}
+
+.muted {
+  color: #667985;
+}
+
+@media (max-width: 980px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .subscriptions-table {
+    overflow-x: auto;
+  }
+
+  .subscriptions-table-head,
+  .subscriptions-row {
+    min-width: 850px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-subscriptions-page {
+    padding-top: 0;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .month-filter,
+  .summary-grid {
+    width: 100%;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

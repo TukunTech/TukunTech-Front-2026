@@ -1,0 +1,75 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <section class="admin-subscriptions-page">
+
+    <header class="page-header">
+      <div>
+        <h1>{{ 'admin.subscriptions.title' | translate }}</h1>
+        <p>{{ 'admin.subscriptions.subtitle' | translate }}</p>
+      </div>
+
+      <div class="month-filter">
+        <label>{{ 'admin.common.month' | translate }}</label>
+        <app-custom-select
+          [options]="monthOptions"
+          [value]="selectedMonth"
+          (valueChange)="changeMonth($event)"
+          [placeholder]="'admin.common.monthPlaceholder' | translate">
+        </app-custom-select>
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <article class="summary-card">
+        <div>
+          <span>{{ 'admin.subscriptions.summary.active' | translate }}</span>
+          <strong>{{ summary.active }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card summary-card--new">
+        <div>
+          <span>{{ 'admin.subscriptions.summary.new' | translate }}</span>
+          <strong>{{ summary.new }}</strong>
+        </div>
+        <i class="bi bi-wifi"></i>
+      </article>
+
+      <article class="summary-card summary-card--canceled">
+        <div>
+          <span>{{ 'admin.subscriptions.summary.canceled' | translate }}</span>
+          <strong>{{ summary.canceled }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="subscriptions-card">
+      <div class="subscriptions-table">
+        <div class="subscriptions-table-head">
+          <span>{{ 'admin.subscriptions.table.user' | translate }}</span>
+          <span>{{ 'admin.subscriptions.table.plan' | translate }}</span>
+          <span>{{ 'admin.subscriptions.table.status' | translate }}</span>
+          <span>{{ 'admin.subscriptions.table.renews' | translate }}</span>
+          <span>{{ 'admin.subscriptions.table.amount' | translate }}</span>
+        </div>
+
+        <div class="subscriptions-row" *ngFor="let subscription of subscriptions">
+          <span>{{ subscription.userEmail }}</span>
+          <span>{{ subscription.plan }}</span>
+          <span>
+            <span class="status-pill" [ngClass]="getStatusClass(subscription.status)">
+              {{ getStatusLabelKey(subscription.status) | translate }}
+            </span>
+          </span>
+          <span class="muted">{{ subscription.renewsAt }}</span>
+          <span>{{ formatAmount(subscription) }}</span>
+        </div>
+      </div>
+    </section>
+
+  </section>
+</app-dashboard-layout>
