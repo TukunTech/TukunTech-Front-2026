@@ -1,0 +1,207 @@
+<app-dashboard-layout
+  [menuItems]="menuItems"
+  [role]="'roles.admin' | translate"
+  [email]="email"
+  [variant]="'admin'"
+>
+  <app-toast
+    [show]="showToast"
+    [message]="toastMessageKey | translate"
+    [type]="toastType">
+  </app-toast>
+
+  <section class="admin-devices-page">
+
+    <header class="page-header">
+      <h1>{{ 'admin.devices.title' | translate }}</h1>
+      <p>{{ 'admin.devices.subtitle' | translate }}</p>
+    </header>
+
+    <section class="summary-grid">
+      <article class="summary-card">
+        <div>
+          <span>{{ 'admin.devices.summary.total' | translate }}</span>
+          <strong>{{ summary.total }}</strong>
+        </div>
+        <i class="bi bi-cpu"></i>
+      </article>
+
+      <article class="summary-card summary-card--online">
+        <div>
+          <span>{{ 'admin.devices.summary.online' | translate }}</span>
+          <strong>{{ summary.online }}</strong>
+        </div>
+        <i class="bi bi-wifi"></i>
+      </article>
+
+      <article class="summary-card">
+        <div>
+          <span>{{ 'admin.devices.summary.offline' | translate }}</span>
+          <strong>{{ summary.offline }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card summary-card--errors">
+        <div>
+          <span>{{ 'admin.devices.summary.errors' | translate }}</span>
+          <strong>{{ summary.errors }}</strong>
+        </div>
+        <i class="bi bi-exclamation-triangle"></i>
+      </article>
+    </section>
+
+    <section class="devices-card">
+      <div class="table-toolbar">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            [placeholder]="'admin.devices.searchPlaceholder' | translate"
+          />
+        </div>
+
+        <span>
+          {{ 'admin.devices.total' | translate:{ total: filteredDevices.length } }}
+        </span>
+      </div>
+
+      <div class="devices-table">
+        <div class="devices-table-head">
+          <span>{{ 'admin.devices.table.serial' | translate }}</span>
+          <span>{{ 'admin.devices.table.owner' | translate }}</span>
+          <span>{{ 'admin.devices.table.id' | translate }}</span>
+          <span>{{ 'admin.devices.table.status' | translate }}</span>
+          <span>{{ 'admin.devices.table.version' | translate }}</span>
+          <span></span>
+        </div>
+
+        <div class="devices-row" *ngFor="let device of filteredDevices">
+          <span>{{ device.serial }}</span>
+          <span>{{ device.owner.fullName }}</span>
+          <span>{{ device.ownerId }}</span>
+          <span>
+            <span class="status-pill" [ngClass]="getStatusClass(device.status)">
+              {{ getStatusLabelKey(device.status) | translate }}
+            </span>
+          </span>
+          <span>{{ device.version }}</span>
+          <span>
+            <button class="edit-button" type="button" (click)="openEditModal(device)">
+              <i class="bi bi-pencil-square"></i>
+              {{ 'admin.devices.edit' | translate }}
+            </button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+  </section>
+
+  <div class="modal-backdrop" *ngIf="editModel">
+    <section class="edit-modal">
+      <button class="modal-close" type="button" (click)="closeEditModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <h2>{{ 'admin.devices.modal.title' | translate }}</h2>
+      <p>{{ 'admin.devices.modal.subtitle' | translate }}</p>
+
+      <div class="modal-grid">
+        <div>
+          <label>{{ 'admin.devices.modal.serial' | translate }}</label>
+          <input type="text" [(ngModel)]="editModel.serial" />
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.owner' | translate }}</label>
+          <input type="text" [(ngModel)]="editModel.owner.fullName" />
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.ownerId' | translate }}</label>
+          <input
+            type="text"
+            inputmode="numeric"
+            [ngModel]="editModel.ownerId"
+            (ngModelChange)="changeOwnerId($event)"
+          />
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.status' | translate }}</label>
+          <app-custom-select
+            [options]="statusOptions"
+            [value]="editModel.status"
+            (valueChange)="changeStatus($event)"
+            [placeholder]="'admin.devices.modal.status' | translate">
+          </app-custom-select>
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.version' | translate }}</label>
+          <input type="text" [(ngModel)]="editModel.version" />
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.ownerEmail' | translate }}</label>
+          <input type="email" [(ngModel)]="editModel.owner.email" />
+        </div>
+      </div>
+
+      <h3>{{ 'admin.devices.modal.parameters' | translate }}</h3>
+
+      <div class="modal-grid parameters-grid">
+        <div>
+          <label>{{ 'admin.devices.modal.heartRateMin' | translate }}</label>
+          <div class="input-with-unit">
+            <input type="number" min="1" [(ngModel)]="editModel.parameters.heartRateMin" (keydown)="preventInvalidNumberInput($event)" />
+            <span>bpm</span>
+          </div>
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.heartRateMax' | translate }}</label>
+          <div class="input-with-unit">
+            <input type="number" min="1" [(ngModel)]="editModel.parameters.heartRateMax" (keydown)="preventInvalidNumberInput($event)" />
+            <span>bpm</span>
+          </div>
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.temperatureMin' | translate }}</label>
+          <div class="input-with-unit">
+            <input type="number" step="0.1" min="30" [(ngModel)]="editModel.parameters.temperatureMin" (keydown)="preventInvalidNumberInput($event)" />
+            <span>°C</span>
+          </div>
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.temperatureMax' | translate }}</label>
+          <div class="input-with-unit">
+            <input type="number" step="0.1" min="30" [(ngModel)]="editModel.parameters.temperatureMax" (keydown)="preventInvalidNumberInput($event)" />
+            <span>°C</span>
+          </div>
+        </div>
+
+        <div>
+          <label>{{ 'admin.devices.modal.oxygenSaturation' | translate }}</label>
+          <div class="input-with-unit">
+            <input type="number" min="70" max="100" [(ngModel)]="editModel.parameters.oxygenSaturation" (keydown)="preventInvalidNumberInput($event)" />
+            <span>%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-button" type="button" (click)="closeEditModal()">
+          {{ 'admin.devices.modal.cancel' | translate }}
+        </button>
+
+        <button class="save-changes-button" type="button" (click)="saveDevice()">
+          {{ 'admin.devices.modal.saveChanges' | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+</app-dashboard-layout>
