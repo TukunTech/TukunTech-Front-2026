@@ -1,0 +1,30 @@
+<main class="not-found-page">
+  <section class="not-found-card">
+    <div class="brand">
+      <img src="ic_logo2.png" alt="TukunTech" />
+      <span>TukunTech</span>
+    </div>
+
+    <div class="illustration" aria-hidden="true">
+      <span>4</span>
+      <i class="bi bi-compass"></i>
+      <span>4</span>
+    </div>
+
+    <p class="eyebrow">{{ 'notFound.eyebrow' | translate }}</p>
+    <h1>{{ 'notFound.title' | translate }}</h1>
+    <p class="description">{{ 'notFound.description' | translate }}</p>
+
+    <div class="actions">
+      <button class="primary-action" type="button" (click)="goHome()">
+        <i class="bi bi-house-door"></i>
+        {{ 'notFound.goHome' | translate }}
+      </button>
+
+      <button class="secondary-action" type="button" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i>
+        {{ 'notFound.goBack' | translate }}
+      </button>
+    </div>
+  </section>
+</main>
