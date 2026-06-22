@@ -62,3 +62,69 @@
   (ngModelChange)="emitChange()"
   [placeholder]="'register.personal.additionalNotesPlaceholder' | translate"
 ></textarea>
+
+<section class="medical-parameters">
+  <div class="medical-parameters__header">
+    <i class="bi bi-heart-pulse"></i>
+    <div>
+      <h3>{{ 'register.medicalParameters.title' | translate }}</h3>
+      <p>{{ 'register.medicalParameters.description' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="parameters-grid">
+    <div>
+      <label>{{ 'register.medicalParameters.heartRateMin' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="1" name="heartRateMin"
+          [(ngModel)]="patient.medicalParameters.heartRateMin" (ngModelChange)="emitChange()" />
+        <span>bpm</span>
+      </div>
+    </div>
+    <div>
+      <label>{{ 'register.medicalParameters.heartRateMax' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="1" name="heartRateMax"
+          [(ngModel)]="patient.medicalParameters.heartRateMax" (ngModelChange)="emitChange()" />
+        <span>bpm</span>
+      </div>
+    </div>
+    <div>
+      <label>{{ 'register.medicalParameters.oxygenMin' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="1" max="100" name="oxygenMin"
+          [(ngModel)]="patient.medicalParameters.oxygenSaturationMin" (ngModelChange)="emitChange()" />
+        <span>%</span>
+      </div>
+    </div>
+    <div>
+      <label>{{ 'register.medicalParameters.oxygenMax' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="1" max="100" name="oxygenMax"
+          [(ngModel)]="patient.medicalParameters.oxygenSaturationMax" (ngModelChange)="emitChange()" />
+        <span>%</span>
+      </div>
+    </div>
+    <div>
+      <label>{{ 'register.medicalParameters.temperatureMin' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="30" max="45" step="0.1" name="temperatureMin"
+          [(ngModel)]="patient.medicalParameters.temperatureMin" (ngModelChange)="emitChange()" />
+        <span>°C</span>
+      </div>
+    </div>
+    <div>
+      <label>{{ 'register.medicalParameters.temperatureMax' | translate }}</label>
+      <div class="input-with-unit">
+        <input type="number" min="30" max="45" step="0.1" name="temperatureMax"
+          [(ngModel)]="patient.medicalParameters.temperatureMax" (ngModelChange)="emitChange()" />
+        <span>°C</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="medical-parameters__notice">
+    <i class="bi bi-info-circle"></i>
+    {{ 'register.medicalParameters.notice' | translate }}
+  </p>
+</section>

@@ -32,6 +32,9 @@ export class History {
   urgentAlertMessageKey = '';
 
   selectedPeriod: PatientHistoryPeriod = 'weekly';
+  dateFrom = '2026-01-01';
+  dateTo = '2026-06-20';
+  alertsOnly = false;
   history: PatientVitalHistoryRecord[] = [];
 
   menuItems: DashboardMenuItem[] = [
@@ -60,6 +63,17 @@ export class History {
 
   changePeriod(period: string): void {
     this.selectedPeriod = period as PatientHistoryPeriod;
+    this.loadHistory();
+  }
+
+  changeCustomRange(): void {
+    if (this.selectedPeriod === 'custom') {
+      this.loadHistory();
+    }
+  }
+
+  toggleAlertsOnly(): void {
+    this.alertsOnly = !this.alertsOnly;
     this.loadHistory();
   }
 
@@ -128,7 +142,12 @@ export class History {
 
   private loadHistory(): void {
     this.patientHistoryRepository
-      .getHistory(this.userId, this.selectedPeriod)
+      .getHistory(this.userId, {
+        period: this.selectedPeriod,
+        from: this.dateFrom,
+        to: this.dateTo,
+        alertsOnly: this.alertsOnly
+      })
       .subscribe(history => {
         this.history = history;
       });

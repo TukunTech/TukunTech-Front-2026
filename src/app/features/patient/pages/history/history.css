@@ -111,6 +111,28 @@
   outline: none;
 }
 
+.date-filter {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dbe6e5;
+  border-radius: 999px;
+  background: white;
+  color: #667985;
+}
+
+.alert-filter {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #9bcfc7;
+  border-radius: 999px;
+  background: white;
+  color: #287666;
+  cursor: pointer;
+}
+
+.alert-filter--active { background: #287666; color: white; }
+.empty-history { padding: 26px; text-align: center; color: #667985; }
+
 .generate-button {
   height: 40px;
   padding: 0 20px;
@@ -285,6 +307,8 @@
   }
 
   .report-actions select,
+  .date-filter,
+  .alert-filter,
   .generate-button {
     width: 100%;
   }

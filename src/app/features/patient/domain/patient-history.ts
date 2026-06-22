@@ -8,7 +8,14 @@ export type PatientHistoryRecordSource = 'hourly-snapshot' | 'alert-event';
 
 export type PatientHistorySeverity = 'normal' | VitalAlertSeverity;
 
-export type PatientHistoryPeriod = 'weekly' | 'biweekly' | 'monthly';
+export type PatientHistoryPeriod = 'weekly' | 'biweekly' | 'monthly' | 'all' | 'custom';
+
+export interface PatientHistoryQuery {
+  period: PatientHistoryPeriod;
+  from?: string;
+  to?: string;
+  alertsOnly?: boolean;
+}
 
 export interface PatientVitalHistoryRecord {
   id: string;

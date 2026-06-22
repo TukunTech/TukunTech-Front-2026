@@ -12,9 +12,9 @@ import {
   RegisterStep
 } from '../../components/register-stepper/register-stepper';
 import {
-  CustomSelect,
-  CustomSelectOption
-} from '../../../../shared/components/custom-select/custom-select';
+  createEmptyRegistrationPatient,
+  hasValidMedicalParameters
+} from '../../domain/registration-patient';
 
 @Component({
   selector: 'app-register-patient',
@@ -24,7 +24,6 @@ import {
     NgIf,
     FormsModule,
     AddressMap,
-    CustomSelect,
     RegisterStepper,
     PatientForm
   ],
@@ -36,18 +35,13 @@ export class RegisterPatient {
   constructor(private router: Router) {}
 
   currentStep = 1;
+  showMedicalParametersError = false;
 
   email = '';
   password = '';
   confirmPassword = '';
 
-  patientData: PatientFormData = {
-    fullName: '',
-    age: '',
-    gender: '',
-    bloodType: '',
-    additionalNotes: ''
-  };
+  patientData: PatientFormData = createEmptyRegistrationPatient();
 
   street = '';
   city = '';
@@ -69,23 +63,14 @@ export class RegisterPatient {
     { number: 7, key: 'register.steps.done' },
   ];
 
-  genderOptions: CustomSelectOption[] = [
-    { label: 'Female', value: 'female' },
-    { label: 'Male', value: 'male' }
-  ];
-
-  bloodTypeOptions: CustomSelectOption[] = [
-    { label: 'A+', value: 'A+' },
-    { label: 'A-', value: 'A-' },
-    { label: 'B+', value: 'B+' },
-    { label: 'B-', value: 'B-' },
-    { label: 'AB+', value: 'AB+' },
-    { label: 'AB-', value: 'AB-' },
-    { label: 'O+', value: 'O+' },
-    { label: 'O-', value: 'O-' }
-  ];
-
   continue() {
+    if (this.currentStep === 3 && !hasValidMedicalParameters(this.patientData)) {
+      this.showMedicalParametersError = true;
+      return;
+    }
+
+    this.showMedicalParametersError = false;
+
     if (this.currentStep < this.steps.length) {
       this.currentStep++;
     }
@@ -99,6 +84,10 @@ export class RegisterPatient {
 
   goToPlanSelection() {
     this.router.navigate(['/register']);
+  }
+
+  goToDashboard() {
+    this.router.navigate(['/patient/today']);
   }
 
   togglePasswordVisibility() {

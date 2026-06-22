@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { SubscriptionAccessStore } from '../../../core/subscription/subscription-access.store';
 
 import {
   CreateEmergencyContactPayload,
@@ -13,6 +14,7 @@ import {
   providedIn: 'root'
 })
 export class PatientProfileRepository {
+  constructor(private subscriptionStore: SubscriptionAccessStore) {}
   private profile: PatientProfile = {
     userId: 'patient-demo-user',
     email: 'demo.patient@tukuntech.app',
@@ -28,7 +30,7 @@ export class PatientProfileRepository {
   private subscription: PatientSubscription = {
     id: 'subscription-demo-1',
     name: 'TukunTech Premium',
-    renewsOn: 'June 9, 2026',
+    renewsOn: '2026-06-23',
     priceLabel: '$19.99',
     status: 'active',
     planLabel: 'Premium - monthly'
@@ -52,11 +54,28 @@ export class PatientProfileRepository {
   ];
 
   getProfilePageData(userId: string): Observable<PatientProfilePageData> {
+    const access = this.subscriptionStore.getRoleAccess('patient');
     return of({
       profile: { ...this.profile, userId },
-      subscription: { ...this.subscription },
+      subscription: {
+        ...this.subscription,
+        renewsOn: access.renewsOn,
+        status: access.canAccess ? 'active' : 'inactive'
+      },
       emergencyContacts: this.getContactsByUser(userId)
     });
+  }
+
+  renewSubscription(): Observable<PatientSubscription> {
+    const access = this.subscriptionStore.renew(this.profile.email, 'patient');
+    this.subscription = { ...this.subscription, renewsOn: access.renewsOn, status: 'active' };
+    return of({ ...this.subscription });
+  }
+
+  cancelSubscription(): Observable<PatientSubscription> {
+    this.subscriptionStore.cancel(this.profile.email, 'patient');
+    this.subscription = { ...this.subscription, status: 'inactive' };
+    return of({ ...this.subscription });
   }
 
   updateProfile(userId: string, profile: PatientProfile): Observable<PatientProfile> {

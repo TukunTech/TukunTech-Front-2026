@@ -8,6 +8,7 @@ import {
 } from '../domain/patient-vitals';
 import { PatientVitalsRepository } from './patient-vitals.repository';
 import {
+  PatientHistoryQuery,
   PatientHistoryPeriod,
   PatientHistoryRecordSource,
   PatientVitalHistoryRecord
@@ -25,9 +26,9 @@ export class PatientHistoryRepository {
 
   getHistory(
     userId: string,
-    period: PatientHistoryPeriod = 'weekly'
+    query: PatientHistoryQuery = { period: 'weekly' }
   ): Observable<PatientVitalHistoryRecord[]> {
-    return of(this.getRecordsForUser(userId, period));
+    return of(this.getRecordsForUser(userId, query));
   }
 
   recordHourlySnapshot(userId: string): Observable<PatientVitalHistoryRecord> {
@@ -77,22 +78,34 @@ export class PatientHistoryRepository {
 
   private getRecordsForUser(
     userId: string,
-    period: PatientHistoryPeriod
+    query: PatientHistoryQuery
   ): PatientVitalHistoryRecord[] {
-    const userRecords = this.records.filter(record => record.patientUserId === userId);
-    const cutoff = this.getPeriodCutoff(period, userRecords);
+    let userRecords = this.records.filter(record => record.patientUserId === userId);
+
+    if (query.alertsOnly) {
+      userRecords = userRecords.filter(record => record.alerts.length > 0);
+    }
+
+    if (query.period === 'custom') {
+      const from = query.from ? new Date(`${query.from}T00:00:00`).getTime() : Number.MIN_SAFE_INTEGER;
+      const to = query.to ? new Date(`${query.to}T23:59:59.999`).getTime() : Number.MAX_SAFE_INTEGER;
+      userRecords = userRecords.filter(record => {
+        const timestamp = new Date(record.recordedAt).getTime();
+        return timestamp >= from && timestamp <= to;
+      });
+    } else if (query.period !== 'all') {
+      const cutoff = this.getPeriodCutoff(query.period, userRecords);
+      userRecords = userRecords.filter(record => new Date(record.recordedAt).getTime() >= cutoff.getTime());
+    }
 
     return userRecords
-      .filter(record =>
-        new Date(record.recordedAt).getTime() >= cutoff.getTime()
-      )
       .sort((a, b) =>
         new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime()
       );
   }
 
   private getPeriodCutoff(
-    period: PatientHistoryPeriod,
+    period: Exclude<PatientHistoryPeriod, 'all' | 'custom'>,
     records: PatientVitalHistoryRecord[]
   ): Date {
     const latestTimestamp = records.reduce(
@@ -101,7 +114,7 @@ export class PatientHistoryRepository {
     );
 
     const date = new Date(latestTimestamp);
-    const daysByPeriod: Record<PatientHistoryPeriod, number> = {
+    const daysByPeriod: Record<Exclude<PatientHistoryPeriod, 'all' | 'custom'>, number> = {
       weekly: 7,
       biweekly: 14,
       monthly: 30
@@ -113,7 +126,7 @@ export class PatientHistoryRepository {
   }
 
   private createSeedRecords(): PatientVitalHistoryRecord[] {
-    return [
+    const recentRecords = [
       this.createRecord(
         'history-001',
         'patient-demo-user',
@@ -169,6 +182,25 @@ export class PatientHistoryRepository {
         36.6
       )
     ];
+
+    const historicalRecords = Array.from({ length: 121 }, (_, index) => {
+      const date = new Date('2026-06-20T09:00:00.000Z');
+      date.setUTCDate(date.getUTCDate() - (index * 2));
+      const isAlert = index % 5 === 0;
+      const isCritical = index % 15 === 0;
+
+      return this.createRecord(
+        `history-generated-${index + 1}`,
+        'patient-demo-user',
+        date.toISOString(),
+        isAlert ? 'alert-event' : 'hourly-snapshot',
+        isCritical ? 132 : isAlert ? 108 : 72 + (index % 18),
+        isCritical ? 87 : isAlert ? 93 : 96 + (index % 4),
+        isCritical ? 39.2 : isAlert ? 38.2 : 36.4 + ((index % 8) / 10)
+      );
+    });
+
+    return [...recentRecords, ...historicalRecords];
   }
 
   private createRecord(

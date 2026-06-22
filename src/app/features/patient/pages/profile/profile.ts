@@ -164,6 +164,20 @@ export class Profile {
       });
   }
 
+  renewSubscription(): void {
+    this.patientProfileRepository.renewSubscription().subscribe(subscription => {
+      this.subscription = subscription;
+      this.showSuccessToast('subscription.renewedSuccessfully');
+    });
+  }
+
+  cancelSubscription(): void {
+    this.patientProfileRepository.cancelSubscription().subscribe(subscription => {
+      this.subscription = subscription;
+      this.showSuccessToast('subscription.canceledSuccessfully');
+    });
+  }
+
   changeBloodType(value: string): void {
     this.profile.bloodType = value as PatientBloodType;
   }

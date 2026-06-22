@@ -4,6 +4,7 @@ export type VitalAlertType =
   | 'heartRateLow'
   | 'heartRateHigh'
   | 'oxygenLow'
+  | 'oxygenHigh'
   | 'oxygenCritical'
   | 'temperatureLow'
   | 'temperatureCriticalLow'
@@ -92,6 +93,10 @@ function evaluateOxygen(
 
   if (threshold.noticeLow !== undefined && oxygen < threshold.noticeLow) {
     return [createAlert('oxygenLow', 'notice', oxygen)];
+  }
+
+  if (threshold.noticeHigh !== undefined && oxygen > threshold.noticeHigh) {
+    return [createAlert('oxygenHigh', 'notice', oxygen)];
   }
 
   return [];

@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import {
-  DeviceAlertParameters,
-  DeviceAlertParametersStore
-} from '../../../core/device-parameters/device-alert-parameters.store';
+  PatientMedicalParameters,
+  PatientMedicalParametersStore
+} from '../../../core/patient-monitoring/patient-medical-parameters.store';
 import {
   PatientVitalAlertSettings,
   PatientVitals,
@@ -23,7 +23,7 @@ export class PatientVitalsRepository {
     temperature: 37.7
   };
 
-  constructor(private parametersStore: DeviceAlertParametersStore) {}
+  constructor(private parametersStore: PatientMedicalParametersStore) {}
 
   getVitalsPageData(userId: string): Observable<PatientVitalsPageData> {
     const alertSettings = this.createAlertSettings(userId);
@@ -65,7 +65,7 @@ export class PatientVitalsRepository {
   }
 
   private mapParametersToAlertSettings(
-    parameters: DeviceAlertParameters
+    parameters: PatientMedicalParameters
   ): PatientVitalAlertSettings {
     return {
       patientUserId: parameters.patientUserId,
@@ -76,8 +76,9 @@ export class PatientVitalsRepository {
         criticalHigh: parameters.heartRateMax + 20
       },
       oxygen: {
-        noticeLow: parameters.oxygenSaturation,
-        criticalLow: Math.max(1, parameters.oxygenSaturation - 5)
+        noticeLow: parameters.oxygenSaturationMin,
+        criticalLow: Math.max(1, parameters.oxygenSaturationMin - 5),
+        noticeHigh: parameters.oxygenSaturationMax
       },
       temperature: {
         noticeLow: parameters.temperatureMin,

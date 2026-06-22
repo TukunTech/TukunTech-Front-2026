@@ -120,6 +120,11 @@
         [(patient)]="patientData">
       </app-patient-form>
 
+      <p class="form-error" *ngIf="showMedicalParametersError">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'register.medicalParameters.validationError' | translate }}
+      </p>
+
     </div>
 
     <!-- STEP 4: ADDRESS -->
@@ -226,6 +231,7 @@
       <button
         class="dashboard-button"
         type="button"
+        (click)="goToDashboard()"
       >
         {{ 'register.done.goToWebsite' | translate }}
       </button>

@@ -2,14 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CustomSelect, CustomSelectOption } from '../../../../shared/components/custom-select/custom-select';
+import {
+  createEmptyRegistrationPatient,
+  RegistrationPatient
+} from '../../domain/registration-patient';
 
-export interface PatientFormData {
-  fullName: string;
-  age: string;
-  gender: string;
-  bloodType: string;
-  additionalNotes: string;
-}
+export type PatientFormData = RegistrationPatient;
 
 @Component({
   selector: 'app-patient-form',
@@ -22,13 +20,7 @@ export interface PatientFormData {
   styleUrl: './patient-form.css',
 })
 export class PatientForm {
-  @Input() patient: PatientFormData = {
-    fullName: '',
-    age: '',
-    gender: '',
-    bloodType: '',
-    additionalNotes: ''
-  };
+  @Input() patient: PatientFormData = createEmptyRegistrationPatient();
 
   @Output() patientChange = new EventEmitter<PatientFormData>();
 
