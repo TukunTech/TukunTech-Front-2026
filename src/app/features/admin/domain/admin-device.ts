@@ -1,27 +1,46 @@
-import { DeviceAlertParameters } from '../../../core/device-parameters/device-alert-parameters.store';
+export type AdminDeviceStatus = 'available' | 'online' | 'offline' | 'error';
+export type AdminPatientAccountType = 'individual' | 'caregiver-patient';
 
-export type AdminDeviceStatus = 'online' | 'offline' | 'error';
-
-export interface AdminDeviceOwner {
-  patientUserId: string;
+export interface AdminAssignablePatient {
+  id: string;
   fullName: string;
   email: string;
+  accountType: AdminPatientAccountType;
+  caregiverId?: string;
+  assignedDeviceId?: string;
+}
+
+export interface AdminCaregiverGroup {
+  id: string;
+  fullName: string;
+  email: string;
+  patients: AdminAssignablePatient[];
 }
 
 export interface AdminDevice {
   id: string;
-  serial: string;
-  owner: AdminDeviceOwner;
-  ownerId: string;
+  code: string;
+  model: string;
+  serialNumber: string;
   status: AdminDeviceStatus;
-  version: string;
-  parameters: DeviceAlertParameters;
+  firmwareVersion: string;
+  registeredAt: string;
+  assignedPatient: AdminAssignablePatient | null;
+}
+
+export interface AdminDeviceDraft {
+  code: string;
+  model: string;
+  serialNumber: string;
+  status: AdminDeviceStatus;
+  firmwareVersion: string;
+  registeredAt: string;
 }
 
 export interface AdminDevicesSummary {
   total: number;
-  online: number;
-  offline: number;
+  available: number;
+  assigned: number;
   errors: number;
 }
 
@@ -30,26 +49,20 @@ export interface AdminDevicesDashboard {
   adminEmail: string;
   summary: AdminDevicesSummary;
   devices: AdminDevice[];
+  individualPatients: AdminAssignablePatient[];
+  caregivers: AdminCaregiverGroup[];
 }
 
-export type AdminDeviceUpdate = Omit<AdminDevice, 'id'>;
+export function filterAdminDevices(devices: AdminDevice[], searchTerm: string): AdminDevice[] {
+  const term = searchTerm.trim().toLowerCase();
+  if (!term) return devices;
 
-export function filterAdminDevices(
-  devices: AdminDevice[],
-  searchTerm: string
-): AdminDevice[] {
-  const normalizedTerm = searchTerm.trim().toLowerCase();
-
-  if (!normalizedTerm) {
-    return devices;
-  }
-
-  return devices.filter(device =>
-    device.serial.toLowerCase().includes(normalizedTerm) ||
-    device.owner.fullName.toLowerCase().includes(normalizedTerm) ||
-    device.owner.email.toLowerCase().includes(normalizedTerm) ||
-    device.ownerId.toLowerCase().includes(normalizedTerm) ||
-    device.status.toLowerCase().includes(normalizedTerm) ||
-    device.version.toLowerCase().includes(normalizedTerm)
-  );
+  return devices.filter(device => [
+    device.code,
+    device.model,
+    device.serialNumber,
+    device.status,
+    device.firmwareVersion,
+    device.assignedPatient?.fullName ?? ''
+  ].some(value => value.toLowerCase().includes(term)));
 }

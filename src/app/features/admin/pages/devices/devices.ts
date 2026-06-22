@@ -4,17 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
-import {
-  CustomSelect,
-  CustomSelectOption
-} from '../../../../shared/components/custom-select/custom-select';
-import {
-  DashboardLayout
-} from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { CustomSelect, CustomSelectOption } from '../../../../shared/components/custom-select/custom-select';
+import { DashboardLayout } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { adminMenuItems } from '../../admin-menu';
 import { AdminDeviceRepository } from '../../data/admin-device.repository';
 import {
+  AdminAssignablePatient,
+  AdminCaregiverGroup,
   AdminDevice,
+  AdminDeviceDraft,
   AdminDevicesSummary,
   AdminDeviceStatus,
   filterAdminDevices
@@ -22,40 +20,39 @@ import {
 
 @Component({
   selector: 'app-admin-devices',
-  imports: [
-    DashboardLayout,
-    TranslatePipe,
-    FormsModule,
-    NgFor,
-    NgIf,
-    NgClass,
-    CustomSelect,
-    AppToast
-  ],
+  imports: [DashboardLayout, TranslatePipe, FormsModule, NgFor, NgIf, NgClass, CustomSelect, AppToast],
   templateUrl: './devices.html',
-  styleUrl: './devices.css',
+  styleUrl: './devices.css'
 })
 export class Devices {
-  adminUserId = 'admin-demo-user';
+  readonly adminUserId = 'admin-demo-user';
+  readonly menuItems = adminMenuItems;
+
   email = 'demo.admin@tukuntech.app';
+  activeView: 'inventory' | 'assignment' = 'inventory';
+  assignmentMode: 'individual' | 'caregiver' = 'individual';
   searchTerm = '';
+  patientSearchTerm = '';
+  caregiverSearchTerm = '';
   devices: AdminDevice[] = [];
-  summary: AdminDevicesSummary = {
-    total: 0,
-    online: 0,
-    offline: 0,
-    errors: 0
-  };
-  selectedDevice: AdminDevice | null = null;
-  editModel: AdminDevice | null = null;
+  individualPatients: AdminAssignablePatient[] = [];
+  caregivers: AdminCaregiverGroup[] = [];
+  summary: AdminDevicesSummary = { total: 0, available: 0, assigned: 0, errors: 0 };
+
+  modalMode: 'create' | 'edit' | null = null;
+  editingDeviceId: string | null = null;
+  deviceDraft: AdminDeviceDraft = this.createEmptyDraft();
+
+  selectedCaregiverId = '';
+  selectedPatientId = '';
+  selectedDeviceId = '';
+
   showToast = false;
   toastType: 'success' | 'error' = 'success';
   toastMessageKey = '';
 
-  menuItems = adminMenuItems;
-
   constructor(
-    private adminDeviceRepository: AdminDeviceRepository,
+    private repository: AdminDeviceRepository,
     private translateService: TranslateService
   ) {
     this.loadDashboard();
@@ -65,74 +62,126 @@ export class Devices {
     return filterAdminDevices(this.devices, this.searchTerm);
   }
 
+  get availableDevices(): AdminDevice[] {
+    return this.devices.filter(device => device.status === 'available' && !device.assignedPatient);
+  }
+
+  get availableDeviceOptions(): CustomSelectOption[] {
+    return this.availableDevices.map(device => ({
+      value: device.id,
+      label: `${device.code} · ${device.model} · ${device.serialNumber}`
+    }));
+  }
+
   get statusOptions(): CustomSelectOption[] {
-    return [
-      { label: this.translateService.instant('admin.devices.status.online'), value: 'online' },
-      { label: this.translateService.instant('admin.devices.status.offline'), value: 'offline' },
-      { label: this.translateService.instant('admin.devices.status.error'), value: 'error' }
-    ];
+    return (['available', 'online', 'offline', 'error'] as AdminDeviceStatus[]).map(status => ({
+      value: status,
+      label: this.translateService.instant(`admin.devices.status.${status}`)
+    }));
+  }
+
+  get filteredIndividualPatients(): AdminAssignablePatient[] {
+    return this.filterPatients(this.individualPatients, this.patientSearchTerm);
+  }
+
+  get filteredCaregivers(): AdminCaregiverGroup[] {
+    const term = this.caregiverSearchTerm.trim().toLowerCase();
+    if (!term) return this.caregivers;
+    return this.caregivers.filter(caregiver =>
+      caregiver.fullName.toLowerCase().includes(term) || caregiver.email.toLowerCase().includes(term)
+    );
+  }
+
+  get selectedCaregiver(): AdminCaregiverGroup | undefined {
+    return this.caregivers.find(caregiver => caregiver.id === this.selectedCaregiverId);
+  }
+
+  get selectedPatient(): AdminAssignablePatient | undefined {
+    return [...this.individualPatients, ...this.caregivers.flatMap(item => item.patients)]
+      .find(patient => patient.id === this.selectedPatientId);
+  }
+
+  openCreateModal(): void {
+    this.modalMode = 'create';
+    this.editingDeviceId = null;
+    this.deviceDraft = this.createEmptyDraft();
   }
 
   openEditModal(device: AdminDevice): void {
-    this.selectedDevice = device;
-    this.editModel = this.cloneDevice(device);
+    this.modalMode = 'edit';
+    this.editingDeviceId = device.id;
+    this.deviceDraft = {
+      code: device.code,
+      model: device.model,
+      serialNumber: device.serialNumber,
+      status: device.status,
+      firmwareVersion: device.firmwareVersion,
+      registeredAt: device.registeredAt
+    };
   }
 
-  closeEditModal(): void {
-    this.selectedDevice = null;
-    this.editModel = null;
+  closeDeviceModal(): void {
+    this.modalMode = null;
+    this.editingDeviceId = null;
   }
 
   changeStatus(status: string): void {
-    if (!this.editModel) {
-      return;
-    }
-
-    this.editModel.status = status as AdminDeviceStatus;
-  }
-
-  changeOwnerId(ownerId: string): void {
-    if (!this.editModel) {
-      return;
-    }
-
-    this.editModel.ownerId = ownerId.replace(/\D/g, '').slice(0, 6);
-  }
-
-  preventInvalidNumberInput(event: KeyboardEvent): void {
-    if (['e', 'E', '+', '-'].includes(event.key)) {
-      event.preventDefault();
-    }
+    this.deviceDraft.status = status as AdminDeviceStatus;
   }
 
   saveDevice(): void {
-    if (!this.editModel) {
+    if (!this.isValidDraft()) {
+      this.showFeedback('error', 'admin.devices.form.requiredError');
       return;
     }
 
-    if (!this.hasValidNumericParameters(this.editModel)) {
-      this.showFeedback('error', 'admin.devices.invalidParameters');
+    const request = this.modalMode === 'edit' && this.editingDeviceId
+      ? this.repository.updateDevice(this.adminUserId, this.editingDeviceId, this.deviceDraft)
+      : this.repository.createDevice(this.adminUserId, this.deviceDraft);
+
+    request.subscribe({
+      next: () => {
+        const message = this.modalMode === 'create'
+          ? 'admin.devices.createdSuccessfully'
+          : 'admin.devices.savedSuccessfully';
+        this.closeDeviceModal();
+        this.loadDashboard();
+        this.showFeedback('success', message);
+      },
+      error: () => this.showFeedback('error', 'admin.devices.saveError')
+    });
+  }
+
+  setAssignmentMode(mode: 'individual' | 'caregiver'): void {
+    this.assignmentMode = mode;
+    this.selectedPatientId = '';
+    this.selectedCaregiverId = '';
+  }
+
+  selectCaregiver(caregiverId: string): void {
+    this.selectedCaregiverId = caregiverId;
+    this.selectedPatientId = '';
+  }
+
+  selectPatient(patient: AdminAssignablePatient): void {
+    if (!patient.assignedDeviceId) this.selectedPatientId = patient.id;
+  }
+
+  confirmAssignment(): void {
+    if (!this.selectedPatientId || !this.selectedDeviceId) {
+      this.showFeedback('error', 'admin.devices.assignment.incomplete');
       return;
     }
 
-    const { id, ...update } = this.editModel;
-
-    this.adminDeviceRepository
-      .updateDevice(this.adminUserId, id, update)
-      .subscribe({
-        next: device => {
-          this.devices = this.devices.map(item =>
-            item.id === device.id
-              ? device
-              : item
-          );
-          this.closeEditModal();
-          this.showFeedback('success', 'admin.devices.savedSuccessfully');
-        },
-        error: () => {
-          this.showFeedback('error', 'admin.devices.saveError');
-        }
-      });
+    this.repository.assignDevice(this.adminUserId, this.selectedPatientId, this.selectedDeviceId).subscribe({
+      next: () => {
+        this.selectedPatientId = '';
+        this.selectedDeviceId = '';
+        this.loadDashboard();
+        this.showFeedback('success', 'admin.devices.assignment.success');
+      },
+      error: () => this.showFeedback('error', 'admin.devices.assignment.error')
+    });
   }
 
   getStatusLabelKey(status: AdminDeviceStatus): string {
@@ -144,42 +193,44 @@ export class Devices {
   }
 
   private loadDashboard(): void {
-    this.adminDeviceRepository
-      .getDashboard(this.adminUserId)
-      .subscribe(data => {
-        this.email = data.adminEmail;
-        this.devices = data.devices;
-        this.summary = data.summary;
-      });
+    this.repository.getDashboard(this.adminUserId).subscribe(data => {
+      this.email = data.adminEmail;
+      this.devices = data.devices;
+      this.summary = data.summary;
+      this.individualPatients = data.individualPatients;
+      this.caregivers = data.caregivers;
+    });
   }
 
-  private hasValidNumericParameters(device: AdminDevice): boolean {
-    const params = device.parameters;
-
-    return !!device.ownerId &&
-      params.heartRateMin > 0 &&
-      params.heartRateMax > params.heartRateMin &&
-      params.temperatureMin > 30 &&
-      params.temperatureMax > params.temperatureMin &&
-      params.oxygenSaturation >= 70 &&
-      params.oxygenSaturation <= 100;
+  private filterPatients(patients: AdminAssignablePatient[], searchTerm: string): AdminAssignablePatient[] {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return patients;
+    return patients.filter(patient =>
+      patient.fullName.toLowerCase().includes(term) || patient.email.toLowerCase().includes(term)
+    );
   }
 
-  private cloneDevice(device: AdminDevice): AdminDevice {
+  private createEmptyDraft(): AdminDeviceDraft {
     return {
-      ...device,
-      owner: { ...device.owner },
-      parameters: { ...device.parameters }
+      code: '',
+      model: '',
+      serialNumber: '',
+      status: 'available',
+      firmwareVersion: '',
+      registeredAt: new Date().toISOString().slice(0, 10)
     };
+  }
+
+  private isValidDraft(): boolean {
+    return !!this.deviceDraft.code.trim() && !!this.deviceDraft.model.trim() &&
+      !!this.deviceDraft.serialNumber.trim() && !!this.deviceDraft.firmwareVersion.trim() &&
+      !!this.deviceDraft.registeredAt;
   }
 
   private showFeedback(type: 'success' | 'error', messageKey: string): void {
     this.toastType = type;
     this.toastMessageKey = messageKey;
     this.showToast = true;
-
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+    setTimeout(() => this.showToast = false, 3000);
   }
 }

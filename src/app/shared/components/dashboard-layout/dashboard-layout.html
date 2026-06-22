@@ -13,6 +13,15 @@
   </div>
 </div>
 
+<div class="subscription-warning" *ngIf="subscriptionWarningShow">
+  <i class="bi bi-credit-card"></i>
+  <div>
+    <strong>{{ 'subscription.expiringTitle' | translate }}</strong>
+    <span>{{ 'subscription.expiringMessage' | translate:{ days: subscriptionDaysRemaining } }}</span>
+  </div>
+  <a [routerLink]="subscriptionRenewalRoute">{{ 'subscription.renewNow' | translate }}</a>
+</div>
+
 <div
   class="sidebar-backdrop"
   [ngClass]="{ 'sidebar-backdrop--show': sidebarOpen }"

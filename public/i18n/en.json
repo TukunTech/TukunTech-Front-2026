@@ -37,6 +37,23 @@
     "createOne": "Create one",
     "chooseDifferentRole": "Choose a different role"
   },
+  "subscription": {
+    "expiringTitle": "Your subscription is about to expire",
+    "expiringMessage": "You have {{days}} days left to renew the service.",
+    "expiredTitle": "Subscription expired",
+    "expiredLoginMessage": "Access expired on {{date}}. Renew your plan to sign in again.",
+    "renewNow": "Renew now",
+    "renewedLoginMessage": "Subscription renewed through {{date}}. You can now sign in.",
+    "renewedSuccessfully": "Subscription renewed successfully",
+    "canceledSuccessfully": "Subscription canceled successfully"
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "This page does not exist",
+    "description": "The address may be misspelled or the page may have moved.",
+    "goHome": "Go home",
+    "goBack": "Go back"
+  },
   "register": {
     "patient": {
       "title": "Create your patient account",
@@ -97,6 +114,19 @@
       "selectBloodType": "Select blood type",
       "additionalNotes": "Additional notes",
       "additionalNotesPlaceholder": "Allergies, conditions, anything we should know..."
+    },
+    "medicalParameters": {
+      "title": "Medical parameters",
+      "description": "Set the personalized monitoring ranges for this patient.",
+      "heartRateMin": "Minimum heart rate",
+      "heartRateMax": "Maximum heart rate",
+      "oxygenMin": "Minimum oxygen saturation",
+      "oxygenMax": "Maximum oxygen saturation",
+      "temperatureMin": "Minimum temperature",
+      "temperatureMax": "Maximum temperature",
+      "notice": "These values belong to the patient and will be used to evaluate readings and alerts. Patients and caregivers cannot edit them.",
+      "validationError": "Complete all six parameters. Each maximum must be greater than its minimum; oxygen must be between 1 and 100 and temperature between 30 and 45 °C.",
+      "caregiverValidationError": "Register at least one patient and correctly complete their six medical parameters. Patients without a name will not be registered."
     },
     "address": {
       "street": "Address",
@@ -187,6 +217,11 @@
           "notice": "Oxygen is below the configured observation range.",
           "critical": "Oxygen is critically low."
         },
+        "oxygenHigh": {
+          "title": "Oxygen above range",
+          "notice": "Oxygen is above this patient's configured maximum.",
+          "critical": "Oxygen is above the configured maximum."
+        },
         "oxygenCritical": {
           "title": "Critical oxygen",
           "notice": "Oxygen is below the configured observation range.",
@@ -246,6 +281,12 @@
       "weekly": "Weekly",
       "biweekly": "Biweekly",
       "monthly": "Monthly",
+      "allTime": "From the beginning",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To",
+      "alertsOnly": "Alerts only",
+      "noResults": "There are no records for the selected filters.",
       "generateButton": "Generate Report",
       "tableTitle": "Vital signs history",
       "date": "Date",
@@ -422,6 +463,11 @@
           "notice": "Oxygen is below the configured observation range.",
           "critical": "Oxygen is critically low."
         },
+        "oxygenHigh": {
+          "title": "Oxygen above range",
+          "notice": "Oxygen is above this patient's configured maximum.",
+          "critical": "Oxygen is above the configured maximum."
+        },
         "oxygenCritical": {
           "title": "Critical oxygen",
           "notice": "Oxygen is below the configured observation range.",
@@ -479,6 +525,12 @@
       "weekly": "Weekly",
       "biweekly": "Biweekly",
       "monthly": "Monthly",
+      "allTime": "From the beginning",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To",
+      "alertsOnly": "Alerts only",
+      "noResults": "There are no records for the selected filters.",
       "generateButton": "Generate Report",
       "tableTitle": "Vital signs history",
       "date": "Date",
@@ -628,48 +680,78 @@
     },
     "devices": {
       "title": "Devices",
-      "subtitle": "Status of all devices.",
-      "searchPlaceholder": "Search devices...",
-      "total": "total: {{total}}",
-      "edit": "Edit",
-      "savedSuccessfully": "Device settings were saved successfully",
-      "saveError": "We could not save the device settings.",
-      "invalidParameters": "Check the device parameters. Maximum values must be greater than minimum values.",
+      "subtitle": "Register equipment and assign it directly to each patient.",
+      "searchPlaceholder": "Search by code, model, serial, or patient...",
+      "total": "{{total}} devices",
+      "edit": "Edit device",
+      "newDevice": "New device",
+      "unassigned": "Unassigned",
+      "createdSuccessfully": "Device registered successfully",
+      "savedSuccessfully": "Device updated successfully",
+      "saveError": "We could not save it. Check that the code and serial are unique.",
       "summary": {
         "total": "Total",
-        "online": "Online",
-        "offline": "Offline",
-        "errors": "Errors"
+        "available": "Available",
+        "assigned": "Assigned",
+        "errors": "With errors"
+      },
+      "tabs": {
+        "inventory": "Inventory",
+        "assignment": "Assignment"
       },
       "table": {
+        "code": "Code",
+        "model": "Model",
         "serial": "Serial",
-        "owner": "Owner",
-        "id": "Id",
+        "patient": "Patient",
         "status": "Status",
-        "version": "Version"
+        "registeredAt": "Registered"
       },
       "status": {
+        "available": "Available",
         "online": "Online",
         "offline": "Offline",
         "error": "Error"
       },
-      "modal": {
-        "title": "Edit device settings",
-        "subtitle": "Update parameters.",
-        "serial": "Serial",
-        "owner": "Owner",
-        "ownerId": "Owner ID",
+      "form": {
+        "createTitle": "Register device",
+        "editTitle": "Edit device",
+        "subtitle": "Complete the equipment's technical information.",
+        "code": "Unique code",
+        "model": "Model",
+        "serial": "Serial number",
+        "version": "Firmware version",
         "status": "Status",
-        "version": "Version",
-        "ownerEmail": "Owner email",
-        "parameters": "Parameters",
-        "heartRateMin": "Heart rate MIN",
-        "heartRateMax": "Heart rate MAX",
-        "temperatureMin": "Temperature MIN",
-        "temperatureMax": "Temperature MAX",
-        "oxygenSaturation": "Oxygen saturation",
+        "registeredAt": "Registration date",
+        "availableNotice": "New devices are saved as available and without an assigned patient.",
+        "requiredError": "Complete all device fields.",
         "cancel": "Cancel",
-        "saveChanges": "Save changes"
+        "create": "Register device",
+        "save": "Save changes"
+      },
+      "assignment": {
+        "title": "Device assignment",
+        "subtitle": "Select a patient and an available device.",
+        "availableCount": "{{count}} available",
+        "individualTitle": "Individual patient",
+        "individualDescription": "Search for a patient account",
+        "caregiverTitle": "Caregiver's patient",
+        "caregiverDescription": "Search for the caregiver first",
+        "selectCaregiver": "Select caregiver",
+        "selectPatient": "Select patient",
+        "selectDevice": "Select device",
+        "searchCaregiver": "Search caregiver...",
+        "searchPatient": "Search patient...",
+        "patients": "patients",
+        "chooseCaregiverFirst": "Select a caregiver to view their patients.",
+        "alreadyAssigned": "Already has a device",
+        "assigningTo": "Assign to",
+        "devicePlaceholder": "Select an available device",
+        "rule": "The assignment is linked to the patient, not the caregiver. A patient and a device can only have one active assignment.",
+        "confirm": "Confirm assignment",
+        "incomplete": "Select a patient and a device.",
+        "success": "Device assigned to the patient successfully",
+        "error": "Assignment failed. The patient or device already has an active assignment."
       }
     },
     "common": {

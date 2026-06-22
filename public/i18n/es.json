@@ -37,6 +37,23 @@
     "createOne": "Crear una",
     "chooseDifferentRole": "Elegir otro rol"
   },
+  "subscription": {
+    "expiringTitle": "Tu suscripción está por vencer",
+    "expiringMessage": "Quedan {{days}} días para renovar el servicio.",
+    "expiredTitle": "Suscripción vencida",
+    "expiredLoginMessage": "El acceso venció el {{date}}. Renueva tu plan para volver a iniciar sesión.",
+    "renewNow": "Renovar ahora",
+    "renewedLoginMessage": "Suscripción renovada hasta {{date}}. Ya puedes iniciar sesión.",
+    "renewedSuccessfully": "Suscripción renovada correctamente",
+    "canceledSuccessfully": "Suscripción cancelada correctamente"
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "Esta página no existe",
+    "description": "La dirección puede estar mal escrita o la página pudo haber cambiado de ubicación.",
+    "goHome": "Ir al inicio",
+    "goBack": "Volver atrás"
+  },
   "register": {
     "patient": {
       "title": "Crea tu cuenta de paciente",
@@ -97,6 +114,19 @@
       "selectBloodType": "Selecciona tipo de sangre",
       "additionalNotes": "Notas adicionales",
       "additionalNotesPlaceholder": "Alergias, condiciones o información importante..."
+    },
+    "medicalParameters": {
+      "title": "Parámetros médicos",
+      "description": "Define los rangos personalizados para el monitoreo de este paciente.",
+      "heartRateMin": "Frecuencia cardíaca mínima",
+      "heartRateMax": "Frecuencia cardíaca máxima",
+      "oxygenMin": "Saturación de oxígeno mínima",
+      "oxygenMax": "Saturación de oxígeno máxima",
+      "temperatureMin": "Temperatura mínima",
+      "temperatureMax": "Temperatura máxima",
+      "notice": "Estos valores pertenecen al paciente y se usarán para evaluar sus mediciones y alertas. No podrán ser modificados por el paciente ni por su cuidador.",
+      "validationError": "Completa los seis parámetros. Cada máximo debe ser mayor que su mínimo; el oxígeno debe estar entre 1 y 100 y la temperatura entre 30 y 45 °C.",
+      "caregiverValidationError": "Registra al menos un paciente y completa correctamente sus seis parámetros médicos. Los pacientes sin nombre no serán registrados."
     },
     "address": {
       "street": "Dirección",
@@ -186,6 +216,11 @@
           "notice": "La oxigenación está por debajo del rango de observación configurado.",
           "critical": "La oxigenación está críticamente baja."
         },
+        "oxygenHigh": {
+          "title": "Oxigenación sobre el rango",
+          "notice": "La oxigenación está por encima del máximo configurado para este paciente.",
+          "critical": "La oxigenación está por encima del máximo configurado."
+        },
         "oxygenCritical": {
           "title": "Oxigenación crítica",
           "notice": "La oxigenación está por debajo del rango de observación configurado.",
@@ -245,6 +280,12 @@
       "weekly": "Semanal",
       "biweekly": "Quincenal",
       "monthly": "Mensual",
+      "allTime": "Desde el inicio",
+      "custom": "Rango personalizado",
+      "from": "Desde",
+      "to": "Hasta",
+      "alertsOnly": "Solo alertas",
+      "noResults": "No hay registros para los filtros seleccionados.",
       "generateButton": "Generar reporte",
       "tableTitle": "Historial de signos vitales",
       "date": "Fecha",
@@ -421,6 +462,11 @@
           "notice": "La oxigenación está por debajo del rango de observación configurado.",
           "critical": "La oxigenación está críticamente baja."
         },
+        "oxygenHigh": {
+          "title": "Oxigenación sobre el rango",
+          "notice": "La oxigenación está por encima del máximo configurado para este paciente.",
+          "critical": "La oxigenación está por encima del máximo configurado."
+        },
         "oxygenCritical": {
           "title": "Oxigenación crítica",
           "notice": "La oxigenación está por debajo del rango de observación configurado.",
@@ -478,6 +524,12 @@
       "weekly": "Semanal",
       "biweekly": "Quincenal",
       "monthly": "Mensual",
+      "allTime": "Desde el inicio",
+      "custom": "Rango personalizado",
+      "from": "Desde",
+      "to": "Hasta",
+      "alertsOnly": "Solo alertas",
+      "noResults": "No hay registros para los filtros seleccionados.",
       "generateButton": "Generar reporte",
       "tableTitle": "Historial de signos vitales",
       "date": "Fecha",
@@ -627,48 +679,78 @@
     },
     "devices": {
       "title": "Dispositivos",
-      "subtitle": "Estado de todos los dispositivos.",
-      "searchPlaceholder": "Buscar dispositivos...",
-      "total": "total: {{total}}",
-      "edit": "Editar",
-      "savedSuccessfully": "Configuración del dispositivo guardada correctamente",
-      "saveError": "No se pudo guardar la configuración del dispositivo.",
-      "invalidParameters": "Revisa los parámetros del dispositivo. Los máximos deben ser mayores que los mínimos.",
+      "subtitle": "Registra equipos y asígnalos directamente a cada paciente.",
+      "searchPlaceholder": "Buscar por código, modelo, serial o paciente...",
+      "total": "{{total}} dispositivos",
+      "edit": "Editar dispositivo",
+      "newDevice": "Nuevo dispositivo",
+      "unassigned": "Sin asignar",
+      "createdSuccessfully": "Dispositivo registrado correctamente",
+      "savedSuccessfully": "Dispositivo actualizado correctamente",
+      "saveError": "No se pudo guardar. Revisa que el código y el serial sean únicos.",
       "summary": {
         "total": "Total",
-        "online": "En línea",
-        "offline": "Sin conexión",
-        "errors": "Errores"
+        "available": "Disponibles",
+        "assigned": "Asignados",
+        "errors": "Con errores"
+      },
+      "tabs": {
+        "inventory": "Inventario",
+        "assignment": "Asignación"
       },
       "table": {
+        "code": "Código",
+        "model": "Modelo",
         "serial": "Serial",
-        "owner": "Propietario",
-        "id": "Id",
+        "patient": "Paciente",
         "status": "Estado",
-        "version": "Versión"
+        "registeredAt": "Registro"
       },
       "status": {
+        "available": "Disponible",
         "online": "En línea",
         "offline": "Sin conexión",
         "error": "Error"
       },
-      "modal": {
-        "title": "Editar configuración del dispositivo",
-        "subtitle": "Actualiza parámetros.",
-        "serial": "Serial",
-        "owner": "Propietario",
-        "ownerId": "ID propietario",
+      "form": {
+        "createTitle": "Registrar dispositivo",
+        "editTitle": "Editar dispositivo",
+        "subtitle": "Completa la información técnica del equipo.",
+        "code": "Código único",
+        "model": "Modelo",
+        "serial": "Número de serie",
+        "version": "Versión de firmware",
         "status": "Estado",
-        "version": "Versión",
-        "ownerEmail": "Correo del propietario",
-        "parameters": "Parámetros",
-        "heartRateMin": "Ritmo cardíaco MIN",
-        "heartRateMax": "Ritmo cardíaco MAX",
-        "temperatureMin": "Temperatura MIN",
-        "temperatureMax": "Temperatura MAX",
-        "oxygenSaturation": "Saturación de oxígeno",
+        "registeredAt": "Fecha de registro",
+        "availableNotice": "Los dispositivos nuevos se guardan como disponibles y sin paciente asignado.",
+        "requiredError": "Completa todos los campos del dispositivo.",
         "cancel": "Cancelar",
-        "saveChanges": "Guardar cambios"
+        "create": "Registrar dispositivo",
+        "save": "Guardar cambios"
+      },
+      "assignment": {
+        "title": "Asignación de dispositivos",
+        "subtitle": "Selecciona un paciente y un dispositivo disponible.",
+        "availableCount": "{{count}} disponibles",
+        "individualTitle": "Paciente individual",
+        "individualDescription": "Buscar una cuenta de paciente",
+        "caregiverTitle": "Paciente de cuidador",
+        "caregiverDescription": "Buscar primero al cuidador",
+        "selectCaregiver": "Seleccionar cuidador",
+        "selectPatient": "Seleccionar paciente",
+        "selectDevice": "Seleccionar dispositivo",
+        "searchCaregiver": "Buscar cuidador...",
+        "searchPatient": "Buscar paciente...",
+        "patients": "pacientes",
+        "chooseCaregiverFirst": "Selecciona un cuidador para ver sus pacientes.",
+        "alreadyAssigned": "Ya tiene dispositivo",
+        "assigningTo": "Asignar a",
+        "devicePlaceholder": "Selecciona un dispositivo disponible",
+        "rule": "La asignación queda vinculada al paciente, no al cuidador. Un paciente y un dispositivo solo pueden tener una asignación activa.",
+        "confirm": "Confirmar asignación",
+        "incomplete": "Selecciona un paciente y un dispositivo.",
+        "success": "Dispositivo asignado correctamente al paciente",
+        "error": "No se pudo asignar. El paciente o el dispositivo ya tiene una asignación activa."
       }
     },
     "common": {
