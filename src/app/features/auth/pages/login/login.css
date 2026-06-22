@@ -37,6 +37,21 @@
   font-weight: 600;
 }
 
+.subscription-blocked {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #f0b6b6;
+  border-radius: 16px;
+  background: #fff1f1;
+  color: #8e2529;
+  display: flex;
+  gap: 12px;
+}
+
+.subscription-blocked p { margin: 3px 0 8px; font-size: 12px; }
+.subscription-blocked button { border: 0; background: transparent; color: #287666; padding: 0; font-weight: 700; cursor: pointer; }
+.renewal-success { padding: 10px; border-radius: 14px; background: #e8f6ed; color: #287666; font-size: 12px; }
+
 .login-form {
   display: flex;
   flex-direction: column;
