@@ -16,6 +16,10 @@ import {
 } from '../../components/patient-form/patient-form';
 
 import { AddressMap } from '../../components/address-map/address-map';
+import {
+  createEmptyRegistrationPatient,
+  hasValidMedicalParameters
+} from '../../domain/registration-patient';
 
 @Component({
   selector: 'app-register-caregiver',
@@ -38,6 +42,7 @@ export class RegisterCaregiver {
 
   currentStep = 1;
   activePatientIndex = 0;
+  showMedicalParametersError = false;
 
   email = '';
   password = '';
@@ -70,19 +75,29 @@ export class RegisterCaregiver {
   ];
 
   createEmptyPatient(): PatientFormData {
-    return {
-      fullName: '',
-      age: '',
-      gender: '',
-      bloodType: '',
-      additionalNotes: ''
-    };
+    return createEmptyRegistrationPatient();
   }
 
   continue() {
+    if (this.currentStep === 3 && !this.canContinue) {
+      this.showMedicalParametersError = true;
+      return;
+    }
+
+    this.showMedicalParametersError = false;
+
     if (this.currentStep < this.steps.length) {
       this.currentStep++;
     }
+  }
+
+  get canContinue(): boolean {
+    if (this.currentStep !== 3) {
+      return true;
+    }
+
+    const registeredPatients = this.patients.filter(patient => patient.fullName.trim());
+    return registeredPatients.length > 0 && registeredPatients.every(hasValidMedicalParameters);
   }
 
   backStep() {

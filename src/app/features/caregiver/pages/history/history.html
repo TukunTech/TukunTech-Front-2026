@@ -14,7 +14,7 @@
       <p>{{ 'caregiver.history.subtitle' | translate }}</p>
     </div>
 
-    <section class="report-card">
+    <section class="report-card" [class.report-card--custom]="selectedPeriod === 'custom'">
       <div class="report-left">
         <i class="bi bi-file-earmark-arrow-down"></i>
 
@@ -34,6 +34,15 @@
             [placeholder]="'caregiver.history.patientPlaceholder' | translate">
           </app-custom-select>
         </div>
+
+        <ng-container *ngIf="selectedPeriod === 'custom'">
+          <div class="report-field"><label>{{ 'caregiver.history.from' | translate }}</label><input type="date" [(ngModel)]="dateFrom" (ngModelChange)="changeCustomRange()" /></div>
+          <div class="report-field"><label>{{ 'caregiver.history.to' | translate }}</label><input type="date" [(ngModel)]="dateTo" (ngModelChange)="changeCustomRange()" /></div>
+        </ng-container>
+
+        <button class="alert-filter" type="button" [class.alert-filter--active]="alertsOnly" (click)="toggleAlertsOnly()">
+          <i class="bi bi-bell"></i>{{ 'caregiver.history.alertsOnly' | translate }}
+        </button>
 
         <div class="report-field">
           <label>{{ 'caregiver.history.period' | translate }}</label>
@@ -115,6 +124,7 @@
           </span>
         </div>
       </div>
+      <p class="empty-history" *ngIf="!history.length">{{ 'caregiver.history.noResults' | translate }}</p>
     </section>
 
     <section class="info-banner">

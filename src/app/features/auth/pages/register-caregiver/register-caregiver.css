@@ -440,6 +440,21 @@
     0 8px 18px rgba(63, 162, 146, 0.22);
 }
 
+.continue-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fff1f1;
+  color: #b4232a;
+  font-size: 12px;
+}
+
 .secondary-link {
   width: 100%;
   margin-top: 18px;

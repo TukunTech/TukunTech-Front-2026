@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { DeviceAssignmentStore } from '../../../core/device-assignment/device-assignment.store';
 
 import {
-  DeviceAlertParameters,
-  DeviceAlertParametersStore
-} from '../../../core/device-parameters/device-alert-parameters.store';
+  PatientMedicalParameters,
+  PatientMedicalParametersStore
+} from '../../../core/patient-monitoring/patient-medical-parameters.store';
 import {
   CaregiverPatientSummary,
   CaregiverVitalAlertSettings,
@@ -17,7 +18,10 @@ import {
 export class CaregiverVitalSignsRepository {
   private patients: CaregiverPatientSummary[] = [];
 
-  constructor(private parametersStore: DeviceAlertParametersStore) {
+  constructor(
+    private parametersStore: PatientMedicalParametersStore,
+    private assignmentStore: DeviceAssignmentStore
+  ) {
     this.patients = this.createPatients();
   }
 
@@ -99,6 +103,7 @@ export class CaregiverVitalSignsRepository {
     connectionStatus: CaregiverPatientSummary['device']['connectionStatus']
   ): CaregiverPatientSummary {
     const alertSettings = this.createDefaultAlertSettings(userId);
+    const assignment = this.assignmentStore.getByPatient(userId);
 
     return {
       userId,
@@ -114,11 +119,11 @@ export class CaregiverVitalSignsRepository {
       },
       alertSettings,
       device: {
-        id: deviceId,
-        model: 'TukunTech IoT',
+        id: assignment?.deviceId ?? '',
+        model: assignment?.model ?? 'TukunTech IoT',
         battery,
         wifiStrength,
-        connectionStatus
+        connectionStatus: assignment?.connectionStatus ?? 'offline'
       }
     };
   }
@@ -136,7 +141,7 @@ export class CaregiverVitalSignsRepository {
         'CB-8DF3-01',
         86,
         'strong',
-        'online'
+        'online',
       ),
       this.createPatient(
         'patient-charls',
@@ -149,7 +154,7 @@ export class CaregiverVitalSignsRepository {
         'CZ-K230-01',
         45,
         'strong',
-        'online'
+        'online',
       ),
       this.createPatient(
         'patient-miguel',
@@ -158,38 +163,38 @@ export class CaregiverVitalSignsRepository {
         78,
         92,
         99,
-        37.2,
+        36.6,
         'CX-771A-04',
         64,
         'medium',
-        'online'
+        'online',
       ),
       this.createPatient(
         'patient-marian',
         'Marian Medilla',
         'MM',
         88,
-        76,
+        99,
         97,
         36.8,
         'CM-660E-12',
         78,
         'strong',
-        'online'
+        'online',
       ),
       this.createPatient(
         'patient-robert',
         'Robert Silva',
         'RS',
         69,
-        0,
-        0,
-        0,
+        88,
+        99,
+        36.8,
         'CR-520F-08',
-        22,
+        66,
         'weak',
-        'offline'
-      )
+        'online',
+      ),
     ];
   }
 
@@ -200,7 +205,7 @@ export class CaregiverVitalSignsRepository {
   }
 
   private mapParametersToAlertSettings(
-    parameters: DeviceAlertParameters
+    parameters: PatientMedicalParameters
   ): CaregiverVitalAlertSettings {
     return {
       patientUserId: parameters.patientUserId,
@@ -211,8 +216,9 @@ export class CaregiverVitalSignsRepository {
         criticalHigh: parameters.heartRateMax + 20
       },
       oxygen: {
-        noticeLow: parameters.oxygenSaturation,
-        criticalLow: Math.max(1, parameters.oxygenSaturation - 5)
+        noticeLow: parameters.oxygenSaturationMin,
+        criticalLow: Math.max(1, parameters.oxygenSaturationMin - 5),
+        noticeHigh: parameters.oxygenSaturationMax
       },
       temperature: {
         noticeLow: parameters.temperatureMin,

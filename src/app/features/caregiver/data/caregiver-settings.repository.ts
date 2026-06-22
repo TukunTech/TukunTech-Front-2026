@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { SubscriptionAccessStore } from '../../../core/subscription/subscription-access.store';
 
 import { AppLanguage } from '../../../core/i18n/language.service';
 import {
@@ -12,6 +13,7 @@ import {
   providedIn: 'root'
 })
 export class CaregiverSettingsRepository {
+  constructor(private subscriptionStore: SubscriptionAccessStore) {}
   private preferences: CaregiverSettingsPreferences = {
     caregiverUserId: 'caregiver-demo-user',
     language: 'en'
@@ -20,13 +22,14 @@ export class CaregiverSettingsRepository {
   private subscription: CaregiverFamilySubscription = {
     id: 'caregiver-family-plus',
     name: 'TukunTech Family Plus',
-    renewsOn: '2026-06-09',
+    renewsOn: '2026-06-24',
     priceLabel: '$200',
     status: 'active',
     planLabel: 'Premium - monthly'
   };
 
   getSettings(caregiverUserId: string): Observable<CaregiverSettingsDashboard> {
+    const access = this.subscriptionStore.getRoleAccess('caregiver');
     return of({
       caregiverUserId,
       caregiverEmail: 'demo.caregiver@tukuntech.app',
@@ -34,7 +37,11 @@ export class CaregiverSettingsRepository {
         ...this.preferences,
         caregiverUserId
       },
-      subscription: { ...this.subscription }
+      subscription: {
+        ...this.subscription,
+        renewsOn: access.renewsOn,
+        status: access.status === 'active' ? 'active' : access.status === 'canceled' ? 'canceled' : 'inactive'
+      }
     });
   }
 
@@ -53,9 +60,11 @@ export class CaregiverSettingsRepository {
   renewSubscription(
     caregiverUserId: string
   ): Observable<CaregiverFamilySubscription> {
+    const access = this.subscriptionStore.renew('demo.caregiver@tukuntech.app', 'caregiver');
     this.subscription = {
       ...this.subscription,
-      status: 'active'
+      status: 'active',
+      renewsOn: access.renewsOn
     };
 
     return of({ ...this.subscription });
@@ -64,6 +73,7 @@ export class CaregiverSettingsRepository {
   cancelSubscription(
     caregiverUserId: string
   ): Observable<CaregiverFamilySubscription> {
+    this.subscriptionStore.cancel('demo.caregiver@tukuntech.app', 'caregiver');
     this.subscription = {
       ...this.subscription,
       status: 'canceled'

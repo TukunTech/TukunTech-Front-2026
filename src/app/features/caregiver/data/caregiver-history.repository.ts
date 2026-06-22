@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { PatientMedicalParametersStore } from '../../../core/patient-monitoring/patient-medical-parameters.store';
 
 import {
   CaregiverHistoryDashboard,
+  CaregiverHistoryQuery,
   CaregiverHistoryPatient,
   CaregiverHistoryPeriod,
   CaregiverHistorySeedRecord,
@@ -26,29 +28,30 @@ export class CaregiverHistoryRepository {
     { userId: 'patient-robert', fullName: 'Robert Silva', initials: 'RS' }
   ];
 
-  private readonly alertSettings = new Map<string, CaregiverVitalAlertSettings>(
-    this.patients.map(patient => [
+  private readonly alertSettings = new Map<string, CaregiverVitalAlertSettings>();
+  private records: CaregiverVitalHistoryRecord[] = [];
+
+  constructor(private parametersStore: PatientMedicalParametersStore) {
+    this.patients.forEach(patient => this.alertSettings.set(
       patient.userId,
       this.createDefaultAlertSettings(patient.userId)
-    ])
-  );
-
-  private records: CaregiverVitalHistoryRecord[] = this.createSeedRecords()
-    .map(seed => createCaregiverHistoryRecord(
+    ));
+    this.records = this.createSeedRecords().map(seed => createCaregiverHistoryRecord(
       seed,
       this.getAlertSettings(seed.patientUserId),
       evaluateCaregiverPatientVitals
     ));
+  }
 
   getDashboard(
     caregiverUserId: string,
-    period: CaregiverHistoryPeriod
+    query: CaregiverHistoryQuery
   ): Observable<CaregiverHistoryDashboard> {
     return of({
       caregiverUserId,
       caregiverEmail: 'demo.caregiver@tukuntech.app',
       patients: this.patients.map(patient => ({ ...patient })),
-      records: this.filterRecordsByPeriod(this.records, period)
+      records: this.filterRecords(this.records, query)
         .map(record => this.cloneRecord(record))
     });
   }
@@ -56,31 +59,35 @@ export class CaregiverHistoryRepository {
   getPatientHistory(
     caregiverUserId: string,
     patientUserId: string,
-    period: CaregiverHistoryPeriod
+    query: CaregiverHistoryQuery
   ): Observable<CaregiverVitalHistoryRecord[]> {
     const records = this.records
       .filter(record => record.patientUserId === patientUserId);
 
-    return of(this.filterRecordsByPeriod(records, period)
+    return of(this.filterRecords(records, query)
       .map(record => this.cloneRecord(record)));
   }
 
   private createDefaultAlertSettings(patientUserId: string): CaregiverVitalAlertSettings {
+    const parameters = this.parametersStore.getParameters(patientUserId);
     return {
       patientUserId,
       heartRate: {
-        criticalLow: 50,
-        noticeLow: 60,
-        noticeHigh: 100,
-        criticalHigh: 120
+        criticalLow: Math.max(1, parameters.heartRateMin - 10),
+        noticeLow: parameters.heartRateMin,
+        noticeHigh: parameters.heartRateMax,
+        criticalHigh: parameters.heartRateMax + 20
       },
       oxygen: {
-        noticeLow: 95,
-        criticalLow: 90
+        noticeLow: parameters.oxygenSaturationMin,
+        criticalLow: Math.max(1, parameters.oxygenSaturationMin - 5),
+        noticeHigh: parameters.oxygenSaturationMax
       },
       temperature: {
-        noticeHigh: 38,
-        criticalHigh: 39
+        noticeLow: parameters.temperatureMin,
+        criticalLow: parameters.temperatureMin - 1,
+        noticeHigh: parameters.temperatureMax,
+        criticalHigh: parameters.temperatureMax + 1
       }
     };
   }
@@ -90,16 +97,35 @@ export class CaregiverHistoryRepository {
       || this.createDefaultAlertSettings(patientUserId);
   }
 
-  private filterRecordsByPeriod(
+  private filterRecords(
     records: CaregiverVitalHistoryRecord[],
-    period: CaregiverHistoryPeriod
+    query: CaregiverHistoryQuery
   ): CaregiverVitalHistoryRecord[] {
-    const daysByPeriod: Record<CaregiverHistoryPeriod, number> = {
+    let filteredRecords = query.alertsOnly
+      ? records.filter(record => record.alerts.length > 0)
+      : [...records];
+
+    if (query.period === 'custom') {
+      const from = query.from ? new Date(`${query.from}T00:00:00`).getTime() : Number.MIN_SAFE_INTEGER;
+      const to = query.to ? new Date(`${query.to}T23:59:59.999`).getTime() : Number.MAX_SAFE_INTEGER;
+      filteredRecords = filteredRecords.filter(record => {
+        const timestamp = new Date(record.recordedAt).getTime();
+        return timestamp >= from && timestamp <= to;
+      });
+    }
+
+    if (query.period === 'all' || query.period === 'custom') {
+      return filteredRecords.sort((first, second) =>
+        new Date(second.recordedAt).getTime() - new Date(first.recordedAt).getTime()
+      );
+    }
+
+    const daysByPeriod: Record<Exclude<CaregiverHistoryPeriod, 'all' | 'custom'>, number> = {
       weekly: 7,
       biweekly: 15,
       monthly: 30
     };
-    const latestRecord = records
+    const latestRecord = filteredRecords
       .map(record => new Date(record.recordedAt).getTime())
       .sort((first, second) => second - first)[0];
 
@@ -107,9 +133,9 @@ export class CaregiverHistoryRepository {
       return [];
     }
 
-    const minimumDate = latestRecord - (daysByPeriod[period] * 24 * 60 * 60 * 1000);
+    const minimumDate = latestRecord - (daysByPeriod[query.period] * 24 * 60 * 60 * 1000);
 
-    return records
+    return filteredRecords
       .filter(record => new Date(record.recordedAt).getTime() >= minimumDate)
       .sort((first, second) =>
         new Date(second.recordedAt).getTime() - new Date(first.recordedAt).getTime()
@@ -129,7 +155,7 @@ export class CaregiverHistoryRepository {
   }
 
   private createSeedRecords(): CaregiverHistorySeedRecord[] {
-    return [
+    const recentRecords = [
       this.record('history-eleanor-001', 'patient-eleanor', '2026-06-04T09:00:00.000Z', 'hourly', 74, 60, 98, 98, 95, 99, 36.7),
       this.record('history-eleanor-002', 'patient-eleanor', '2026-06-03T09:00:00.000Z', 'noticeAlert', 58, 54, 88, 97, 95, 99, 36.9),
       this.record('history-eleanor-003', 'patient-eleanor', '2026-05-30T09:00:00.000Z', 'hourly', 72, 60, 96, 98, 95, 99, 36.6),
@@ -155,6 +181,31 @@ export class CaregiverHistoryRepository {
       this.record('history-robert-003', 'patient-robert', '2026-05-26T09:00:00.000Z', 'noticeAlert', 54, 50, 88, 96, 94, 98, 36.6),
       this.record('history-robert-004', 'patient-robert', '2026-05-10T09:00:00.000Z', 'hourly', 72, 60, 90, 98, 95, 99, 36.8)
     ];
+
+    const generatedRecords = this.patients.flatMap((patient, patientIndex) =>
+      Array.from({ length: 91 }, (_, index) => {
+        const date = new Date('2026-06-20T09:00:00.000Z');
+        date.setUTCDate(date.getUTCDate() - (index * 3));
+        const isCritical = index % 17 === 0;
+        const isNotice = !isCritical && index % 6 === 0;
+
+        return this.record(
+          `history-generated-${patient.userId}-${index + 1}`,
+          patient.userId,
+          date.toISOString(),
+          isCritical ? 'criticalAlert' : isNotice ? 'noticeAlert' : 'hourly',
+          isCritical ? 128 : isNotice ? 108 : 70 + ((index + patientIndex) % 22),
+          60,
+          100,
+          isCritical ? 87 : isNotice ? 93 : 96 + (index % 4),
+          95,
+          100,
+          isCritical ? 39.3 : isNotice ? 38.1 : 36.3 + ((index % 8) / 10)
+        );
+      })
+    );
+
+    return [...recentRecords, ...generatedRecords];
   }
 
   private record(

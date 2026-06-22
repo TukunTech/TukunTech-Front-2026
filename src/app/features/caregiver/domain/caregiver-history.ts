@@ -5,7 +5,14 @@ import {
   CaregiverVitalAlertSeverity
 } from './caregiver-vital-signs';
 
-export type CaregiverHistoryPeriod = 'weekly' | 'biweekly' | 'monthly';
+export type CaregiverHistoryPeriod = 'weekly' | 'biweekly' | 'monthly' | 'all' | 'custom';
+
+export interface CaregiverHistoryQuery {
+  period: CaregiverHistoryPeriod;
+  from?: string;
+  to?: string;
+  alertsOnly?: boolean;
+}
 
 export type CaregiverHistorySource =
   | 'hourly'

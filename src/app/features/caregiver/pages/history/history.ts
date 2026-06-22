@@ -1,5 +1,6 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -30,7 +31,8 @@ import { CaregiverVitalAlert } from '../../domain/caregiver-vital-signs';
     CustomSelect,
     NgFor,
     NgIf,
-    NgClass
+    NgClass,
+    FormsModule
   ],
   templateUrl: './history.html',
   styleUrl: './history.css',
@@ -47,6 +49,9 @@ export class History {
   selectedPatientId = '';
   selectedReportPatientId = '';
   selectedPeriod: CaregiverHistoryPeriod = 'weekly';
+  dateFrom = '2026-01-01';
+  dateTo = '2026-06-20';
+  alertsOnly = false;
   history: CaregiverVitalHistoryRecord[] = [];
 
   menuItems: DashboardMenuItem[] = [
@@ -79,6 +84,8 @@ export class History {
       { label: this.translateService.instant('caregiver.history.weekly'), value: 'weekly' },
       { label: this.translateService.instant('caregiver.history.biweekly'), value: 'biweekly' },
       { label: this.translateService.instant('caregiver.history.monthly'), value: 'monthly' }
+      ,{ label: this.translateService.instant('caregiver.history.allTime'), value: 'all' }
+      ,{ label: this.translateService.instant('caregiver.history.custom'), value: 'custom' }
     ];
   }
 
@@ -100,6 +107,15 @@ export class History {
 
   changePeriod(period: string): void {
     this.selectedPeriod = period as CaregiverHistoryPeriod;
+    this.loadHistory();
+  }
+
+  changeCustomRange(): void {
+    if (this.selectedPeriod === 'custom') this.loadHistory();
+  }
+
+  toggleAlertsOnly(): void {
+    this.alertsOnly = !this.alertsOnly;
     this.loadHistory();
   }
 
@@ -178,7 +194,7 @@ export class History {
     }
 
     this.caregiverHistoryRepository
-      .getPatientHistory(this.caregiverUserId, selectedPatient.userId, this.selectedPeriod)
+      .getPatientHistory(this.caregiverUserId, selectedPatient.userId, this.historyQuery)
       .subscribe(records => {
         const doc = new jsPDF();
         const title = this.translateService.instant('caregiver.history.reportTitle');
@@ -214,7 +230,7 @@ export class History {
 
   private loadDashboard(): void {
     this.caregiverHistoryRepository
-      .getDashboard(this.caregiverUserId, this.selectedPeriod)
+      .getDashboard(this.caregiverUserId, this.historyQuery)
       .subscribe(data => {
         this.email = data.caregiverEmail;
         this.patients = data.patients;
@@ -242,7 +258,7 @@ export class History {
     }
 
     this.caregiverHistoryRepository
-      .getPatientHistory(this.caregiverUserId, this.selectedPatientId, this.selectedPeriod)
+      .getPatientHistory(this.caregiverUserId, this.selectedPatientId, this.historyQuery)
       .subscribe(history => {
         this.history = history;
       });
@@ -252,6 +268,15 @@ export class History {
     return this.periodOptions.find(option =>
       option.value === this.selectedPeriod
     )?.label || this.selectedPeriod;
+  }
+
+  private get historyQuery() {
+    return {
+      period: this.selectedPeriod,
+      from: this.dateFrom,
+      to: this.dateTo,
+      alertsOnly: this.alertsOnly
+    };
   }
 
   private getReportStatus(item: CaregiverVitalHistoryRecord): string {

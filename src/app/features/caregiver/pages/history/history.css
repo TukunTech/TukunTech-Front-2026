@@ -64,11 +64,18 @@
 }
 
 .report-actions {
-  display: grid;
-  grid-template-columns: 190px 170px auto;
-  align-items: end;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
   gap: 16px;
+  white-space: nowrap;
 }
+
+.report-field:first-child { width: 190px; }
+.report-field:has(input[type='date']) { width: 145px; }
+.report-actions .report-field:nth-last-of-type(1) { width: 135px; }
+.report-card--custom { align-items: flex-start; flex-direction: column; }
+.report-card--custom .report-actions { width: 100%; }
 
 .report-field label {
   display: block;
@@ -77,6 +84,29 @@
   color: #667985;
   font-size: 14px;
 }
+
+.report-field input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dbe6e5;
+  border-radius: 999px;
+  background: white;
+  color: #667985;
+}
+
+.alert-filter {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #9bcfc7;
+  border-radius: 999px;
+  background: white;
+  color: #287666;
+  cursor: pointer;
+  flex: 0 0 150px;
+}
+
+.alert-filter--active { background: #287666; color: white; }
+.empty-history { padding: 26px; text-align: center; color: #667985; }
 
 .report-field ::ng-deep .custom-select {
   margin-bottom: 0;
@@ -91,6 +121,7 @@
 
 .generate-button {
   height: 40px;
+  min-width: 190px;
   padding: 0 22px;
 
   border: none;
@@ -355,8 +386,14 @@
 
   .report-actions {
     width: 100%;
-    grid-template-columns: 1fr 1fr auto;
+    display: grid;
+    grid-template-columns: 190px 150px 135px minmax(190px, 1fr);
   }
+
+  .report-card--custom .report-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .report-field:first-child,
+  .report-field:has(input[type='date']),
+  .report-actions .report-field:nth-last-of-type(1) { width: auto; }
 
   .patient-tabs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -387,6 +424,8 @@
   .patient-tabs {
     grid-template-columns: 1fr;
   }
+
+  .report-card--custom .report-actions { grid-template-columns: 1fr; }
 
   .generate-button {
     width: 100%;

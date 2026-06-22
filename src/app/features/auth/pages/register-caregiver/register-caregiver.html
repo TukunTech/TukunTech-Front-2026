@@ -141,6 +141,11 @@
           [(patient)]="patients[activePatientIndex]">
         </app-patient-form>
 
+        <p class="form-error" *ngIf="showMedicalParametersError">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ 'register.medicalParameters.caregiverValidationError' | translate }}
+        </p>
+
         <div class="patient-navigation">
 
           <button

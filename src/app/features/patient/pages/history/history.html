@@ -44,7 +44,19 @@
           <option value="weekly">{{ 'patient.history.weekly' | translate }}</option>
           <option value="biweekly">{{ 'patient.history.biweekly' | translate }}</option>
           <option value="monthly">{{ 'patient.history.monthly' | translate }}</option>
+          <option value="all">{{ 'patient.history.allTime' | translate }}</option>
+          <option value="custom">{{ 'patient.history.custom' | translate }}</option>
         </select>
+
+        <ng-container *ngIf="selectedPeriod === 'custom'">
+          <input class="date-filter" type="date" [(ngModel)]="dateFrom" (ngModelChange)="changeCustomRange()" [attr.aria-label]="'patient.history.from' | translate" />
+          <input class="date-filter" type="date" [(ngModel)]="dateTo" (ngModelChange)="changeCustomRange()" [attr.aria-label]="'patient.history.to' | translate" />
+        </ng-container>
+
+        <button class="alert-filter" type="button" [class.alert-filter--active]="alertsOnly" (click)="toggleAlertsOnly()">
+          <i class="bi bi-bell"></i>
+          {{ 'patient.history.alertsOnly' | translate }}
+        </button>
 
         <button class="generate-button" type="button" (click)="generateReport()">
           <i class="bi bi-download"></i>
@@ -105,6 +117,8 @@
         </div>
 
       </div>
+
+      <p class="empty-history" *ngIf="!history.length">{{ 'patient.history.noResults' | translate }}</p>
 
     </section>
 

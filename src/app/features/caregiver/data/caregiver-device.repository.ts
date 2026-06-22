@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { DeviceAssignmentStore } from '../../../core/device-assignment/device-assignment.store';
 
 import {
   CaregiverDeviceConnectionStatus,
@@ -10,9 +11,10 @@ import {
 } from '../domain/caregiver-device';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CaregiverDeviceRepository {
+  constructor(private assignmentStore: DeviceAssignmentStore) {}
   private devices: CaregiverPatientDevice[] = [
     this.createDevice(
       'device-eleanor',
@@ -25,7 +27,7 @@ export class CaregiverDeviceRepository {
       'strong',
       96,
       'good',
-      'online'
+      'online',
     ),
     this.createDevice(
       'device-charls',
@@ -38,7 +40,7 @@ export class CaregiverDeviceRepository {
       'strong',
       94,
       'good',
-      'online'
+      'online',
     ),
     this.createDevice(
       'device-miguel',
@@ -51,7 +53,7 @@ export class CaregiverDeviceRepository {
       'medium',
       90,
       'good',
-      'online'
+      'online',
     ),
     this.createDevice(
       'device-marian',
@@ -64,7 +66,7 @@ export class CaregiverDeviceRepository {
       'strong',
       95,
       'good',
-      'online'
+      'online',
     ),
     this.createDevice(
       'device-robert',
@@ -77,43 +79,70 @@ export class CaregiverDeviceRepository {
       'weak',
       0,
       'failed',
-      'offline'
-    )
+      'online',
+    ),
   ];
 
   getDashboard(caregiverUserId: string): Observable<CaregiverDeviceDashboard> {
     return of({
       caregiverUserId,
       caregiverEmail: 'demo.caregiver@tukuntech.app',
-      devices: this.devices.map(device => this.cloneDevice(device))
+      devices: this.devices.flatMap((device) => {
+        const assignment = this.assignmentStore.getByPatient(device.patient.userId);
+        return assignment
+          ? [
+              {
+                ...this.cloneDevice(device),
+                id: assignment.deviceId,
+                label: assignment.model,
+                serialNumber: assignment.serialNumber,
+                firmwareVersion: assignment.firmwareVersion,
+                connectionStatus: assignment.connectionStatus,
+              },
+            ]
+          : [];
+      }),
     });
   }
 
   getDeviceByPatient(
     caregiverUserId: string,
-    patientUserId: string
+    patientUserId: string,
   ): Observable<CaregiverPatientDevice | undefined> {
-    const device = this.devices.find(item => item.patient.userId === patientUserId);
+    const device = this.devices.find((item) => item.patient.userId === patientUserId);
+    const assignment = this.assignmentStore.getByPatient(patientUserId);
 
-    return of(device ? this.cloneDevice(device) : undefined);
+    return of(
+      device && assignment
+        ? {
+            ...this.cloneDevice(device),
+            id: assignment.deviceId,
+            label: assignment.model,
+            serialNumber: assignment.serialNumber,
+            firmwareVersion: assignment.firmwareVersion,
+            connectionStatus: assignment.connectionStatus,
+          }
+        : undefined,
+    );
   }
 
   updateConnectionStatus(
     patientUserId: string,
-    connectionStatus: CaregiverDeviceConnectionStatus
+    connectionStatus: CaregiverDeviceConnectionStatus,
   ): Observable<CaregiverPatientDevice | undefined> {
-    this.devices = this.devices.map(device => {
+    this.devices = this.devices.map((device) => {
       if (device.patient.userId !== patientUserId) {
         return device;
       }
 
       return {
         ...device,
-        connectionStatus
+        connectionStatus,
       };
     });
+    this.assignmentStore.setConnectionStatus(patientUserId, connectionStatus);
 
-    const device = this.devices.find(item => item.patient.userId === patientUserId);
+    const device = this.devices.find((item) => item.patient.userId === patientUserId);
 
     return of(device ? this.cloneDevice(device) : undefined);
   }
@@ -129,14 +158,14 @@ export class CaregiverDeviceRepository {
     wifiSignalLevel: CaregiverDeviceSignalLevel,
     syncPercent: number,
     syncStatus: CaregiverDeviceSyncStatus,
-    connectionStatus: CaregiverDeviceConnectionStatus
+    connectionStatus: CaregiverDeviceConnectionStatus,
   ): CaregiverPatientDevice {
     return {
       id,
       patient: {
         userId: patientUserId,
         fullName,
-        initials
+        initials,
       },
       label: 'TukunTech IOT',
       serialNumber,
@@ -147,14 +176,14 @@ export class CaregiverDeviceRepository {
       wifiSignalLevel,
       syncPercent,
       syncStatus,
-      lastSyncedAt: '2026-06-04T09:00:00.000Z'
+      lastSyncedAt: '2026-06-04T09:00:00.000Z',
     };
   }
 
   private cloneDevice(device: CaregiverPatientDevice): CaregiverPatientDevice {
     return {
       ...device,
-      patient: { ...device.patient }
+      patient: { ...device.patient },
     };
   }
 }
