@@ -96,19 +96,13 @@
   color: #667985;
 }
 
-.report-actions select {
-  width: 150px;
-  height: 40px;
+.report-actions ::ng-deep .custom-select {
+  width: 170px;
+}
 
-  border: 1px solid #dbe6e5;
+.report-actions ::ng-deep .custom-select__control {
+  min-height: 40px;
   border-radius: 999px;
-
-  padding: 0 16px;
-
-  background: white;
-  color: #667985;
-
-  outline: none;
 }
 
 .date-filter {
@@ -306,7 +300,7 @@
     width: 100%;
   }
 
-  .report-actions select,
+  .report-actions ::ng-deep .custom-select,
   .date-filter,
   .alert-filter,
   .generate-button {

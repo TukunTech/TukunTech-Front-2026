@@ -1,3 +1,69 @@
+<section class="patient-account-fields">
+  <div class="patient-form-section-title">
+    <i class="bi bi-person-badge"></i>
+    <div>
+      <h3>{{ 'register.patientAccount.title' | translate }}</h3>
+      <p>{{ 'register.patientAccount.description' | translate }}</p>
+    </div>
+  </div>
+
+  <label>
+    {{ 'register.patientAccount.email' | translate }}
+  </label>
+
+  <input
+    type="email"
+    name="patientEmail"
+    [(ngModel)]="patient.email"
+    (ngModelChange)="emitChange()"
+    [placeholder]="'register.patientAccount.emailPlaceholder' | translate"
+  />
+
+  <div class="form-grid">
+    <div>
+      <label>
+        {{ 'register.patientAccount.password' | translate }}
+      </label>
+
+      <input
+        type="password"
+        name="patientPassword"
+        [(ngModel)]="patient.password"
+        (ngModelChange)="emitChange()"
+        [placeholder]="'register.account.passwordPlaceholder' | translate"
+      />
+    </div>
+
+    <div>
+      <label>
+        {{ 'register.patientAccount.confirmPassword' | translate }}
+      </label>
+
+      <input
+        type="password"
+        name="patientConfirmPassword"
+        [(ngModel)]="patient.confirmPassword"
+        (ngModelChange)="emitChange()"
+        [placeholder]="'register.account.passwordPlaceholder' | translate"
+      />
+    </div>
+  </div>
+
+  <label>
+    {{ 'register.patientAccount.dni' | translate }}
+  </label>
+
+  <input
+    type="text"
+    name="patientDni"
+    maxlength="8"
+    inputmode="numeric"
+    [(ngModel)]="patient.dni"
+    (ngModelChange)="emitChange()"
+    [placeholder]="'register.patientAccount.dniPlaceholder' | translate"
+  />
+</section>
+
 <label>
   {{ 'register.personal.fullName' | translate }}
 </label>

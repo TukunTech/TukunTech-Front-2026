@@ -8,34 +8,31 @@
 
     <div class="plan-options">
 
-      <button class="plan-option-card" type="button" (click)="goToPatientRegister()">
+      <button
+        class="plan-option-card"
+        type="button"
+        *ngFor="let plan of plans"
+        (click)="choosePlan(plan.id)"
+      >
         <div class="plan-option-content">
-          <div class="plan-option-icon plan-option-icon--blue">
-            <i class="bi bi-person"></i>
+          <div
+            class="plan-option-icon"
+            [class.plan-option-icon--blue]="plan.tone === 'blue'"
+            [class.plan-option-icon--green]="plan.tone === 'green'"
+          >
+            <i [class]="plan.icon"></i>
           </div>
 
           <div>
-            <h2>{{ 'registerPlan.individual.title' | translate }}</h2>
-            <p>{{ 'registerPlan.individual.description' | translate }}</p>
+            <h2>{{ plan.titleKey | translate }}</h2>
+            <p>{{ plan.descriptionKey | translate }}</p>
           </div>
         </div>
 
-        <i class="bi bi-arrow-right plan-option-arrow"></i>
-      </button>
-
-      <button class="plan-option-card" type="button" (click)="goToCaregiverRegister()">
-        <div class="plan-option-content">
-          <div class="plan-option-icon plan-option-icon--green">
-            <i class="bi bi-heart"></i>
-          </div>
-
-          <div>
-            <h2>{{ 'registerPlan.family.title' | translate }}</h2>
-            <p>{{ 'registerPlan.family.description' | translate }}</p>
-          </div>
-        </div>
-
-        <i class="bi bi-arrow-right plan-option-arrow"></i>
+        <span class="plan-option-price">
+          <span>{{ 'registerPlan.initialPayment' | translate }}: ${{ plan.initialPrice }}</span>
+          <strong>{{ 'registerPlan.monthlyPayment' | translate }}: ${{ plan.monthlyPrice }}/mo</strong>
+        </span>
       </button>
 
     </div>

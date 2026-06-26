@@ -9,6 +9,10 @@ import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import {
+  CustomSelect,
+  CustomSelectOption
+} from '../../../../shared/components/custom-select/custom-select';
 import { PatientAlertRepository } from '../../data/patient-alert.repository';
 import { PatientHistoryRepository } from '../../data/patient-history.repository';
 import {
@@ -20,7 +24,7 @@ import { PatientVitalAlert } from '../../domain/patient-vitals';
 
 @Component({
   selector: 'app-history',
-  imports: [DashboardLayout, TranslatePipe, FormsModule, NgFor, NgIf, NgClass],
+  imports: [DashboardLayout, TranslatePipe, FormsModule, NgFor, NgIf, NgClass, CustomSelect],
   templateUrl: './history.html',
   styleUrl: './history.css',
 })
@@ -64,6 +68,16 @@ export class History {
   changePeriod(period: string): void {
     this.selectedPeriod = period as PatientHistoryPeriod;
     this.loadHistory();
+  }
+
+  get periodOptions(): CustomSelectOption[] {
+    return [
+      { label: this.translateService.instant('patient.history.weekly'), value: 'weekly' },
+      { label: this.translateService.instant('patient.history.biweekly'), value: 'biweekly' },
+      { label: this.translateService.instant('patient.history.monthly'), value: 'monthly' },
+      { label: this.translateService.instant('patient.history.allTime'), value: 'all' },
+      { label: this.translateService.instant('patient.history.custom'), value: 'custom' }
+    ];
   }
 
   changeCustomRange(): void {

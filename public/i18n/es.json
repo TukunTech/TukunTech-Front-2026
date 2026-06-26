@@ -7,6 +7,8 @@
   "welcome": {
     "title": "Bienvenido a TukunTech",
     "subtitle": "Elige tu rol para continuar.",
+    "memberTitle": "Soy paciente o cuidador",
+    "memberDescription": "Ingresa con tu correo. El sistema reconocerá tu acceso automáticamente.",
     "patientTitle": "Soy Paciente",
     "patientDescription": "Accede a tus signos vitales, dispositivo y suscripción.",
     "caregiverTitle": "Soy Cuidador / Familiar",
@@ -19,10 +21,12 @@
   "roles": {
     "patient": "Paciente",
     "caregiver": "Cuidador",
+    "member": "Paciente / Cuidador",
     "admin": "Administrador"
   },
   "login": {
     "title": {
+      "user": "Inicio de sesión",
       "patient": "Inicio de sesión de paciente",
       "caregiver": "Inicio de sesión de cuidador",
       "admin": "Inicio de sesión de administrador"
@@ -59,6 +63,10 @@
       "title": "Crea tu cuenta de paciente",
       "subtitle": "Suscríbete para activar tu TukunTech."
     },
+    "unified": {
+      "title": "Crea tu cuenta TukunTech",
+      "subtitle": "Primero registra al cuidador y luego los pacientes incluidos en tu plan."
+    },
     "steps": {
       "plan": "Plan",
       "account": "Cuenta",
@@ -72,7 +80,27 @@
       "recommended": "RECOMENDADO",
       "personal": {
         "title": "Plan Individual",
-        "description": "1 dispositivo TukunTech · signos vitales · 50GB en la nube · acceso app móvil y web"
+        "description": "1 dispositivo TukunTech · signos vitales · acceso app móvil y web"
+      },
+      "individualCare": {
+        "title": "Plan individual",
+        "description": "1 paciente + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+      },
+      "family2": {
+        "title": "Plan familiar 2",
+        "description": "2 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+      },
+      "family3": {
+        "title": "Plan familiar 3",
+        "description": "3 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+      },
+      "family4": {
+        "title": "Plan familiar 4",
+        "description": "4 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+      },
+      "family5": {
+        "title": "Plan familiar 5",
+        "description": "5 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
       },
       "family": {
         "title": "Family Pro",
@@ -83,7 +111,7 @@
       "title": "Crea tu cuenta Family Pro",
       "subtitle": "Monitorea hasta 5 pacientes bajo tu cuidado.",
       "patient": "Paciente",
-      "registerPatientsInfo": "Registra a los 5 pacientes bajo tu cuidado.",
+      "registerPatientsInfo": "Registra los {{count}} pacientes incluidos en este plan.",
       "previousPatient": "Paciente anterior",
       "nextPatient": "Siguiente paciente",
       "backToAccount": "Volver a cuenta",
@@ -91,10 +119,23 @@
     },
     "account": {
       "email": "Correo electrónico",
+      "caregiverEmail": "Correo electrónico del cuidador",
       "emailPlaceholder": "tu@ejemplo.com",
       "password": "Contraseña",
+      "caregiverPassword": "Contraseña del cuidador",
       "confirmPassword": "Confirmar contraseña",
+      "caregiverConfirmPassword": "Confirmar contraseña del cuidador",
       "passwordPlaceholder": "••••••••"
+    },
+    "patientAccount": {
+      "title": "Cuenta del paciente",
+      "description": "Cada paciente tendrá su propio acceso independiente.",
+      "email": "Correo electrónico del paciente",
+      "emailPlaceholder": "paciente@ejemplo.com",
+      "password": "Contraseña del paciente",
+      "confirmPassword": "Confirmar contraseña del paciente",
+      "dni": "DNI",
+      "dniPlaceholder": "8 dígitos"
     },
     "actions": {
       "continue": "Continuar",
@@ -126,7 +167,7 @@
       "temperatureMax": "Temperatura máxima",
       "notice": "Estos valores pertenecen al paciente y se usarán para evaluar sus mediciones y alertas. No podrán ser modificados por el paciente ni por su cuidador.",
       "validationError": "Completa los seis parámetros. Cada máximo debe ser mayor que su mínimo; el oxígeno debe estar entre 1 y 100 y la temperatura entre 30 y 45 °C.",
-      "caregiverValidationError": "Registra al menos un paciente y completa correctamente sus seis parámetros médicos. Los pacientes sin nombre no serán registrados."
+      "caregiverValidationError": "Completa los {{count}} pacientes del plan. Cada paciente debe tener correo, contraseña, DNI de 8 dígitos, datos personales y sus seis parámetros médicos."
     },
     "address": {
       "street": "Dirección",
@@ -147,26 +188,40 @@
       "description": "Este es un paso de pago simulado. La pasarela real se conectará más adelante.",
       "plan": "Plan individual",
       "mockPay": "Simular pago y continuar",
-      "familyPlan": "Plan Family Pro"
+      "familyPlan": "Plan seleccionado"
     },
     "done": {
       "title": "Cuenta creada",
       "description": "Tu cuenta de paciente fue creada correctamente.",
-      "familyTitle": "Cuenta Family Pro creada",
-      "familyDescription": "Tu cuenta de cuidador y pacientes fue registrada correctamente.",
+      "familyTitle": "Cuenta TukunTech creada",
+      "familyDescription": "Tu cuenta de cuidador y las cuentas de pacientes fueron registradas correctamente.",
       "goToWebsite": "Ir a la página web"
     }
   },
   "registerPlan": {
     "title": "Crea tu cuenta",
     "subtitle": "Elige el plan que se adapta a ti. Las cuentas se crean durante el registro.",
+    "initialPayment": "Pago inicial",
+    "monthlyPayment": "Mensual",
     "individual": {
       "title": "Plan individual",
-      "description": "1 dispositivo TukunTech · signos vitales · 50GB de almacenamiento en la nube · acceso web y móvil"
+      "description": "1 paciente + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
     },
-    "family": {
-      "title": "Plan familiar",
-      "description": "Hasta 5 dispositivos TukunTech · dashboard familiar · monitoreo de signos vitales · acceso web y móvil"
+    "family2": {
+      "title": "Plan familiar 2",
+      "description": "2 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+    },
+    "family3": {
+      "title": "Plan familiar 3",
+      "description": "3 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+    },
+    "family4": {
+      "title": "Plan familiar 4",
+      "description": "4 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
+    },
+    "family5": {
+      "title": "Plan familiar 5",
+      "description": "5 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil"
     },
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "signIn": "Iniciar sesión"

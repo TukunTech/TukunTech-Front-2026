@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -18,8 +19,20 @@ import {
 import { AddressMap } from '../../components/address-map/address-map';
 import {
   createEmptyRegistrationPatient,
-  hasValidMedicalParameters
+  hasValidRegistrationPatient
 } from '../../domain/registration-patient';
+
+interface RegisterPlanOption {
+  id: 'individual' | 'family-2' | 'family-3' | 'family-4' | 'family-5';
+  titleKey: string;
+  descriptionKey: string;
+  patients: number;
+  monthlyPrice: number;
+  initialPrice: number;
+  monthlyStripePriceId: string;
+  initialStripePriceId: string;
+  recommended?: boolean;
+}
 
 @Component({
   selector: 'app-register-caregiver',
@@ -38,7 +51,15 @@ import {
 })
 export class RegisterCaregiver {
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    const requestedPlan = this.route.snapshot.queryParamMap.get('plan');
+    const matchingPlan = this.planOptions.find(plan => plan.id === requestedPlan);
+    this.selectedPlan = matchingPlan ?? this.planOptions[0];
+    this.syncPatientsWithPlan();
+  }
 
   currentStep = 1;
   activePatientIndex = 0;
@@ -56,6 +77,62 @@ export class RegisterCaregiver {
   showPassword = false;
   showConfirmPassword = false;
 
+  selectedPlan!: RegisterPlanOption;
+
+  planOptions: RegisterPlanOption[] = [
+    {
+      id: 'individual',
+      titleKey: 'register.plan.individualCare.title',
+      descriptionKey: 'register.plan.individualCare.description',
+      patients: 1,
+      monthlyPrice: 15,
+      initialPrice: 50,
+      monthlyStripePriceId: 'price_1TlKxoKE2OW5fr4NtaaptoKG',
+      initialStripePriceId: 'price_1TlL0uKE2OW5fr4NJVs86Hxg'
+    },
+    {
+      id: 'family-2',
+      titleKey: 'register.plan.family2.title',
+      descriptionKey: 'register.plan.family2.description',
+      patients: 2,
+      monthlyPrice: 28,
+      initialPrice: 95,
+      monthlyStripePriceId: 'price_1TlWHFKE2OW5fr4NMGsrsJyi',
+      initialStripePriceId: 'price_1TlWHgKE2OW5fr4N3EE7ulm7'
+    },
+    {
+      id: 'family-3',
+      titleKey: 'register.plan.family3.title',
+      descriptionKey: 'register.plan.family3.description',
+      patients: 3,
+      monthlyPrice: 40,
+      initialPrice: 140,
+      monthlyStripePriceId: 'price_1TlWHzKE2OW5fr4NVlwwbWaL',
+      initialStripePriceId: 'price_1TlWIEKE2OW5fr4N6IYuqNzH',
+      recommended: true
+    },
+    {
+      id: 'family-4',
+      titleKey: 'register.plan.family4.title',
+      descriptionKey: 'register.plan.family4.description',
+      patients: 4,
+      monthlyPrice: 52,
+      initialPrice: 180,
+      monthlyStripePriceId: 'price_1TlWIRKE2OW5fr4NUYmM5vvk',
+      initialStripePriceId: 'price_1TlWIeKE2OW5fr4NDHoURaeG'
+    },
+    {
+      id: 'family-5',
+      titleKey: 'register.plan.family5.title',
+      descriptionKey: 'register.plan.family5.description',
+      patients: 5,
+      monthlyPrice: 62,
+      initialPrice: 215,
+      monthlyStripePriceId: 'price_1TlWIrKE2OW5fr4Ns4OAz36U',
+      initialStripePriceId: 'price_1TlWJ3KE2OW5fr4NCK15zWxe'
+    }
+  ];
+
   steps: RegisterStep[] = [
     { number: 1, key: 'register.steps.plan' },
     { number: 2, key: 'register.steps.account' },
@@ -66,13 +143,7 @@ export class RegisterCaregiver {
     { number: 7, key: 'register.steps.done' },
   ];
 
-  patients: PatientFormData[] = [
-    this.createEmptyPatient(),
-    this.createEmptyPatient(),
-    this.createEmptyPatient(),
-    this.createEmptyPatient(),
-    this.createEmptyPatient(),
-  ];
+  patients: PatientFormData[] = [];
 
   createEmptyPatient(): PatientFormData {
     return createEmptyRegistrationPatient();
@@ -96,8 +167,8 @@ export class RegisterCaregiver {
       return true;
     }
 
-    const registeredPatients = this.patients.filter(patient => patient.fullName.trim());
-    return registeredPatients.length > 0 && registeredPatients.every(hasValidMedicalParameters);
+    return this.patients.length === this.selectedPlan.patients &&
+      this.patients.every(hasValidRegistrationPatient);
   }
 
   backStep() {
@@ -136,5 +207,21 @@ export class RegisterCaregiver {
     if (this.activePatientIndex > 0) {
       this.activePatientIndex--;
     }
+  }
+
+  get selectedMonthlyPrice(): string {
+    return `$${this.selectedPlan.monthlyPrice}/mo`;
+  }
+
+  get selectedInitialPrice(): string {
+    return `$${this.selectedPlan.initialPrice}`;
+  }
+
+  private syncPatientsWithPlan(): void {
+    const nextPatients = [...this.patients];
+    while (nextPatients.length < this.selectedPlan.patients) {
+      nextPatients.push(this.createEmptyPatient());
+    }
+    this.patients = nextPatients.slice(0, this.selectedPlan.patients);
   }
 }

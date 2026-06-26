@@ -2,8 +2,8 @@
   <div class="register-container">
 
     <div class="register-header">
-      <h1>{{ 'register.family.title' | translate }}</h1>
-      <p>{{ 'register.family.subtitle' | translate }}</p>
+      <h1>{{ 'register.unified.title' | translate }}</h1>
+      <p>{{ 'register.unified.subtitle' | translate }}</p>
     </div>
 
     <!-- STEPPER -->
@@ -17,27 +17,30 @@
 
     <div *ngIf="currentStep === 1" class="plans">
 
-      <div class="plan-card plan-card--selected">
+      <section class="plan-confirmation-card plan-card plan-card--selected">
 
         <div>
 
           <div class="plan-title-row">
-            <h2>{{ 'register.plan.family.title' | translate }}</h2>
+            <h2>{{ selectedPlan.titleKey | translate }}</h2>
 
-            <span>
+            <span *ngIf="selectedPlan.recommended">
               {{ 'register.plan.recommended' | translate }}
             </span>
           </div>
 
           <p>
-            {{ 'register.plan.family.description' | translate }}
+            {{ selectedPlan.descriptionKey | translate }}
           </p>
 
         </div>
 
-        <strong>$200/mo</strong>
+        <strong class="plan-price-stack">
+          <span>{{ 'registerPlan.initialPayment' | translate }}: {{ selectedInitialPrice }}</span>
+          <b>{{ 'registerPlan.monthlyPayment' | translate }}: {{ selectedMonthlyPrice }}</b>
+        </strong>
 
-      </div>
+      </section>
 
     </div>
 
@@ -46,7 +49,7 @@
     <div *ngIf="currentStep === 2" class="register-card">
 
       <label>
-        {{ 'register.account.email' | translate }}
+        {{ 'register.account.caregiverEmail' | translate }}
       </label>
 
       <input
@@ -57,7 +60,7 @@
       />
 
       <label>
-        {{ 'register.account.password' | translate }}
+        {{ 'register.account.caregiverPassword' | translate }}
       </label>
 
       <div class="password-input-wrapper">
@@ -84,7 +87,7 @@
       </div>
 
       <label>
-        {{ 'register.account.confirmPassword' | translate }}
+        {{ 'register.account.caregiverConfirmPassword' | translate }}
       </label>
 
       <div class="password-input-wrapper">
@@ -120,7 +123,7 @@
 
       <div class="patients-info-banner">
         <i class="bi bi-people"></i>
-        <span>{{ 'register.family.registerPatientsInfo' | translate }}</span>
+        <span>{{ 'register.family.registerPatientsInfo' | translate:{ count: selectedPlan.patients } }}</span>
       </div>
 
       <div class="patient-tabs">
@@ -143,7 +146,7 @@
 
         <p class="form-error" *ngIf="showMedicalParametersError">
           <i class="bi bi-exclamation-circle"></i>
-          {{ 'register.medicalParameters.caregiverValidationError' | translate }}
+          {{ 'register.medicalParameters.caregiverValidationError' | translate:{ count: selectedPlan.patients } }}
         </p>
 
         <div class="patient-navigation">
@@ -247,7 +250,10 @@
           {{ 'register.payment.familyPlan' | translate }}
         </span>
 
-        <strong>$200/mo</strong>
+        <strong class="payment-price-stack">
+          <span>{{ 'registerPlan.initialPayment' | translate }}: {{ selectedInitialPrice }}</span>
+          <b>{{ 'registerPlan.monthlyPayment' | translate }}: {{ selectedMonthlyPrice }}</b>
+        </strong>
 
       </div>
 

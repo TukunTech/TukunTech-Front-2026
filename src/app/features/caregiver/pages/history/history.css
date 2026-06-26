@@ -68,7 +68,6 @@
   align-items: flex-end;
   justify-content: flex-end;
   gap: 16px;
-  white-space: nowrap;
 }
 
 .report-field:first-child { width: 190px; }
@@ -110,6 +109,8 @@
 
 .report-field ::ng-deep .custom-select {
   margin-bottom: 0;
+  min-width: 0;
+  white-space: normal;
 }
 
 .report-field ::ng-deep .custom-select__control {

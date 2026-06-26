@@ -19,14 +19,14 @@ export class SubscriptionAccessStore {
     {
       email: 'demo.patient@tukuntech.app',
       role: 'patient',
-      status: 'canceled',
-      renewsOn: '2026-06-23',
+      status: 'active',
+      renewsOn: '2026-07-23',
     },
     {
       email: 'demo.caregiver@tukuntech.app',
       role: 'caregiver',
       status: 'active',
-      renewsOn: '2026-06-24',
+      renewsOn: '2026-07-24',
     },
     {
       email: 'expired.patient@tukuntech.app',

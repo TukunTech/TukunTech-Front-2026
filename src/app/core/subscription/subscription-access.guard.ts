@@ -10,7 +10,7 @@ function createGuard(role: SubscriptionRole): CanActivateFn {
 
     return access.canAccess
       ? true
-      : router.createUrlTree(['/login', role], { queryParams: { reason: 'subscription-expired' } });
+      : router.createUrlTree(['/login'], { queryParams: { reason: 'subscription-expired', role } });
   };
 }
 

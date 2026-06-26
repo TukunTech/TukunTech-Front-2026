@@ -98,9 +98,21 @@
   color: #667985;
 }
 
-.plan-option-arrow {
+.plan-option-price {
   color: #7a8a93;
-  font-size: 18px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.plan-option-price strong {
+  color: #10232b;
+  font-size: 13px;
+  font-weight: 600
 }
 
 .sign-in-text {

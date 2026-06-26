@@ -8,6 +8,10 @@ export interface PatientMedicalParameters {
 }
 
 export interface RegistrationPatient {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  dni: string;
   fullName: string;
   age: string;
   gender: string;
@@ -18,6 +22,10 @@ export interface RegistrationPatient {
 
 export function createEmptyRegistrationPatient(): RegistrationPatient {
   return {
+    email: '',
+    password: '',
+    confirmPassword: '',
+    dni: '',
     fullName: '',
     age: '',
     gender: '',
@@ -34,6 +42,13 @@ export function createEmptyRegistrationPatient(): RegistrationPatient {
   };
 }
 
+export function hasValidPatientAccount(patient: RegistrationPatient): boolean {
+  return /^\S+@\S+\.\S+$/.test(patient.email.trim()) &&
+    patient.password.length >= 6 &&
+    patient.password === patient.confirmPassword &&
+    /^\d{8}$/.test(patient.dni.trim());
+}
+
 export function hasValidMedicalParameters(patient: RegistrationPatient): boolean {
   const parameters = patient.medicalParameters;
   const values = Object.values(parameters);
@@ -47,4 +62,13 @@ export function hasValidMedicalParameters(patient: RegistrationPatient): boolean
     parameters.temperatureMin! >= 30 &&
     parameters.temperatureMax! <= 45 &&
     parameters.temperatureMax! > parameters.temperatureMin!;
+}
+
+export function hasValidRegistrationPatient(patient: RegistrationPatient): boolean {
+  return !!patient.fullName.trim() &&
+    !!patient.age &&
+    !!patient.gender &&
+    !!patient.bloodType &&
+    hasValidPatientAccount(patient) &&
+    hasValidMedicalParameters(patient);
 }

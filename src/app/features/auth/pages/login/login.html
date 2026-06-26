@@ -2,19 +2,18 @@
   <div class="login-container">
 
     <div class="login-header">
-      <h1>{{ 'login.title.' + role | translate }}</h1>
+      <h1>{{ titleKey | translate }}</h1>
       <p>{{ 'login.subtitle' | translate }}</p>
     </div>
 
     <div class="role-pill">
       <i
         class="bi"
-        [class.bi-person]="role === 'patient'"
-        [class.bi-heart]="role === 'caregiver'"
-        [class.bi-shield]="role === 'admin'"
+        [class.bi-person-heart]="!isAdminLogin"
+        [class.bi-shield]="isAdminLogin"
       ></i>
 
-      <span>{{ 'roles.' + role | translate }}</span>
+      <span>{{ roleLabelKey | translate }}</span>
     </div>
 
     <section class="subscription-blocked" *ngIf="subscriptionBlocked">
@@ -79,7 +78,7 @@
 
     </form>
 
-    <p class="create-account" *ngIf="role !== 'admin'">
+    <p class="create-account" *ngIf="!isAdminLogin">
       {{ 'login.noAccount' | translate }}
       <button type="button" (click)="goToCreateAccount()">
         {{ 'login.createOne' | translate }}

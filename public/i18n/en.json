@@ -7,6 +7,8 @@
   "welcome": {
     "title": "Welcome to TukunTech",
     "subtitle": "Choose your role to continue.",
+    "memberTitle": "I'm a patient or caregiver",
+    "memberDescription": "Sign in with your email. The system will recognize your access automatically.",
     "patientTitle": "I'm a Patient",
     "patientDescription": "Access your personal vitals, device and subscription.",
     "caregiverTitle": "I'm a Caregiver / Family member",
@@ -19,10 +21,12 @@
   "roles": {
     "patient": "Patient",
     "caregiver": "Caregiver",
+    "member": "Patient / Caregiver",
     "admin": "Admin"
   },
   "login": {
     "title": {
+      "user": "Sign in",
       "patient": "Patient sign in",
       "caregiver": "Caregiver sign in",
       "admin": "Administrator sign in"
@@ -59,11 +63,15 @@
       "title": "Create your patient account",
       "subtitle": "Subscribe to activate your TukunTech."
     },
+    "unified": {
+      "title": "Create your TukunTech account",
+      "subtitle": "Register the caregiver first, then the patients included in your plan."
+    },
     "family": {
       "title": "Create your Family Pro account",
       "subtitle": "Monitor up to 5 patients under your care.",
       "patient": "Patient",
-      "registerPatientsInfo": "Register all 5 patients under your care.",
+      "registerPatientsInfo": "Register the {{count}} patients included in this plan.",
       "previousPatient": "Previous patient",
       "nextPatient": "Next patient",
       "backToAccount": "Back to account",
@@ -84,17 +92,50 @@
         "title": "Individual plan",
         "description": "1 TukunTech device · vitals · 50GB cloud storage · Mobile app and web access"
       },
+      "individualCare": {
+        "title": "Individual plan",
+        "description": "1 patient + 1 caregiver · vital signs monitoring · web and mobile access"
+      },
+      "family2": {
+        "title": "Family plan 2",
+        "description": "2 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+      },
+      "family3": {
+        "title": "Family plan 3",
+        "description": "3 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+      },
+      "family4": {
+        "title": "Family plan 4",
+        "description": "4 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+      },
+      "family5": {
+        "title": "Family plan 5",
+        "description": "5 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+      },
       "family": {
         "title": "Family Pro",
-        "description": "Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access"
+        "description": "Up to 5 TukunTech devices · vital signs monitoring · web and mobile access"
       }
     },
     "account": {
       "email": "Email",
+      "caregiverEmail": "Caregiver email",
       "emailPlaceholder": "you@example.com",
       "password": "Password",
+      "caregiverPassword": "Caregiver password",
       "confirmPassword": "Confirm password",
+      "caregiverConfirmPassword": "Confirm caregiver password",
       "passwordPlaceholder": "••••••••"
+    },
+    "patientAccount": {
+      "title": "Patient account",
+      "description": "Each patient will have their own independent access.",
+      "email": "Patient email",
+      "emailPlaceholder": "patient@example.com",
+      "password": "Patient password",
+      "confirmPassword": "Confirm patient password",
+      "dni": "DNI",
+      "dniPlaceholder": "8 digits"
     },
     "actions": {
       "continue": "Continue",
@@ -126,7 +167,7 @@
       "temperatureMax": "Maximum temperature",
       "notice": "These values belong to the patient and will be used to evaluate readings and alerts. Patients and caregivers cannot edit them.",
       "validationError": "Complete all six parameters. Each maximum must be greater than its minimum; oxygen must be between 1 and 100 and temperature between 30 and 45 °C.",
-      "caregiverValidationError": "Register at least one patient and correctly complete their six medical parameters. Patients without a name will not be registered."
+      "caregiverValidationError": "Complete the {{count}} patients in the plan. Each patient needs email, password, an 8-digit DNI, personal data and their six medical parameters."
     },
     "address": {
       "street": "Address",
@@ -146,14 +187,14 @@
       "title": "Payment",
       "description": "This is a mock payment step. The real payment gateway will be connected later.",
       "plan": "Individual plan",
-      "familyPlan": "Family Pro plan",
+      "familyPlan": "Selected plan",
       "mockPay": "Simulate payment and continue"
     },
     "done": {
       "title": "Account created",
       "description": "Your patient account has been created successfully.",
-      "familyTitle": "Family Pro account created",
-      "familyDescription": "Your caregiver account and patients were registered successfully.",
+      "familyTitle": "TukunTech account created",
+      "familyDescription": "Your caregiver account and patient accounts were registered successfully.",
       "goToDashboard": "Go to dashboard",
       "goToWebsite": "Go to website"
     }
@@ -161,13 +202,27 @@
   "registerPlan": {
     "title": "Create your account",
     "subtitle": "Choose the plan that fits you. Accounts are created during checkout.",
+    "initialPayment": "Initial payment",
+    "monthlyPayment": "Monthly",
     "individual": {
       "title": "Individual plan",
-      "description": "1 TukunTech device · vitals · 50GB cloud storage · Mobile app and web access"
+      "description": "1 patient + 1 caregiver · vital signs monitoring · web and mobile access"
     },
-    "family": {
-      "title": "Family plan",
-      "description": "Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access"
+    "family2": {
+      "title": "Family plan 2",
+      "description": "2 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+    },
+    "family3": {
+      "title": "Family plan 3",
+      "description": "3 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+    },
+    "family4": {
+      "title": "Family plan 4",
+      "description": "4 patients + 1 caregiver · vital signs monitoring · web and mobile access"
+    },
+    "family5": {
+      "title": "Family plan 5",
+      "description": "5 patients + 1 caregiver · vital signs monitoring · web and mobile access"
     },
     "alreadyHaveAccount": "Already have an account?",
     "signIn": "Sign in"

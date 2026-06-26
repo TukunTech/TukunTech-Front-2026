@@ -37,16 +37,12 @@
           {{ 'patient.history.period' | translate }}
         </label>
 
-        <select
-          [ngModel]="selectedPeriod"
-          (ngModelChange)="changePeriod($event)"
-        >
-          <option value="weekly">{{ 'patient.history.weekly' | translate }}</option>
-          <option value="biweekly">{{ 'patient.history.biweekly' | translate }}</option>
-          <option value="monthly">{{ 'patient.history.monthly' | translate }}</option>
-          <option value="all">{{ 'patient.history.allTime' | translate }}</option>
-          <option value="custom">{{ 'patient.history.custom' | translate }}</option>
-        </select>
+        <app-custom-select
+          [options]="periodOptions"
+          [value]="selectedPeriod"
+          (valueChange)="changePeriod($event)"
+          [placeholder]="'patient.history.period' | translate">
+        </app-custom-select>
 
         <ng-container *ngIf="selectedPeriod === 'custom'">
           <input class="date-filter" type="date" [(ngModel)]="dateFrom" (ngModelChange)="changeCustomRange()" [attr.aria-label]="'patient.history.from' | translate" />

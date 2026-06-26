@@ -35,7 +35,7 @@ export class DashboardLayout implements OnInit {
     if (!role) return;
     const access = this.subscriptionStore.getRoleAccess(role);
     if (!access.canAccess) {
-      this.router.navigate(['/login', role], { queryParams: { reason: 'subscription-expired' } });
+      this.router.navigate(['/login'], { queryParams: { reason: 'subscription-expired', role } });
       return;
     }
     this.subscriptionWarningShow = access.canAccess && access.daysRemaining <= 7;

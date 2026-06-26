@@ -36,7 +36,14 @@ export class Login {
       this.role = currentRole;
     }
 
-    this.email = `demo.${this.role}@tukuntech.app`;
+    const blockedRole = this.route.snapshot.queryParamMap.get('role');
+    if (blockedRole === 'caregiver' || blockedRole === 'patient') {
+      this.role = blockedRole;
+    }
+
+    this.email = this.role === 'admin'
+      ? 'demo.admin@tukuntech.app'
+      : 'demo.caregiver@tukuntech.app';
     this.subscriptionBlocked = this.route.snapshot.queryParamMap.get('reason') === 'subscription-expired';
     if (this.subscriptionBlocked && this.role !== 'admin') {
       this.blockedRenewalDate = this.subscriptionStore.getRoleAccess(this.role).renewsOn;
@@ -44,8 +51,10 @@ export class Login {
   }
 
   signIn() {
-    if (this.role !== 'admin') {
-      const access = this.subscriptionStore.getAccountAccess(this.email, this.role);
+    const resolvedRole = this.resolveRoleFromEmail();
+
+    if (resolvedRole !== 'admin') {
+      const access = this.subscriptionStore.getAccountAccess(this.email, resolvedRole);
       if (!access.canAccess) {
         this.subscriptionBlocked = true;
         this.renewalSucceeded = false;
@@ -54,12 +63,12 @@ export class Login {
       }
     }
 
-    if (this.role === 'patient') {
+    if (resolvedRole === 'patient') {
       this.router.navigate(['/patient/today']);
       return;
     }
 
-    if (this.role === 'caregiver') {
+    if (resolvedRole === 'caregiver') {
       this.router.navigate(['/caregiver/vital-signs']);
       return;
     }
@@ -68,8 +77,9 @@ export class Login {
   }
 
   renewSubscription(): void {
-    if (this.role === 'admin') return;
-    const access = this.subscriptionStore.renew(this.email, this.role);
+    const resolvedRole = this.resolveRoleFromEmail();
+    if (resolvedRole === 'admin') return;
+    const access = this.subscriptionStore.renew(this.email, resolvedRole);
     this.subscriptionBlocked = false;
     this.renewalSucceeded = true;
     this.blockedRenewalDate = access.renewsOn;
@@ -80,14 +90,7 @@ export class Login {
   }
 
   goToCreateAccount() {
-    if (this.role === 'patient') {
-      this.router.navigate(['/register/patient']);
-      return;
-    }
-
-    if (this.role === 'caregiver') {
-      this.router.navigate(['/register/caregiver']);
-    }
+    this.router.navigate(['/register']);
   }
 
 
@@ -99,5 +102,26 @@ export class Login {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  get isAdminLogin(): boolean {
+    return this.role === 'admin';
+  }
+
+  get titleKey(): string {
+    return this.isAdminLogin ? 'login.title.admin' : 'login.title.user';
+  }
+
+  get roleLabelKey(): string {
+    return this.isAdminLogin ? 'roles.admin' : 'roles.member';
+  }
+
+  private resolveRoleFromEmail(): 'patient' | 'caregiver' | 'admin' {
+    if (this.role === 'admin') {
+      return 'admin';
+    }
+
+    const normalizedEmail = this.email.trim().toLowerCase();
+    return normalizedEmail.includes('patient') ? 'patient' : 'caregiver';
   }
 }

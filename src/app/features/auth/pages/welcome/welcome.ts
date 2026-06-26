@@ -17,8 +17,8 @@ export class Welcome {
     private languageService: LanguageService
   ) {}
 
-  goToLogin(role: string) {
-    this.router.navigate([`/login/${role}`]);
+  goToLogin(role?: string) {
+    this.router.navigate(role === 'admin' ? ['/login/admin'] : ['/login']);
   }
 
   get currentLanguage(): AppLanguage {

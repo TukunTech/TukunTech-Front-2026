@@ -2,6 +2,9 @@
   position: relative;
   width: 100%;
   margin-bottom: 14px;
+  min-width: 0;
+  box-sizing: border-box;
+  white-space: normal;
 }
 
 .custom-select__control {
@@ -19,6 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 
   font-size: 14px;
   cursor: pointer;
@@ -28,6 +32,13 @@
     0 1px 1px rgba(15, 23, 42, 0.02);
 
   transition: 0.2s ease;
+}
+
+.custom-select__control span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .custom-select__control:hover,
@@ -60,6 +71,9 @@
   max-height: 230px;
 
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  white-space: normal;
 
   border-radius: 16px;
   border: 1px solid #dbe6e5;
@@ -74,7 +88,7 @@
 
 .custom-select__option {
   width: 100%;
-  height: 38px;
+  min-height: 38px;
 
   border: none;
   border-radius: 12px;
@@ -85,6 +99,9 @@
   padding: 0 12px;
 
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 
   font-size: 14px;
   cursor: pointer;
