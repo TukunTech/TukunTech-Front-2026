@@ -7,6 +7,13 @@ export interface PatientMedicalParameters {
   temperatureMax: number | null;
 }
 
+export interface PatientRegistrationAddress {
+  street: string;
+  displayName: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 export interface RegistrationPatient {
   email: string;
   password: string;
@@ -17,6 +24,7 @@ export interface RegistrationPatient {
   gender: string;
   bloodType: string;
   additionalNotes: string;
+  address: PatientRegistrationAddress;
   medicalParameters: PatientMedicalParameters;
 }
 
@@ -31,6 +39,12 @@ export function createEmptyRegistrationPatient(): RegistrationPatient {
     gender: '',
     bloodType: '',
     additionalNotes: '',
+    address: {
+      street: '',
+      displayName: '',
+      latitude: null,
+      longitude: null
+    },
     medicalParameters: {
       heartRateMin: null,
       heartRateMax: null,
@@ -64,11 +78,18 @@ export function hasValidMedicalParameters(patient: RegistrationPatient): boolean
     parameters.temperatureMax! > parameters.temperatureMin!;
 }
 
+export function hasValidPatientAddress(patient: RegistrationPatient): boolean {
+  return !!patient.address.street.trim() &&
+    Number.isFinite(patient.address.latitude) &&
+    Number.isFinite(patient.address.longitude);
+}
+
 export function hasValidRegistrationPatient(patient: RegistrationPatient): boolean {
   return !!patient.fullName.trim() &&
     !!patient.age &&
     !!patient.gender &&
     !!patient.bloodType &&
     hasValidPatientAccount(patient) &&
-    hasValidMedicalParameters(patient);
+    hasValidMedicalParameters(patient) &&
+    hasValidPatientAddress(patient);
 }

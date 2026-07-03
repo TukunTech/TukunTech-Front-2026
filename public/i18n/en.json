@@ -169,9 +169,24 @@
       "validationError": "Complete all six parameters. Each maximum must be greater than its minimum; oxygen must be between 1 and 100 and temperature between 30 and 45 °C.",
       "caregiverValidationError": "Complete the {{count}} patients in the plan. Each patient needs email, password, an 8-digit DNI, personal data and their six medical parameters."
     },
+    "validation": {
+      "title": "Review these details before continuing",
+      "addressTitle": "Review the addresses before continuing",
+      "patientEmail": "patient email is empty or invalid",
+      "patientPassword": "password must be at least 6 characters",
+      "patientPasswordMatch": "passwords do not match",
+      "patientDni": "8-digit DNI is required",
+      "fullName": "full name is empty",
+      "age": "age is empty",
+      "gender": "gender is not selected",
+      "bloodType": "blood type is not selected",
+      "medicalParameters": "medical parameters are incomplete or out of range",
+      "patientAddress": "address has not been confirmed on the map"
+    },
     "address": {
       "street": "Address",
       "streetPlaceholder": "Enter your address",
+      "patientAddressInfo": "Register an independent address for each patient in the plan.",
       "city": "City",
       "cityPlaceholder": "Enter your city",
       "reference": "Reference",

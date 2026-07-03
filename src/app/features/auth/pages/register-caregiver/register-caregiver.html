@@ -144,10 +144,25 @@
           [(patient)]="patients[activePatientIndex]">
         </app-patient-form>
 
-        <p class="form-error" *ngIf="showMedicalParametersError">
+        <section class="validation-summary" *ngIf="showMedicalParametersError && patientInfoValidationErrors.length">
           <i class="bi bi-exclamation-circle"></i>
-          {{ 'register.medicalParameters.caregiverValidationError' | translate:{ count: selectedPlan.patients } }}
-        </p>
+          <div>
+            <strong>{{ 'register.validation.title' | translate }}</strong>
+            <button
+              type="button"
+              class="validation-summary__patient"
+              *ngFor="let error of patientInfoValidationErrors"
+              (click)="selectPatient(error.patientIndex)"
+            >
+              <span>{{ 'register.family.patient' | translate }} {{ error.patientIndex + 1 }}</span>
+              <small>
+                <ng-container *ngFor="let issueKey of error.issueKeys; let last = last">
+                  {{ issueKey | translate }}<ng-container *ngIf="!last"> · </ng-container>
+                </ng-container>
+              </small>
+            </button>
+          </div>
+        </section>
 
         <div class="patient-navigation">
 
@@ -181,23 +196,96 @@
 
     <!-- STEP 4 -->
 
-    <div *ngIf="currentStep === 4" class="register-card">
+    <div *ngIf="currentStep === 4" class="patient-address-step">
 
-      <label>
-        {{ 'register.address.street' | translate }}
-      </label>
+      <div class="patients-info-banner">
+        <i class="bi bi-geo-alt"></i>
+        <span>{{ 'register.address.patientAddressInfo' | translate:{ count: selectedPlan.patients } }}</span>
+      </div>
 
-      <input
-        type="text"
-        name="street"
-        [(ngModel)]="street"
-        [placeholder]="'register.address.streetPlaceholder' | translate"
-      />
+      <div class="patient-tabs">
+        <button
+          type="button"
+          class="patient-tab"
+          *ngFor="let patient of patients; let i = index"
+          [class.patient-tab--active]="activeAddressPatientIndex === i"
+          (click)="selectAddressPatient(i)"
+        >
+          {{ patient.fullName || ('register.family.patient' | translate) + ' ' + (i + 1) }}
+        </button>
+      </div>
 
-      <app-address-map
-        [addressQuery]="street"
-        (addressSelected)="street = $event">
-      </app-address-map>
+      <div class="register-card">
+
+        <label>
+          {{ 'register.address.street' | translate }}
+        </label>
+
+        <input
+          type="text"
+          name="patientStreet"
+          [(ngModel)]="activeAddressPatient.address.street"
+          [placeholder]="'register.address.streetPlaceholder' | translate"
+        />
+
+        <app-address-map
+          [mapId]="'patient-address-map-' + activeAddressPatientIndex"
+          [addressQuery]="activeAddressPatient.address.street"
+          [latitude]="activeAddressPatient.address.latitude"
+          [longitude]="activeAddressPatient.address.longitude"
+          (addressSelected)="updateActivePatientAddress($event)">
+        </app-address-map>
+
+        <p class="address-preview" *ngIf="activeAddressPatient.address.displayName">
+          <i class="bi bi-check-circle"></i>
+          {{ activeAddressPatient.address.displayName }}
+        </p>
+
+        <section class="validation-summary" *ngIf="showAddressValidationError && patientAddressValidationErrors.length">
+          <i class="bi bi-exclamation-circle"></i>
+          <div>
+            <strong>{{ 'register.validation.addressTitle' | translate }}</strong>
+            <button
+              type="button"
+              class="validation-summary__patient"
+              *ngFor="let error of patientAddressValidationErrors"
+              (click)="selectAddressPatient(error.patientIndex)"
+            >
+              <span>{{ patients[error.patientIndex].fullName || ('register.family.patient' | translate) + ' ' + (error.patientIndex + 1) }}</span>
+              <small>
+                <ng-container *ngFor="let issueKey of error.issueKeys; let last = last">
+                  {{ issueKey | translate }}<ng-container *ngIf="!last"> · </ng-container>
+                </ng-container>
+              </small>
+            </button>
+          </div>
+        </section>
+
+        <div class="patient-navigation">
+
+          <button
+            type="button"
+            class="previous-patient-button"
+            [disabled]="activeAddressPatientIndex === 0"
+            (click)="previousAddressPatient()"
+          >
+            <i class="bi bi-arrow-left"></i>
+            {{ 'register.family.previousPatient' | translate }}
+          </button>
+
+          <button
+            type="button"
+            class="next-patient-button"
+            [disabled]="activeAddressPatientIndex === patients.length - 1"
+            (click)="nextAddressPatient()"
+          >
+            {{ 'register.family.nextPatient' | translate }}
+            <i class="bi bi-arrow-right"></i>
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 

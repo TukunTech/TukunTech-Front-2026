@@ -16,10 +16,15 @@ import {
   PatientFormData
 } from '../../components/patient-form/patient-form';
 
-import { AddressMap } from '../../components/address-map/address-map';
+import {
+  AddressMap,
+  AddressMapSelection
+} from '../../components/address-map/address-map';
 import {
   createEmptyRegistrationPatient,
-  hasValidRegistrationPatient
+  hasValidMedicalParameters,
+  hasValidPatientAccount,
+  hasValidPatientAddress
 } from '../../domain/registration-patient';
 
 interface RegisterPlanOption {
@@ -63,13 +68,13 @@ export class RegisterCaregiver {
 
   currentStep = 1;
   activePatientIndex = 0;
+  activeAddressPatientIndex = 0;
   showMedicalParametersError = false;
+  showAddressValidationError = false;
 
   email = '';
   password = '';
   confirmPassword = '';
-
-  street = '';
 
   deliveryPhone = '';
   deliveryInstructions = '';
@@ -155,7 +160,13 @@ export class RegisterCaregiver {
       return;
     }
 
+    if (this.currentStep === 4 && !this.canContinue) {
+      this.showAddressValidationError = true;
+      return;
+    }
+
     this.showMedicalParametersError = false;
+    this.showAddressValidationError = false;
 
     if (this.currentStep < this.steps.length) {
       this.currentStep++;
@@ -163,12 +174,16 @@ export class RegisterCaregiver {
   }
 
   get canContinue(): boolean {
-    if (this.currentStep !== 3) {
-      return true;
+    if (this.currentStep === 3) {
+      return this.patients.length === this.selectedPlan.patients &&
+        this.patients.every(patient => this.getPatientInfoIssueKeys(patient).length === 0);
     }
 
-    return this.patients.length === this.selectedPlan.patients &&
-      this.patients.every(hasValidRegistrationPatient);
+    if (this.currentStep === 4) {
+      return this.patients.every(hasValidPatientAddress);
+    }
+
+    return true;
   }
 
   backStep() {
@@ -209,6 +224,54 @@ export class RegisterCaregiver {
     }
   }
 
+  selectAddressPatient(index: number): void {
+    this.activeAddressPatientIndex = index;
+  }
+
+  nextAddressPatient(): void {
+    if (this.activeAddressPatientIndex < this.patients.length - 1) {
+      this.activeAddressPatientIndex++;
+    }
+  }
+
+  previousAddressPatient(): void {
+    if (this.activeAddressPatientIndex > 0) {
+      this.activeAddressPatientIndex--;
+    }
+  }
+
+  updateActivePatientAddress(selection: AddressMapSelection): void {
+    const patient = this.activeAddressPatient;
+    patient.address = {
+      street: selection.address,
+      displayName: selection.address,
+      latitude: selection.latitude,
+      longitude: selection.longitude
+    };
+  }
+
+  get activeAddressPatient(): PatientFormData {
+    return this.patients[this.activeAddressPatientIndex];
+  }
+
+  get patientInfoValidationErrors(): Array<{ patientIndex: number; issueKeys: string[] }> {
+    return this.patients
+      .map((patient, index) => ({
+        patientIndex: index,
+        issueKeys: this.getPatientInfoIssueKeys(patient)
+      }))
+      .filter(item => item.issueKeys.length);
+  }
+
+  get patientAddressValidationErrors(): Array<{ patientIndex: number; issueKeys: string[] }> {
+    return this.patients
+      .map((patient, index) => ({
+        patientIndex: index,
+        issueKeys: this.getPatientAddressIssueKeys(patient)
+      }))
+      .filter(item => item.issueKeys.length);
+  }
+
   get selectedMonthlyPrice(): string {
     return `$${this.selectedPlan.monthlyPrice}/mo`;
   }
@@ -223,5 +286,51 @@ export class RegisterCaregiver {
       nextPatients.push(this.createEmptyPatient());
     }
     this.patients = nextPatients.slice(0, this.selectedPlan.patients);
+    if (this.activeAddressPatientIndex >= this.patients.length) {
+      this.activeAddressPatientIndex = Math.max(0, this.patients.length - 1);
+    }
+  }
+
+  private getPatientInfoIssueKeys(patient: PatientFormData): string[] {
+    const issues: string[] = [];
+
+    if (!hasValidPatientAccount(patient)) {
+      if (!/^\S+@\S+\.\S+$/.test(patient.email.trim())) {
+        issues.push('register.validation.patientEmail');
+      }
+      if (patient.password.length < 6) {
+        issues.push('register.validation.patientPassword');
+      }
+      if (patient.password !== patient.confirmPassword) {
+        issues.push('register.validation.patientPasswordMatch');
+      }
+      if (!/^\d{8}$/.test(patient.dni.trim())) {
+        issues.push('register.validation.patientDni');
+      }
+    }
+
+    if (!patient.fullName.trim()) {
+      issues.push('register.validation.fullName');
+    }
+    if (!patient.age) {
+      issues.push('register.validation.age');
+    }
+    if (!patient.gender) {
+      issues.push('register.validation.gender');
+    }
+    if (!patient.bloodType) {
+      issues.push('register.validation.bloodType');
+    }
+    if (!hasValidMedicalParameters(patient)) {
+      issues.push('register.validation.medicalParameters');
+    }
+
+    return issues;
+  }
+
+  private getPatientAddressIssueKeys(patient: PatientFormData): string[] {
+    return hasValidPatientAddress(patient)
+      ? []
+      : ['register.validation.patientAddress'];
   }
 }
