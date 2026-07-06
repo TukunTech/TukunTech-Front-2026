@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -14,6 +14,7 @@ import {
 } from '../../../../shared/components/custom-select/custom-select';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { PatientAlertRepository } from '../../data/patient-alert.repository';
 import { PatientProfileRepository } from '../../data/patient-profile.repository';
 import {
@@ -39,8 +40,9 @@ import {
   styleUrl: './profile.css',
 })
 export class Profile {
-  userId = 'patient-demo-user';
-  email = 'demo.patient@tukuntech.app';
+  userId = '';
+  email = '';
+  profileLoaded = false;
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
   urgentAlertMessageKey = '';
@@ -49,6 +51,7 @@ export class Profile {
 
   showToast = false;
   toastMessageKey = '';
+  contactError = '';
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.patient.vitalSigns', route: '/patient/today' },
@@ -64,7 +67,7 @@ export class Profile {
     email: this.email,
     initials: '',
     fullName: '',
-    age: 0,
+    age: null,
     address: '',
     bloodType: 'A+',
     gender: 'Female',
@@ -101,18 +104,25 @@ export class Profile {
 
   genderOptions: CustomSelectOption[] = [
     { label: 'Female', value: 'Female' },
-    { label: 'Male', value: 'Male' }
+    { label: 'Male', value: 'Male' },
+    { label: 'Other', value: 'Other' },
+    { label: 'Prefer not to say', value: 'Prefer not to say' }
   ];
 
   constructor(
+    private authService: AuthApiService,
     private patientProfileRepository: PatientProfileRepository,
-    private patientAlertRepository: PatientAlertRepository
+    private patientAlertRepository: PatientAlertRepository,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.userId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadProfile();
-    this.loadGlobalUrgentAlert();
   }
 
   addContact(): void {
+    this.contactError = '';
     this.newContact = {
       name: '',
       relation: '',
@@ -124,10 +134,20 @@ export class Profile {
 
   closeContactModal(): void {
     this.showContactModal = false;
+    this.contactError = '';
   }
 
   saveContact(): void {
-    if (!this.newContact.name.trim()) {
+    this.contactError = '';
+
+    if (!this.newContact.name.trim() || !this.newContact.relation.trim()) {
+      this.contactError = 'Completa nombre y relacion del contacto.';
+      return;
+    }
+
+    const phone = this.normalizePeruPhone(this.newContact.phone);
+    if (!this.isValidPeruPhone(phone)) {
+      this.contactError = 'Ingresa un celular peruano valido de 9 digitos que empiece con 9.';
       return;
     }
 
@@ -135,12 +155,14 @@ export class Profile {
       .createEmergencyContact(this.userId, {
         name: this.newContact.name.trim(),
         relation: this.newContact.relation.trim(),
-        phone: this.newContact.phone.trim()
+        phone
       })
-      .subscribe(contact => {
-        this.emergencyContacts = [...this.emergencyContacts, contact];
+      .subscribe(() => {
         this.closeContactModal();
+        this.loadProfile();
         this.showSuccessToast('patient.profile.contactAddedSuccessfully');
+      }, () => {
+        this.contactError = 'No se pudo guardar el contacto. Revisa los datos e intenta nuevamente.';
       });
   }
 
@@ -148,9 +170,7 @@ export class Profile {
     this.patientProfileRepository
       .deleteEmergencyContact(this.userId, contactId)
       .subscribe(() => {
-        this.emergencyContacts = this.emergencyContacts.filter(contact =>
-          contact.id !== contactId
-        );
+        this.loadProfile();
       });
   }
 
@@ -191,19 +211,39 @@ export class Profile {
       .getProfilePageData(this.userId)
       .subscribe(data => {
         this.profile = data.profile;
+        this.userId = data.profile.userId;
         this.email = data.profile.email;
         this.subscription = data.subscription;
         this.emergencyContacts = data.emergencyContacts;
+        this.profileLoaded = true;
+        this.changeDetector.detectChanges();
+        this.loadGlobalUrgentAlert();
       });
   }
 
+  updateContactPhone(value: string): void {
+    this.newContact.phone = value.replace(/\D/g, '').slice(0, 9);
+  }
+
+  private normalizePeruPhone(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    return digits.startsWith('51') ? digits.slice(2, 11) : digits.slice(0, 9);
+  }
+
+  private isValidPeruPhone(phone: string): boolean {
+    return /^9\d{8}$/.test(phone);
+  }
+
   private loadGlobalUrgentAlert(): void {
+    if (!this.userId) return;
+
     this.patientAlertRepository
       .getGlobalUrgentAlert(this.userId)
       .subscribe(alert => {
         this.urgentAlertShow = !!alert;
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
+        this.changeDetector.detectChanges();
       });
   }
 

@@ -1,0 +1,43 @@
+<app-auth-layout>
+  <div class="payment-result">
+    <div
+      class="payment-result__icon"
+      [class.payment-result__icon--success]="isSuccess"
+      [class.payment-result__icon--canceled]="!isSuccess"
+    >
+      <i class="bi" [class.bi-check-lg]="isSuccess" [class.bi-x-lg]="!isSuccess"></i>
+    </div>
+
+    <h1>
+      {{ (isSuccess ? 'paymentResult.success.title' : 'paymentResult.canceled.title') | translate }}
+    </h1>
+
+    <p>
+      {{ (isSuccess ? 'paymentResult.success.description' : 'paymentResult.canceled.description') | translate }}
+    </p>
+
+    <section class="payment-result__notice" *ngIf="isSuccess">
+      <i class="bi bi-info-circle"></i>
+      <span>{{ 'paymentResult.success.notice' | translate }}</span>
+    </section>
+
+    <button
+      *ngIf="isSuccess"
+      class="payment-result__primary"
+      type="button"
+      (click)="goToLogin()"
+    >
+      {{ 'paymentResult.success.action' | translate }}
+    </button>
+
+    <div class="payment-result__actions" *ngIf="!isSuccess">
+      <button class="payment-result__primary" type="button" (click)="tryAgain()">
+        {{ 'paymentResult.canceled.primaryAction' | translate }}
+      </button>
+
+      <button class="payment-result__secondary" type="button" (click)="goToLogin()">
+        {{ 'paymentResult.canceled.secondaryAction' | translate }}
+      </button>
+    </div>
+  </div>
+</app-auth-layout>

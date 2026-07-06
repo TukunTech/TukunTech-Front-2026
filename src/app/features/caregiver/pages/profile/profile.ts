@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -12,6 +12,7 @@ import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { CaregiverAlertRepository } from '../../data/caregiver-alert.repository';
 import { CaregiverProfileRepository } from '../../data/caregiver-profile.repository';
 import {
@@ -37,8 +38,8 @@ import {
   styleUrl: './profile.css',
 })
 export class Profile {
-  caregiverUserId = 'caregiver-demo-user';
-  email = 'demo.caregiver@tukuntech.app';
+  caregiverUserId = '';
+  email = '';
   selectedPatientId = '';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
@@ -80,12 +81,16 @@ export class Profile {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private caregiverAlertRepository: CaregiverAlertRepository,
     private caregiverProfileRepository: CaregiverProfileRepository,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.caregiverUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
-    this.loadGlobalCriticalAlert();
   }
 
   get genderOptions(): CustomSelectOption[] {
@@ -194,6 +199,7 @@ export class Profile {
     this.caregiverProfileRepository
       .getDashboard(this.caregiverUserId)
       .subscribe(data => {
+        this.caregiverUserId = data.caregiverUserId;
         this.email = data.caregiverEmail;
         this.patients = data.patients;
         this.emergencyContacts = data.emergencyContacts;
@@ -206,10 +212,15 @@ export class Profile {
           this.selectedPatientId = selectedProfile.userId;
           this.profile = { ...selectedProfile };
         }
+
+        this.changeDetector.detectChanges();
+        this.loadGlobalCriticalAlert();
       });
   }
 
   private loadGlobalCriticalAlert(): void {
+    if (!this.caregiverUserId) return;
+
     this.caregiverAlertRepository
       .getGlobalCriticalAlert(this.caregiverUserId)
       .subscribe(alert => {
@@ -217,6 +228,7 @@ export class Profile {
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
         this.urgentAlertMessageParams = alert?.messageParams || {};
+        this.changeDetector.detectChanges();
       });
   }
 
@@ -234,7 +246,7 @@ export class Profile {
       userId: '',
       initials: '',
       fullName: '',
-      age: 0,
+      age: null,
       address: '',
       bloodType: 'A+',
       gender: 'Female',

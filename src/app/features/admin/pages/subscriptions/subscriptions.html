@@ -57,6 +57,14 @@
           <span>{{ 'admin.subscriptions.table.amount' | translate }}</span>
         </div>
 
+        <div class="subscriptions-row subscriptions-row--state" *ngIf="!subscriptionsLoaded">
+          <span>{{ 'common.loading' | translate }}</span>
+        </div>
+
+        <div class="subscriptions-row subscriptions-row--state" *ngIf="subscriptionsLoaded && !subscriptions.length">
+          <span>{{ 'admin.subscriptions.empty' | translate }}</span>
+        </div>
+
         <div class="subscriptions-row" *ngFor="let subscription of subscriptions">
           <span>{{ subscription.userEmail }}</span>
           <span>{{ subscription.plan }}</span>

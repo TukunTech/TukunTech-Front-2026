@@ -11,6 +11,7 @@ export interface SupportTicket {
   description: string;
   createdAt: string;
   status: SupportTicketStatus;
+  messages: SupportTicketMessage[];
 }
 
 export interface CreateSupportTicketPayload {
@@ -19,4 +20,12 @@ export interface CreateSupportTicketPayload {
   requesterRole: SupportRequesterRole;
   subject: string;
   description: string;
+}
+
+export interface SupportTicketMessage {
+  id: string;
+  authorName: string;
+  createdAt: string;
+  message: string;
+  fromAdmin: boolean;
 }

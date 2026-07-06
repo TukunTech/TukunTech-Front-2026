@@ -6,7 +6,7 @@ export interface AdminSubscription {
   plan: string;
   status: AdminSubscriptionStatus;
   renewsAt: string;
-  amount: number;
+  amount: number | null;
   currency: string;
   month: string;
 }
@@ -29,5 +29,12 @@ export function filterSubscriptionsByMonth(
   subscriptions: AdminSubscription[],
   month: string
 ): AdminSubscription[] {
-  return subscriptions.filter(subscription => subscription.month === month);
+  if (month === 'all') {
+    return subscriptions;
+  }
+
+  return subscriptions.filter(subscription =>
+    subscription.month === month ||
+    subscription.month === 'unassigned'
+  );
 }

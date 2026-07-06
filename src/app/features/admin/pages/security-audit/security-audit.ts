@@ -1,9 +1,10 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import {
   CustomSelect,
   CustomSelectOption
@@ -35,11 +36,12 @@ import {
   templateUrl: './security-audit.html',
   styleUrl: './security-audit.css',
 })
-export class SecurityAudit {
-  adminUserId = 'admin-demo-user';
-  email = 'demo.admin@tukuntech.app';
+export class SecurityAudit implements OnInit {
+  adminUserId = '';
+  email = '';
   searchTerm = '';
   users: AdminManagedUser[] = [];
+  usersLoaded = false;
   selectedUser: AdminManagedUser | null = null;
   editModel: AdminManagedUser | null = null;
   showToast = false;
@@ -50,8 +52,15 @@ export class SecurityAudit {
 
   constructor(
     private adminSecurityAuditRepository: AdminSecurityAuditRepository,
-    private translateService: TranslateService
-  ) {
+    private translateService: TranslateService,
+    private authService: AuthApiService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const session = this.authService.getSession();
+    this.adminUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
   }
 
@@ -155,11 +164,14 @@ export class SecurityAudit {
   }
 
   private loadDashboard(): void {
+    this.usersLoaded = false;
     this.adminSecurityAuditRepository
       .getDashboard(this.adminUserId)
       .subscribe(data => {
         this.email = data.adminEmail;
         this.users = data.users;
+        this.usersLoaded = true;
+        this.changeDetector.detectChanges();
       });
   }
 

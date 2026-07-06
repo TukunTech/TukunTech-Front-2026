@@ -19,6 +19,14 @@
 
     <section class="tickets-workspace">
       <aside class="ticket-list-card">
+        <div class="ticket-list-state" *ngIf="!ticketsLoaded">
+          {{ 'common.loading' | translate }}
+        </div>
+
+        <div class="ticket-list-state" *ngIf="ticketsLoaded && !tickets.length">
+          {{ 'admin.supportTickets.empty' | translate }}
+        </div>
+
         <button
           class="ticket-item"
           type="button"
@@ -93,6 +101,10 @@
             </button>
           </div>
         </footer>
+      </section>
+
+      <section class="conversation-card conversation-card--state" *ngIf="ticketsLoaded && !selectedTicket">
+        <p>{{ 'admin.supportTickets.empty' | translate }}</p>
       </section>
     </section>
 

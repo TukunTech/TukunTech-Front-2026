@@ -28,6 +28,10 @@
   color: #667985;
 }
 
+.profile-loading {
+  min-height: 360px;
+}
+
 .save-button {
   height: 42px;
   padding: 0 26px;
@@ -499,6 +503,15 @@ input {
   font-size: 14px;
   color: #667985;
   margin: 0 0 22px;
+}
+
+.contact-modal .form-error {
+  margin: -8px 0 16px;
+  color: #d64550;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .modal-actions {

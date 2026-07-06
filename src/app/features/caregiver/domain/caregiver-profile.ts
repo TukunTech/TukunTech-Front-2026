@@ -8,13 +8,13 @@ export type CaregiverPatientBloodType =
   | 'O+'
   | 'O-';
 
-export type CaregiverPatientGender = 'Female' | 'Male';
+export type CaregiverPatientGender = 'Female' | 'Male' | 'Other' | 'Prefer not to say';
 
 export interface CaregiverPatientProfile {
   userId: string;
   initials: string;
   fullName: string;
-  age: number;
+  age: number | null;
   address: string;
   bloodType: CaregiverPatientBloodType;
   gender: CaregiverPatientGender;

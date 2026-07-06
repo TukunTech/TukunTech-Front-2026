@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AppLanguage, LanguageService } from '../../../../core/i18n/language.service';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
 import {
   CustomSelect,
@@ -27,8 +28,8 @@ import { CaregiverFamilySubscription } from '../../domain/caregiver-settings';
   styleUrl: './settings.css',
 })
 export class Settings {
-  caregiverUserId = 'caregiver-demo-user';
-  email = 'demo.caregiver@tukuntech.app';
+  caregiverUserId = '';
+  email = '';
   language: AppLanguage = 'en';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
@@ -61,11 +62,16 @@ export class Settings {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private languageService: LanguageService,
     private translateService: TranslateService,
     private caregiverAlertRepository: CaregiverAlertRepository,
-    private caregiverSettingsRepository: CaregiverSettingsRepository
+    private caregiverSettingsRepository: CaregiverSettingsRepository,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.caregiverUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.language = this.languageService.currentLanguage;
     this.loadSettings();
     this.loadGlobalCriticalAlert();
@@ -129,10 +135,13 @@ export class Settings {
         this.email = data.caregiverEmail;
         this.language = this.languageService.currentLanguage;
         this.subscription = data.subscription;
+        this.changeDetector.detectChanges();
       });
   }
 
   private loadGlobalCriticalAlert(): void {
+    if (!this.caregiverUserId) return;
+
     this.caregiverAlertRepository
       .getGlobalCriticalAlert(this.caregiverUserId)
       .subscribe(alert => {
@@ -140,6 +149,7 @@ export class Settings {
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
         this.urgentAlertMessageParams = alert?.messageParams || {};
+        this.changeDetector.detectChanges();
       });
   }
 

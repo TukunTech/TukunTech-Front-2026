@@ -1,8 +1,9 @@
-import { NgClass, NgFor } from '@angular/common';
-import { Component } from '@angular/core';
+import { NgClass, NgFor, NgIf } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CustomSelect, CustomSelectOption } from '../../../../shared/components/custom-select/custom-select';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { DashboardLayout } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { adminMenuItems } from '../../admin-menu';
 import { AdminAnalyticsRepository } from '../../data/admin-analytics.repository';
@@ -10,13 +11,14 @@ import { AdminAnalyticsBar, AdminAnalyticsMetric } from '../../domain/admin-anal
 
 @Component({
   selector: 'app-admin-analytics',
-  imports: [DashboardLayout, TranslatePipe, CustomSelect, NgFor, NgClass],
+  imports: [DashboardLayout, TranslatePipe, CustomSelect, NgFor, NgIf, NgClass],
   templateUrl: './analytics.html',
   styleUrl: './analytics.css',
 })
-export class Analytics {
-  adminUserId = 'admin-demo-user';
-  email = 'demo.admin@tukuntech.app';
+export class Analytics implements OnInit {
+  adminUserId = '';
+  email = '';
+  analyticsLoaded = false;
   selectedMonth = '';
   availableMonths: string[] = [];
   metrics: AdminAnalyticsMetric[] = [];
@@ -24,9 +26,16 @@ export class Analytics {
   menuItems = adminMenuItems;
 
   constructor(
+    private authService: AuthApiService,
     private adminAnalyticsRepository: AdminAnalyticsRepository,
-    private translateService: TranslateService
-  ) {
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const session = this.authService.getSession();
+    this.adminUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
   }
 
@@ -54,6 +63,7 @@ export class Analytics {
   }
 
   private loadDashboard(month?: string): void {
+    this.analyticsLoaded = false;
     this.adminAnalyticsRepository
       .getDashboard(this.adminUserId, month)
       .subscribe(data => {
@@ -62,6 +72,8 @@ export class Analytics {
         this.availableMonths = data.availableMonths;
         this.metrics = data.metrics;
         this.usersChart = data.usersChart;
+        this.analyticsLoaded = true;
+        this.changeDetector.detectChanges();
       });
   }
 

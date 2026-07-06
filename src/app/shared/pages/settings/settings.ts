@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import {
@@ -12,6 +12,7 @@ import {
 } from '../../components/custom-select/custom-select';
 
 import { AppToast } from '../../components/app-toast/app-toast';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { PatientAlertRepository } from '../../../features/patient/data/patient-alert.repository';
 
@@ -27,8 +28,8 @@ import { PatientAlertRepository } from '../../../features/patient/data/patient-a
   styleUrl: './settings.css',
 })
 export class Settings {
-  userId = 'patient-demo-user';
-  email = 'demo.patient@tukuntech.app';
+  userId = '';
+  email = '';
   role = 'Patient';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
@@ -53,9 +54,14 @@ export class Settings {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private languageService: LanguageService,
-    private patientAlertRepository: PatientAlertRepository
+    private patientAlertRepository: PatientAlertRepository,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.userId = session?.userId || '';
+    this.email = session?.email || '';
     this.language = this.languageService.currentLanguage;
     this.loadGlobalUrgentAlert();
   }
@@ -75,12 +81,15 @@ export class Settings {
   }
 
   private loadGlobalUrgentAlert(): void {
+    if (!this.userId) return;
+
     this.patientAlertRepository
       .getGlobalUrgentAlert(this.userId)
       .subscribe(alert => {
         this.urgentAlertShow = !!alert;
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
+        this.changeDetector.detectChanges();
       });
   }
 }

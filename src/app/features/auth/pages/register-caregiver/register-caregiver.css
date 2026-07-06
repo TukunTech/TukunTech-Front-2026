@@ -19,8 +19,6 @@
   color: #6b7c85;
 }
 
-/* PLAN */
-
 .plans {
   display: flex;
   flex-direction: column;
@@ -39,11 +37,7 @@
   align-items: flex-start;
   text-align: left;
   font: inherit;
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .plan-card--selected {
@@ -51,10 +45,7 @@
   background: #eefaf7;
 }
 
-.plan-confirmation-card {
-  cursor: default;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-}
+.plan-confirmation-card { cursor: default; }
 
 .plan-title-row {
   display: flex;
@@ -111,8 +102,6 @@
   font-size: 15px;
   font-weight: 600;
 }
-
-/* REGISTER CARD */
 
 .register-card,
 .patient-card {
@@ -191,8 +180,6 @@
   resize: none;
   transition: 0.2s ease;
 }
-
-/* PATIENTS */
 
 .caregiver-patients-step {
   display: flex;
@@ -310,10 +297,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .previous-patient-button {
@@ -355,8 +339,6 @@
   font-weight: 600;
   cursor: pointer;
 }
-
-/* PAYMENT */
 
 .payment-card,
 .done-card {
@@ -420,6 +402,26 @@
   font-weight: 600;
 }
 
+.terms-check {
+  width: 100%;
+  margin: 4px 0 16px;
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  color: #536b76;
+  font-size: 13px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.terms-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: #3fa292;
+  flex-shrink: 0;
+}
+
 .mock-payment-button,
 .dashboard-button {
   width: 100%;
@@ -435,19 +437,15 @@
     background 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
-  box-shadow:
-    0 4px 12px rgba(63, 162, 146, 0.18);
+  box-shadow: 0 4px 12px rgba(63, 162, 146, 0.18);
 }
 
 .mock-payment-button:hover,
 .dashboard-button:hover {
   background: #379484;
   transform: translateY(-1px);
-  box-shadow:
-    0 8px 18px rgba(63, 162, 146, 0.22);
+  box-shadow: 0 8px 18px rgba(63, 162, 146, 0.22);
 }
-
-/* ACTIONS */
 
 .actions {
   display: flex;
@@ -461,12 +459,15 @@
   border: none;
   background: transparent;
   color: #10232b;
+  border-radius: 14px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .continue-button {
@@ -482,19 +483,14 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  box-shadow:
-    0 4px 12px rgba(63, 162, 146, 0.18);
+  transition: 0.2s ease;
+  box-shadow: 0 4px 12px rgba(63, 162, 146, 0.18);
 }
 
 .continue-button:hover {
   background: #379484;
   transform: translateY(-1px);
-  box-shadow:
-    0 8px 18px rgba(63, 162, 146, 0.22);
+  box-shadow: 0 8px 18px rgba(63, 162, 146, 0.22);
 }
 
 .continue-button:disabled {
@@ -544,10 +540,7 @@
   margin-top: 7px;
   text-align: left;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .validation-summary__patient:hover {
@@ -604,14 +597,6 @@
     flex: 1;
     justify-content: center;
   }
-}
-.back-action-button {
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-  border-radius: 14px;
-  padding: 0 14px;
 }
 
 .back-action-button:hover {

@@ -47,7 +47,7 @@ export interface CaregiverPatientDevice {
   id: string;
   model: string;
   battery: number;
-  wifiStrength: 'strong' | 'medium' | 'weak';
+  wifiStrength: 'strong' | 'off';
   connectionStatus: CaregiverPatientConnectionStatus;
 }
 

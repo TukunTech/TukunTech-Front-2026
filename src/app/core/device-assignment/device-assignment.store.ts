@@ -13,69 +13,14 @@ export interface DeviceAssignmentProjection {
 @Injectable({ providedIn: 'root' })
 export class DeviceAssignmentStore {
   private readonly storageKey = 'tukuntech.device-assignments.v1';
-  private assignments = new Map<string, DeviceAssignmentProjection>([
-    [
-      'patient-eleanor',
-      this.seed(
-        'device-eleanor',
-        'patient-eleanor',
-        'CC4B32',
-        'Tukun Care 2',
-        'CB-9F32-01',
-        '2.4.1',
-        'online',
-      ),
-    ],
-    [
-      'patient-charls',
-      this.seed(
-        'device-charls',
-        'patient-charls',
-        'DD8A91',
-        'Tukun Care 2',
-        'C1-K22L-01',
-        '2.4.1',
-        'online',
-      ),
-    ],
-    [
-      'patient-miguel',
-      this.seed(
-        'device-miguel',
-        'patient-miguel',
-        'FF3K22',
-        'Tukun Care Pro',
-        'H4-23LP-01',
-        '2.5.0',
-        'online',
-      ),
-    ],
-    [
-      'patient-robert',
-      this.seed(
-        'device-robert',
-        'patient-robert',
-        'ZX9P15',
-        'Tukun Care Pro',
-        'CR-520F-08',
-        '2.5.0',
-        'online',
-      ),
-    ],
-    [
-      'patient-marian',
-      this.seed(
-        'device-marian',
-        'patient-marian',
-        'AA7N40',
-        'Tukun Care 2',
-        'CM-660E-12',
-        '2.4.1',
-        'online',
-      ),
-    ],
-
+  private readonly demoPatientIds = new Set([
+    'patient-eleanor',
+    'patient-charls',
+    'patient-miguel',
+    'patient-robert',
+    'patient-marian',
   ]);
+  private assignments = new Map<string, DeviceAssignmentProjection>();
 
   constructor() {
     const saved = globalThis.localStorage?.getItem(this.storageKey);
@@ -83,15 +28,16 @@ export class DeviceAssignmentStore {
 
     try {
       const assignments = JSON.parse(saved) as DeviceAssignmentProjection[];
-      this.assignments = new Map(assignments.map(item => [item.patientUserId, item]));
+      const realAssignments = assignments.filter(item => !this.isDemoAssignment(item));
+      this.assignments = new Map(realAssignments.map(item => [item.patientUserId, item]));
+      if (realAssignments.length !== assignments.length) this.persist();
     } catch {
-      // Keep the local seed when stored mock data is invalid.
+      this.assignments = new Map();
     }
   }
 
   getByPatient(patientUserId: string): DeviceAssignmentProjection | undefined {
-    const resolvedId = patientUserId === 'patient-demo-user' ? 'patient-eleanor' : patientUserId;
-    const assignment = this.assignments.get(resolvedId);
+    const assignment = this.assignments.get(patientUserId);
     return assignment ? { ...assignment, patientUserId } : undefined;
   }
 
@@ -113,6 +59,21 @@ export class DeviceAssignmentStore {
     }
   }
 
+  removeByDevice(deviceId: string): void {
+    let changed = false;
+
+    for (const [patientId, current] of this.assignments) {
+      if (current.deviceId === deviceId) {
+        this.assignments.delete(patientId);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      this.persist();
+    }
+  }
+
   private persist(): void {
     globalThis.localStorage?.setItem(
       this.storageKey,
@@ -120,23 +81,8 @@ export class DeviceAssignmentStore {
     );
   }
 
-  private seed(
-    deviceId: string,
-    patientUserId: string,
-    code: string,
-    model: string,
-    serialNumber: string,
-    firmwareVersion: string,
-    connectionStatus: 'online' | 'offline',
-  ): DeviceAssignmentProjection {
-    return {
-      deviceId,
-      patientUserId,
-      code,
-      model,
-      serialNumber,
-      firmwareVersion,
-      connectionStatus,
-    };
+  private isDemoAssignment(assignment: DeviceAssignmentProjection): boolean {
+    return this.demoPatientIds.has(assignment.patientUserId) ||
+      assignment.deviceId.startsWith('device-') && this.demoPatientIds.has(assignment.patientUserId);
   }
 }

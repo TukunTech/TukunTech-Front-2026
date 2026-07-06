@@ -1,12 +1,14 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { interval, Subscription } from 'rxjs';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { EcgLiveChart } from '../../../../shared/components/ecg-live-chart/ecg-live-chart';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { PatientAlertRepository } from '../../data/patient-alert.repository';
 import { PatientDeviceRepository } from '../../data/patient-device.repository';
 import { PatientHistoryRepository } from '../../data/patient-history.repository';
@@ -31,8 +33,9 @@ import {
   templateUrl: './today.html',
   styleUrl: './today.css',
 })
-export class Today {
-  userId = 'patient-demo-user';
+export class Today implements OnDestroy {
+  private readonly telemetryFreshnessMs = 60000;
+  userId = '';
   deviceDisconnected = false;
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
@@ -67,17 +70,26 @@ export class Today {
   };
 
   vitalAlerts: PatientVitalAlert[] = [];
+  private refreshSubscription?: Subscription;
 
   constructor(
+    private authService: AuthApiService,
     private patientDeviceRepository: PatientDeviceRepository,
     private patientVitalsRepository: PatientVitalsRepository,
     private patientAlertRepository: PatientAlertRepository,
     private patientHistoryRepository: PatientHistoryRepository,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.userId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadVitals();
-    this.loadDeviceConnectionAlert();
-    this.loadGlobalUrgentAlert();
+    this.refreshSubscription = interval(5000).subscribe(() => this.loadVitals());
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSubscription?.unsubscribe();
   }
 
   get statusTextKey(): string {
@@ -255,30 +267,56 @@ export class Today {
         this.initials = data.initials;
         this.email = data.email;
         this.vitals = data.vitals;
+        this.userId = data.vitals.patientUserId;
         this.alertSettings = data.alertSettings;
+        this.deviceDisconnected = !this.hasFreshTelemetry(data.vitals);
         this.vitalAlerts = evaluatePatientVitals(data.vitals, data.alertSettings);
+        this.changeDetector.detectChanges();
+        this.loadDeviceConnectionAlert();
+        this.loadGlobalUrgentAlert();
 
         if (this.vitalAlerts.length) {
           this.patientHistoryRepository.recordAlertSnapshot(this.userId).subscribe();
         }
+
+        this.patientHistoryRepository.recordPeriodicSnapshotIfDue(this.userId).subscribe();
       });
   }
 
   private loadDeviceConnectionAlert(): void {
+    if (!this.userId) {
+      this.deviceDisconnected = true;
+      return;
+    }
+
     this.patientDeviceRepository
       .getDeviceByPatient(this.userId)
       .subscribe(device => {
-        this.deviceDisconnected = device.connectionStatus === 'offline';
+        this.deviceDisconnected = device.connectionStatus === 'offline' && !this.hasFreshTelemetry(this.vitals);
+        this.changeDetector.detectChanges();
       });
   }
 
   private loadGlobalUrgentAlert(): void {
+    if (!this.userId) return;
+
     this.patientAlertRepository
       .getGlobalUrgentAlert(this.userId)
       .subscribe(alert => {
         this.urgentAlertShow = !!alert;
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
+        this.changeDetector.detectChanges();
       });
+  }
+
+  private hasFreshTelemetry(vitals: PatientVitals): boolean {
+    if (!vitals.measuredAt) {
+      return false;
+    }
+
+    const measuredAtMs = Date.parse(vitals.measuredAt);
+
+    return Number.isFinite(measuredAtMs) && Date.now() - measuredAtMs <= this.telemetryFreshnessMs;
   }
 }

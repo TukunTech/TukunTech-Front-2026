@@ -24,6 +24,24 @@
   font-size: 15px;
 }
 
+.empty-state {
+  border: 1px solid #dbe6e5;
+  border-radius: 24px;
+  padding: 28px;
+  background: #ffffff;
+  color: #667985;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px;
+  color: #10232b;
+  font-size: 20px;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
 .selected-vitals-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

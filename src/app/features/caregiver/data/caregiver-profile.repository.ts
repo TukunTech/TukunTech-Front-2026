@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
+import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 
 import {
   CaregiverEmergencyContact,
@@ -12,111 +15,29 @@ import {
   providedIn: 'root'
 })
 export class CaregiverProfileRepository {
-  private profiles: CaregiverPatientProfile[] = [
-    {
-      userId: 'patient-eleanor',
-      initials: 'EM',
-      fullName: 'Eleanor Marsh',
-      age: 82,
-      address: 'Av. Siempre Viva 235',
-      bloodType: 'A+',
-      gender: 'Female',
-      notes: 'Prefers morning check-ins'
-    },
-    {
-      userId: 'patient-charls',
-      initials: 'CM',
-      fullName: 'Charls March',
-      age: 72,
-      address: '742 Cedar Avenue',
-      bloodType: 'O+',
-      gender: 'Male',
-      notes: 'Hypertension follow-up'
-    },
-    {
-      userId: 'patient-miguel',
-      initials: 'MM',
-      fullName: 'Miguel Montana',
-      age: 78,
-      address: '1189 North Lake Street',
-      bloodType: 'B+',
-      gender: 'Male',
-      notes: 'Uses oxygen during sleep'
-    },
-    {
-      userId: 'patient-marian',
-      initials: 'MM',
-      fullName: 'Marian Medilla',
-      age: 88,
-      address: '91 Garden Road',
-      bloodType: 'AB+',
-      gender: 'Female',
-      notes: 'Temperature alerts configured by admin'
-    },
-    {
-      userId: 'patient-robert',
-      initials: 'RS',
-      fullName: 'Robert Silva',
-      age: 69,
-      address: '505 Harbor Lane',
-      bloodType: 'O-',
-      gender: 'Male',
-      notes: 'Device reconnection required'
-    }
-  ];
+  constructor(
+    private authService: AuthApiService,
+    private userProfileApi: UserProfileApiService
+  ) {}
 
-  private emergencyContacts: CaregiverEmergencyContact[] = [
-    {
-      id: 'contact-eleanor-001',
-      patientUserId: 'patient-eleanor',
-      name: 'Sara Marsh',
-      relation: 'Daughter',
-      phone: '940999345'
-    },
-    {
-      id: 'contact-eleanor-002',
-      patientUserId: 'patient-eleanor',
-      name: 'Daniel Marsh',
-      relation: 'Son',
-      phone: '940883211'
-    },
-    {
-      id: 'contact-charls-001',
-      patientUserId: 'patient-charls',
-      name: 'Andrea March',
-      relation: 'Wife',
-      phone: '941222333'
-    },
-    {
-      id: 'contact-miguel-001',
-      patientUserId: 'patient-miguel',
-      name: 'Laura Montana',
-      relation: 'Daughter',
-      phone: '944555777'
-    },
-    {
-      id: 'contact-marian-001',
-      patientUserId: 'patient-marian',
-      name: 'Peter Medilla',
-      relation: 'Son',
-      phone: '933112244'
-    },
-    {
-      id: 'contact-robert-001',
-      patientUserId: 'patient-robert',
-      name: 'Mia Silva',
-      relation: 'Sister',
-      phone: '955001122'
-    }
-  ];
+  private profiles: CaregiverPatientProfile[] = [];
+
+  private emergencyContacts: CaregiverEmergencyContact[] = [];
 
   getDashboard(caregiverUserId: string): Observable<CaregiverProfileDashboard> {
-    return of({
-      caregiverUserId,
-      caregiverEmail: 'demo.caregiver@tukuntech.app',
-      patients: this.profiles.map(profile => ({ ...profile })),
-      emergencyContacts: this.emergencyContacts.map(contact => ({ ...contact }))
-    });
+    return this.userProfileApi.getMyPatients().pipe(
+      map(patients => {
+        this.profiles = patients.map(patient => this.mapProfile(patient));
+        this.emergencyContacts = patients.flatMap(patient => this.mapEmergencyContacts(patient));
+
+        return {
+          caregiverUserId: this.authService.getSession()?.userId || caregiverUserId,
+          caregiverEmail: this.authService.getSession()?.email || '',
+          patients: this.profiles.map(profile => ({ ...profile })),
+          emergencyContacts: this.emergencyContacts.map(contact => ({ ...contact }))
+        };
+      })
+    );
   }
 
   getPatientProfile(
@@ -167,5 +88,68 @@ export class CaregiverProfileRepository {
     );
 
     return of(undefined);
+  }
+
+  private mapProfile(profile: UserProfileResponse): CaregiverPatientProfile {
+    return {
+      userId: profile.id,
+      initials: this.getInitials(profile.fullName || profile.email),
+      fullName: profile.fullName || profile.email,
+      age: this.toOptionalNumber(profile.age),
+      address: profile.address || '',
+      bloodType: this.mapBloodType(profile.bloodType),
+      gender: this.mapGender(profile.gender),
+      notes: profile.notes || ''
+    };
+  }
+
+  private mapEmergencyContacts(profile: UserProfileResponse): CaregiverEmergencyContact[] {
+    return (profile.emergencyContacts || []).map((contact, index) => ({
+      id: contact.internalId || `contact-${profile.id}-${index}`,
+      patientUserId: profile.id,
+      name: contact.name || '',
+      relation: contact.relationship || '',
+      phone: contact.phoneNumber || ''
+    }));
+  }
+
+  private toOptionalNumber(value: unknown): number | null {
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : null;
+  }
+
+  private mapBloodType(value?: string): CaregiverPatientProfile['bloodType'] {
+    const bloodTypes: Record<string, CaregiverPatientProfile['bloodType']> = {
+      A_POSITIVE: 'A+',
+      A_NEGATIVE: 'A-',
+      B_POSITIVE: 'B+',
+      B_NEGATIVE: 'B-',
+      AB_POSITIVE: 'AB+',
+      AB_NEGATIVE: 'AB-',
+      O_POSITIVE: 'O+',
+      O_NEGATIVE: 'O-'
+    };
+
+    return bloodTypes[value || ''] || 'A+';
+  }
+
+  private mapGender(value?: string): CaregiverPatientProfile['gender'] {
+    const genders: Record<string, CaregiverPatientProfile['gender']> = {
+      FEMALE: 'Female',
+      MALE: 'Male',
+      OTHER: 'Other',
+      PREFER_NOT_TO_SAY: 'Prefer not to say'
+    };
+
+    return genders[value || ''] || 'Prefer not to say';
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('');
   }
 }

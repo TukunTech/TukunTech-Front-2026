@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
@@ -9,6 +9,7 @@ import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import {
   CustomSelect,
   CustomSelectOption
@@ -17,6 +18,7 @@ import { PatientAlertRepository } from '../../data/patient-alert.repository';
 import { PatientHistoryRepository } from '../../data/patient-history.repository';
 import {
   getHistorySeverity,
+  isOfflineHistoryRecord,
   PatientHistoryPeriod,
   PatientVitalHistoryRecord
 } from '../../domain/patient-history';
@@ -29,8 +31,8 @@ import { PatientVitalAlert } from '../../domain/patient-vitals';
   styleUrl: './history.css',
 })
 export class History {
-  userId = 'patient-demo-user';
-  email = 'demo.patient@tukuntech.app';
+  userId = '';
+  email = '';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
   urgentAlertMessageKey = '';
@@ -51,10 +53,15 @@ export class History {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private patientAlertRepository: PatientAlertRepository,
     private patientHistoryRepository: PatientHistoryRepository,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.userId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadHistory();
     this.loadGlobalUrgentAlert();
   }
@@ -117,14 +124,26 @@ export class History {
   }
 
   formatHeartRate(item: PatientVitalHistoryRecord): string {
+    if (isOfflineHistoryRecord(item)) {
+      return '-';
+    }
+
     return `${item.vitals.heartRate} bpm`;
   }
 
   formatOxygen(item: PatientVitalHistoryRecord): string {
+    if (isOfflineHistoryRecord(item)) {
+      return '-';
+    }
+
     return `${item.vitals.oxygen}%`;
   }
 
   formatTemperature(item: PatientVitalHistoryRecord): string {
+    if (isOfflineHistoryRecord(item)) {
+      return '-';
+    }
+
     return `${item.vitals.temperature} \u00b0C`;
   }
 
@@ -136,7 +155,7 @@ export class History {
 
     doc.setFontSize(11);
     doc.text(`Period: ${this.selectedPeriod}`, 14, 28);
-    doc.text(`Patient: Eleanor Marsh`, 14, 36);
+    doc.text(`Patient: ${this.email || this.userId}`, 14, 36);
 
     autoTable(doc, {
       startY: 46,
@@ -164,16 +183,20 @@ export class History {
       })
       .subscribe(history => {
         this.history = history;
+        this.changeDetector.detectChanges();
       });
   }
 
   private loadGlobalUrgentAlert(): void {
+    if (!this.userId) return;
+
     this.patientAlertRepository
       .getGlobalUrgentAlert(this.userId)
       .subscribe(alert => {
         this.urgentAlertShow = !!alert;
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
+        this.changeDetector.detectChanges();
       });
   }
 

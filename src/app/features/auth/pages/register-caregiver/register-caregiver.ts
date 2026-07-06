@@ -4,6 +4,8 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { OnboardingApiService } from '../../data/onboarding-api.service';
+import { finalize } from 'rxjs';
 
 import { AuthLayout } from '../../components/auth-layout/auth-layout';
 import {
@@ -58,7 +60,8 @@ export class RegisterCaregiver {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private onboardingApi: OnboardingApiService
   ) {
     const requestedPlan = this.route.snapshot.queryParamMap.get('plan');
     const matchingPlan = this.planOptions.find(plan => plan.id === requestedPlan);
@@ -71,6 +74,11 @@ export class RegisterCaregiver {
   activeAddressPatientIndex = 0;
   showMedicalParametersError = false;
   showAddressValidationError = false;
+  showAccountValidationError = false;
+  isSubmittingOnboarding = false;
+  onboardingError = '';
+  termsAccepted = false;
+  showTermsError = false;
 
   email = '';
   password = '';
@@ -155,6 +163,11 @@ export class RegisterCaregiver {
   }
 
   continue() {
+    if (this.currentStep === 2 && !this.hasValidCaregiverAccount) {
+      this.showAccountValidationError = true;
+      return;
+    }
+
     if (this.currentStep === 3 && !this.canContinue) {
       this.showMedicalParametersError = true;
       return;
@@ -165,6 +178,7 @@ export class RegisterCaregiver {
       return;
     }
 
+    this.showAccountValidationError = false;
     this.showMedicalParametersError = false;
     this.showAddressValidationError = false;
 
@@ -174,6 +188,10 @@ export class RegisterCaregiver {
   }
 
   get canContinue(): boolean {
+    if (this.currentStep === 2) {
+      return this.hasValidCaregiverAccount;
+    }
+
     if (this.currentStep === 3) {
       return this.patients.length === this.selectedPlan.patients &&
         this.patients.every(patient => this.getPatientInfoIssueKeys(patient).length === 0);
@@ -198,6 +216,50 @@ export class RegisterCaregiver {
 
   goToDashboard() {
     this.router.navigate(['/caregiver/vital-signs']);
+  }
+
+  submitOnboarding(): void {
+    if (this.isSubmittingOnboarding) return;
+
+    this.onboardingError = '';
+    this.isSubmittingOnboarding = true;
+
+    const request = this.onboardingApi.buildRequest(
+      this.email,
+      this.password,
+      this.selectedPlan.id,
+      this.termsAccepted,
+      this.patients
+    );
+
+    if (!this.termsAccepted) {
+      this.showTermsError = true;
+      this.onboardingError = 'Debes aceptar los terminos y condiciones para continuar con el pago.';
+      this.isSubmittingOnboarding = false;
+      return;
+    }
+
+    this.onboardingApi.createCheckout(request).pipe(
+      finalize(() => {
+        this.isSubmittingOnboarding = false;
+      })
+    ).subscribe({
+      next: checkoutUrl => {
+        const cleanUrl = checkoutUrl.trim();
+        if (cleanUrl.startsWith('http')) {
+          globalThis.location.href = cleanUrl;
+          return;
+        }
+        this.onboardingError = 'No se recibió el enlace de pago de Stripe. Intenta nuevamente.';
+      },
+      error: error => {
+        this.onboardingError = error.name === 'TimeoutError'
+          ? 'El servidor tardó demasiado preparando Stripe. Intenta nuevamente en unos segundos.'
+          : typeof error.error === 'string'
+          ? error.error
+          : 'No se pudo crear la cuenta. Revisa los datos, DNI unico y terminos aceptados.';
+      }
+    });
   }
 
   togglePasswordVisibility() {
@@ -280,6 +342,12 @@ export class RegisterCaregiver {
     return `$${this.selectedPlan.initialPrice}`;
   }
 
+  get hasValidCaregiverAccount(): boolean {
+    return /^\S+@\S+\.\S+$/.test(this.email.trim()) &&
+      this.password.length >= 6 &&
+      this.password === this.confirmPassword;
+  }
+
   private syncPatientsWithPlan(): void {
     const nextPatients = [...this.patients];
     while (nextPatients.length < this.selectedPlan.patients) {
@@ -309,6 +377,10 @@ export class RegisterCaregiver {
       }
     }
 
+    if (/^\d{8}$/.test(patient.dni.trim()) && this.hasDuplicateDni(patient.dni, patient)) {
+      issues.push('register.validation.duplicateDni');
+    }
+
     if (!patient.fullName.trim()) {
       issues.push('register.validation.fullName');
     }
@@ -332,5 +404,10 @@ export class RegisterCaregiver {
     return hasValidPatientAddress(patient)
       ? []
       : ['register.validation.patientAddress'];
+  }
+
+  private hasDuplicateDni(dni: string, currentPatient: PatientFormData): boolean {
+    const normalizedDni = dni.trim();
+    return this.patients.filter(patient => patient !== currentPatient && patient.dni.trim() === normalizedDni).length > 0;
   }
 }

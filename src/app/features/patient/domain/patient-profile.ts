@@ -1,6 +1,6 @@
 export type PatientBloodType = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
-export type PatientGender = 'Female' | 'Male';
+export type PatientGender = 'Female' | 'Male' | 'Other' | 'Prefer not to say';
 
 export type PatientSubscriptionStatus = 'active' | 'inactive';
 
@@ -9,7 +9,7 @@ export interface PatientProfile {
   email: string;
   initials: string;
   fullName: string;
-  age: number;
+  age: number | null;
   address: string;
   bloodType: PatientBloodType;
   gender: PatientGender;

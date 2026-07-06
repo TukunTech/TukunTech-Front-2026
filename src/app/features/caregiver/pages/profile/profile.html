@@ -47,7 +47,7 @@
         </div>
 
         <h2>{{ profile.fullName }}</h2>
-        <p>{{ profile.age }} {{ 'caregiver.profile.yearsOld' | translate }}</p>
+        <p *ngIf="profile.age !== null">{{ profile.age }} {{ 'caregiver.profile.yearsOld' | translate }}</p>
       </section>
 
       <div class="profile-right">

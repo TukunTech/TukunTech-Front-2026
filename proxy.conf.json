@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "http://tukuntech-backend.duckdns.org",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

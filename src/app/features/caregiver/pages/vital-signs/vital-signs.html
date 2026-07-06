@@ -15,7 +15,17 @@
       </div>
     </header>
 
-    <section class="selected-vitals-grid" *ngIf="selectedPatient">
+    <section class="empty-state" *ngIf="isLoading">
+      <h2>Cargando pacientes...</h2>
+      <p>Estamos buscando los pacientes enlazados a tu cuenta.</p>
+    </section>
+
+    <section class="empty-state" *ngIf="!isLoading && !patients.length">
+      <h2>No hay pacientes enlazados</h2>
+      <p>Cuando el backend relacione un paciente con este cuidador, aparecerá aquí.</p>
+    </section>
+
+    <section class="selected-vitals-grid" *ngIf="!isLoading && selectedPatient">
       <article
         class="selected-vital-card selected-vital-card--heart"
         [class.selected-vital-card--offline]="selectedPatientOffline"
@@ -53,7 +63,7 @@
       </article>
     </section>
 
-    <section class="caregiver-alerts" *ngIf="hasCaregiverAlerts">
+    <section class="caregiver-alerts" *ngIf="!isLoading && hasCaregiverAlerts">
       <article
         class="caregiver-alert"
         *ngFor="let item of caregiverAlerts"
@@ -74,7 +84,7 @@
       </article>
     </section>
 
-    <section class="patients-grid">
+    <section class="patients-grid" *ngIf="!isLoading && patients.length">
       <button
         class="patient-card"
         type="button"

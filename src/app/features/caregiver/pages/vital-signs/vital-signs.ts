@@ -1,11 +1,13 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { interval, Subscription } from 'rxjs';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { CaregiverAlertRepository } from '../../data/caregiver-alert.repository';
 import { EcgLiveChart } from '../../../../shared/components/ecg-live-chart/ecg-live-chart';
 import { CaregiverVitalSignsRepository } from '../../data/caregiver-vital-signs.repository';
@@ -34,16 +36,18 @@ interface CaregiverPatientAlertView {
   templateUrl: './vital-signs.html',
   styleUrl: './vital-signs.css',
 })
-export class VitalSigns {
-  caregiverUserId = 'caregiver-demo-user';
-  email = 'demo.caregiver@tukuntech.app';
+export class VitalSigns implements OnDestroy {
+  caregiverUserId = '';
+  email = '';
   selectedPatientId = '';
+  isLoading = true;
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
   urgentAlertMessageKey = '';
   urgentAlertMessageParams: Record<string, string> = {};
 
   patients: CaregiverPatientSummary[] = [];
+  private refreshSubscription?: Subscription;
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.caregiver.vitalSigns', route: '/caregiver/vital-signs' },
@@ -55,12 +59,21 @@ export class VitalSigns {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private caregiverAlertRepository: CaregiverAlertRepository,
     private caregiverVitalSignsRepository: CaregiverVitalSignsRepository,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.caregiverUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
-    this.loadGlobalCriticalAlert();
+    this.refreshSubscription = interval(5000).subscribe(() => this.loadDashboard(true));
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSubscription?.unsubscribe();
   }
 
   get selectedPatient(): CaregiverPatientSummary | undefined {
@@ -245,17 +258,27 @@ export class VitalSigns {
     return alert ? this.getAlertValueLabel(alert) : '';
   }
 
-  private loadDashboard(): void {
+  private loadDashboard(isRefresh = false): void {
+    if (!isRefresh) {
+      this.isLoading = true;
+    }
+
     this.caregiverVitalSignsRepository
       .getDashboard(this.caregiverUserId)
       .subscribe(data => {
+        this.caregiverUserId = data.caregiverUserId;
         this.email = data.caregiverEmail;
         this.patients = data.patients;
         this.selectedPatientId = this.selectedPatientId || data.patients[0]?.userId || '';
+        this.isLoading = false;
+        this.changeDetector.detectChanges();
+        this.loadGlobalCriticalAlert();
       });
   }
 
   private loadGlobalCriticalAlert(): void {
+    if (!this.caregiverUserId) return;
+
     this.caregiverAlertRepository
       .getGlobalCriticalAlert(this.caregiverUserId)
       .subscribe(alert => {
@@ -263,6 +286,7 @@ export class VitalSigns {
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
         this.urgentAlertMessageParams = alert?.messageParams || {};
+        this.changeDetector.detectChanges();
       });
   }
 

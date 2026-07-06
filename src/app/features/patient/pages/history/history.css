@@ -248,6 +248,14 @@
   border-top: none;
 }
 
+.history-row--offline {
+  background: #f3f7f7;
+  color: #667985;
+  border-radius: 24px;
+  margin-top: 8px;
+  border-top: none;
+}
+
 .history-row--normal + .history-row--normal {
   border-top: 1px solid #e7efed;
 }

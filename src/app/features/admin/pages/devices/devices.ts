@@ -1,9 +1,10 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { CustomSelect, CustomSelectOption } from '../../../../shared/components/custom-select/custom-select';
 import { DashboardLayout } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { adminMenuItems } from '../../admin-menu';
@@ -24,13 +25,14 @@ import {
   templateUrl: './devices.html',
   styleUrl: './devices.css'
 })
-export class Devices {
-  readonly adminUserId = 'admin-demo-user';
+export class Devices implements OnInit {
+  adminUserId = '';
   readonly menuItems = adminMenuItems;
 
-  email = 'demo.admin@tukuntech.app';
+  email = '';
+  devicesLoaded = false;
   activeView: 'inventory' | 'assignment' = 'inventory';
-  assignmentMode: 'individual' | 'caregiver' = 'individual';
+  assignmentMode: 'caregiver' = 'caregiver';
   searchTerm = '';
   patientSearchTerm = '';
   caregiverSearchTerm = '';
@@ -52,9 +54,16 @@ export class Devices {
   toastMessageKey = '';
 
   constructor(
+    private authService: AuthApiService,
     private repository: AdminDeviceRepository,
-    private translateService: TranslateService
-  ) {
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const session = this.authService.getSession();
+    this.adminUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
   }
 
@@ -152,12 +161,6 @@ export class Devices {
     });
   }
 
-  setAssignmentMode(mode: 'individual' | 'caregiver'): void {
-    this.assignmentMode = mode;
-    this.selectedPatientId = '';
-    this.selectedCaregiverId = '';
-  }
-
   selectCaregiver(caregiverId: string): void {
     this.selectedCaregiverId = caregiverId;
     this.selectedPatientId = '';
@@ -193,12 +196,15 @@ export class Devices {
   }
 
   private loadDashboard(): void {
+    this.devicesLoaded = false;
     this.repository.getDashboard(this.adminUserId).subscribe(data => {
       this.email = data.adminEmail;
       this.devices = data.devices;
       this.summary = data.summary;
       this.individualPatients = data.individualPatients;
       this.caregivers = data.caregivers;
+      this.devicesLoaded = true;
+      this.changeDetector.detectChanges();
     });
   }
 

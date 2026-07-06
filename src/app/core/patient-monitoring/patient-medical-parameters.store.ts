@@ -12,14 +12,7 @@ export interface PatientMedicalParameters {
 
 @Injectable({ providedIn: 'root' })
 export class PatientMedicalParametersStore {
-  private parameters = new Map<string, PatientMedicalParameters>([
-    ['patient-demo-user', this.createParameters('patient-demo-user', 70, 100, 95, 100, 36.1, 37.2)],
-    ['patient-eleanor', this.createParameters('patient-eleanor', 70, 100, 95, 100, 36.1, 37.2)],
-    ['patient-charls', this.createParameters('patient-charls', 65, 105, 94, 100, 36.0, 37.4)],
-    ['patient-miguel', this.createParameters('patient-miguel', 68, 108, 93, 100, 36.0, 37.6)],
-    ['patient-marian', this.createParameters('patient-marian', 72, 98, 96, 100, 36.2, 37.2)],
-    ['patient-robert', this.createParameters('patient-robert', 65, 100, 95, 100, 36.1, 37.3)]
-  ]);
+  private parameters = new Map<string, PatientMedicalParameters>();
 
   getParameters(patientUserId: string): PatientMedicalParameters {
     return {

@@ -6,7 +6,7 @@ import {
 
 export type PatientHistoryRecordSource = 'hourly-snapshot' | 'alert-event';
 
-export type PatientHistorySeverity = 'normal' | VitalAlertSeverity;
+export type PatientHistorySeverity = 'normal' | 'offline' | VitalAlertSeverity;
 
 export type PatientHistoryPeriod = 'weekly' | 'biweekly' | 'monthly' | 'all' | 'custom';
 
@@ -29,6 +29,10 @@ export interface PatientVitalHistoryRecord {
 export function getHistorySeverity(
   record: PatientVitalHistoryRecord
 ): PatientHistorySeverity {
+  if (isOfflineHistoryRecord(record)) {
+    return 'offline';
+  }
+
   if (record.alerts.some(alert => alert.severity === 'critical')) {
     return 'critical';
   }
@@ -38,4 +42,14 @@ export function getHistorySeverity(
   }
 
   return 'normal';
+}
+
+export function isOfflineHistoryRecord(record: PatientVitalHistoryRecord): boolean {
+  const measuredAt = Date.parse(record.vitals.measuredAt);
+  const hasMeasuredAt = Number.isFinite(measuredAt);
+  const hasAnySignal = record.vitals.heartRate > 0 ||
+    record.vitals.oxygen > 0 ||
+    record.vitals.temperature > 0;
+
+  return !hasMeasuredAt || !hasAnySignal;
 }

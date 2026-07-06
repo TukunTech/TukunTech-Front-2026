@@ -1,9 +1,10 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import {provideHttpClient, HttpClient} from '@angular/common/http';
+import {provideHttpClient, HttpClient, withInterceptors} from '@angular/common/http';
 import { routes } from './app.routes';
 import {provideTranslateService, TranslateLoader} from '@ngx-translate/core';
 import {CustomTranslateLoader} from './core/i18n/custom-translate-loader';
+import { authInterceptor } from './core/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
 
     provideRouter(routes),
 
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
 
     provideTranslateService({
       fallbackLang: 'en',

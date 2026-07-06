@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AppLanguage } from '../../../../core/i18n/language.service';
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
 import { CustomSelect, CustomSelectOption } from '../../../../shared/components/custom-select/custom-select';
@@ -10,14 +12,15 @@ import { AdminSettingsRepository } from '../../data/admin-settings.repository';
 
 @Component({
   selector: 'app-admin-settings',
-  imports: [DashboardLayout, TranslatePipe, CustomSelect, AppToast],
+  imports: [DashboardLayout, TranslatePipe, CustomSelect, AppToast, NgIf],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
-export class Settings {
-  adminUserId = 'admin-demo-user';
-  email = 'demo.admin@tukuntech.app';
+export class Settings implements OnInit {
+  adminUserId = '';
+  email = '';
   language: AppLanguage = 'en';
+  settingsLoaded = false;
   showToast = false;
   menuItems = adminMenuItems;
 
@@ -26,7 +29,16 @@ export class Settings {
     { label: 'Español', value: 'es' }
   ];
 
-  constructor(private adminSettingsRepository: AdminSettingsRepository) {
+  constructor(
+    private authService: AuthApiService,
+    private adminSettingsRepository: AdminSettingsRepository,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const session = this.authService.getSession();
+    this.adminUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadSettings();
   }
 
@@ -57,6 +69,8 @@ export class Settings {
       .subscribe(profile => {
         this.email = profile.adminEmail;
         this.language = profile.language;
+        this.settingsLoaded = true;
+        this.changeDetector.detectChanges();
       });
   }
 }

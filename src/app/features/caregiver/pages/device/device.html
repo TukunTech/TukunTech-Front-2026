@@ -27,7 +27,12 @@
       </div>
     </section>
 
-    <section class="devices-list">
+    <section class="empty-state" *ngIf="!devices.length">
+      <h2>No hay pacientes enlazados</h2>
+      <p>Cuando el backend asocie pacientes a este cuidador, sus dispositivos aparecerán aquí.</p>
+    </section>
+
+    <section class="devices-list" *ngIf="devices.length">
       <article
         class="device-card"
         *ngFor="let device of devices"

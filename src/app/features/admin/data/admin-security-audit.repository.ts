@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { API_BASE_URL } from '../../../core/api/api.config';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
 
 import {
   AdminManagedUser,
@@ -7,55 +12,45 @@ import {
   AdminSecurityAuditDashboard
 } from '../domain/admin-security-audit';
 
+interface AdminUserResponse {
+  userId: string;
+  email: string;
+  fullName?: string;
+  role?: string;
+  status?: string;
+  subscriptionEnd?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AdminSecurityAuditRepository {
-  private users: AdminManagedUser[] = [
-    {
-      id: 'user-sarah-caregiver',
-      fullName: 'Sarah Marsh',
-      email: 'sarah@tukuntech.com',
-      phone: '+51 955 512 880',
-      role: 'caregiver',
-      status: 'active',
-      joinedAt: '2026-03-12'
-    },
-    {
-      id: 'user-sarah-admin',
-      fullName: 'Sarah Marsh',
-      email: 'sarah.admin@tukuntech.com',
-      phone: '+51 955 240 188',
-      role: 'admin',
-      status: 'active',
-      joinedAt: '2026-03-12'
-    },
-    {
-      id: 'user-sarah-patient',
-      fullName: 'Sarah Marsh',
-      email: 'sarah.patient@tukuntech.com',
-      phone: '+51 955 991 244',
-      role: 'patient',
-      status: 'active',
-      joinedAt: '2026-03-12'
-    },
-    {
-      id: 'user-sarah-suspended',
-      fullName: 'Sarah Marsh',
-      email: 'sarah.suspended@tukuntech.com',
-      phone: '+51 955 731 066',
-      role: 'patient',
-      status: 'suspended',
-      joinedAt: '2026-03-12'
-    }
-  ];
+  private users: AdminManagedUser[] = [];
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthApiService,
+    @Inject(API_BASE_URL) private apiBaseUrl: string
+  ) {}
 
   getDashboard(adminUserId: string): Observable<AdminSecurityAuditDashboard> {
-    return of({
-      adminUserId,
-      adminEmail: 'demo.admin@tukuntech.app',
-      users: this.users.map(user => ({ ...user }))
-    });
+    return this.http.get<AdminUserResponse[]>(`${this.apiBaseUrl}/admin/users`).pipe(
+      map(users => {
+        const session = this.authService.getSession();
+        this.users = this.dedupeUsers(users.map(user => this.mapAdminUser(user)));
+
+        return {
+          adminUserId: session?.userId || adminUserId,
+          adminEmail: session?.email || '',
+          users: this.users.map(user => ({ ...user }))
+        };
+      }),
+      catchError(() => of({
+        adminUserId,
+        adminEmail: this.authService.getSession()?.email || '',
+        users: this.users.map(user => ({ ...user }))
+      }))
+    );
   }
 
   updateUser(
@@ -79,13 +74,23 @@ export class AdminSecurityAuditRepository {
       phone: this.formatPeruPhone(update.phone)
     };
 
-    this.users = this.users.map(user =>
-      user.id === userId
-        ? nextUser
-        : user
-    );
+    const updateLocal = () => {
+      this.users = this.users.map(user =>
+        user.id === userId
+          ? nextUser
+          : user
+      );
+      return { ...nextUser };
+    };
 
-    return of({ ...nextUser });
+    if (update.status === 'suspended') {
+      return this.http.delete(`${this.apiBaseUrl}/accounts/${userId}`, { responseType: 'text' }).pipe(
+        map(() => updateLocal()),
+        catchError(() => throwError(() => new Error('Could not suspend user')))
+      );
+    }
+
+    return of(updateLocal());
   }
 
   private isValidPeruPhone(phone: string): boolean {
@@ -107,4 +112,38 @@ export class AdminSecurityAuditRepository {
       ? digits.slice(2, 11)
       : digits.slice(0, 9);
   }
+
+  private mapAdminUser(user: AdminUserResponse): AdminManagedUser {
+    return {
+      id: user.userId,
+      fullName: user.fullName || user.email,
+      email: user.email,
+      phone: '',
+      role: this.mapRole(user.role),
+      status: this.mapStatus(user.status),
+      joinedAt: user.subscriptionEnd || ''
+    };
+  }
+
+  private mapRole(role?: string): AdminManagedUser['role'] {
+    const normalizedRole = (role || '').toUpperCase();
+    if (normalizedRole.includes('ADMIN')) return 'admin';
+    if (normalizedRole.includes('CAREGIVER')) return 'caregiver';
+    return 'patient';
+  }
+
+  private mapStatus(status?: string): AdminManagedUser['status'] {
+    return (status || '').toUpperCase() === 'ACTIVE' ? 'active' : 'suspended';
+  }
+
+  private dedupeUsers(users: AdminManagedUser[]): AdminManagedUser[] {
+    const seen = new Set<string>();
+    return users.filter(user => {
+      const key = (user.id || user.email).toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
 }

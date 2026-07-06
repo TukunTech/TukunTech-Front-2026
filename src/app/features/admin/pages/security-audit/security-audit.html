@@ -43,6 +43,14 @@
           <span></span>
         </div>
 
+        <div class="users-row users-row--state" *ngIf="!usersLoaded">
+          <span>{{ 'common.loading' | translate }}</span>
+        </div>
+
+        <div class="users-row users-row--state" *ngIf="usersLoaded && !filteredUsers.length">
+          <span>{{ 'admin.securityAudit.empty' | translate }}</span>
+        </div>
+
         <div class="users-row" *ngFor="let user of filteredUsers">
           <span>{{ user.fullName }}</span>
           <span>{{ user.email }}</span>

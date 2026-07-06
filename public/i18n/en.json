@@ -58,6 +58,20 @@
     "goHome": "Go home",
     "goBack": "Go back"
   },
+  "paymentResult": {
+    "success": {
+      "title": "Payment confirmed",
+      "description": "Stripe confirmed your payment. Your TukunTech account is being activated.",
+      "notice": "If you just paid, wait a few seconds before signing in so the backend can finish activating the account.",
+      "action": "Go to sign in"
+    },
+    "canceled": {
+      "title": "Payment not completed",
+      "description": "The payment was canceled or rejected. No account was activated.",
+      "primaryAction": "Try again",
+      "secondaryAction": "Go to sign in"
+    }
+  },
   "register": {
     "patient": {
       "title": "Create your patient account",
@@ -176,6 +190,8 @@
       "patientPassword": "password must be at least 6 characters",
       "patientPasswordMatch": "passwords do not match",
       "patientDni": "8-digit DNI is required",
+      "duplicateDni": "Repeated DNI; each patient must have a unique DNI",
+      "caregiverAccount": "Use a valid email and a password of at least 6 characters that matches both fields.",
       "fullName": "full name is empty",
       "age": "age is empty",
       "gender": "gender is not selected",
@@ -200,10 +216,12 @@
     },
     "payment": {
       "title": "Payment",
-      "description": "This is a mock payment step. The real payment gateway will be connected later.",
+      "description": "You will be redirected to Stripe to complete payment. The account will activate after Stripe confirms the payment.",
       "plan": "Individual plan",
       "familyPlan": "Selected plan",
-      "mockPay": "Simulate payment and continue"
+      "mockPay": "Pay with Stripe",
+      "payWithStripe": "Pay with Stripe",
+      "creatingCheckout": "Preparing payment..."
     },
     "done": {
       "title": "Account created",
@@ -330,8 +348,6 @@
       "wifi": "WiFi",
       "sync": "Sync",
       "strong": "Strong",
-      "medium": "Medium",
-      "weak": "Weak",
       "good": "Good",
       "pending": "Pending",
       "failed": "Failed",
@@ -339,7 +355,8 @@
       "disconnectedTitle": "Device disconnected",
       "alert": "Your device is reporting normally. We'll notify you here if anything changes.",
       "disconnectedAlert": "Monitoring is disabled. Reconnect the device to resume patient status tracking.",
-      "disconnectedGlobalAlert": "Urgent: reconnect the device. Patient monitoring is disabled while the device is offline."
+      "disconnectedGlobalAlert": "Urgent: reconnect the device. Patient monitoring is disabled while the device is offline.",
+      "off": "Off"
     },
     "history": {
       "title": "My history",
@@ -366,11 +383,12 @@
       "temperature": "Temperature",
       "status": "Status",
       "sources": {
-        "hourly-snapshot": "Hourly record",
+        "hourly-snapshot": "Periodic record",
         "alert-event": "Alert event"
       },
       "severity": {
         "normal": "Normal",
+        "offline": "Offline",
         "notice": "Needs attention",
         "critical": "Critical"
       }
@@ -514,8 +532,7 @@
       },
       "wifi": {
         "strong": "Strong",
-        "medium": "Medium",
-        "weak": "Weak"
+        "off": "Off"
       },
       "alerts": {
         "heartRateLow": {
@@ -575,13 +592,12 @@
       "wifi": "WiFi",
       "sync": "Sync",
       "strong": "Strong",
-      "medium": "Medium",
-      "weak": "Weak",
       "good": "Good",
       "pending": "Pending",
       "failed": "Failed",
       "offlineAlertTitle": "Device disconnected",
-      "offlineAlertMessage": "Urgent: reconnect the device for {{patients}}. Monitoring is disabled while offline."
+      "offlineAlertMessage": "Urgent: reconnect the device for {{patients}}. Monitoring is disabled while offline.",
+      "off": "Off"
     },
     "history": {
       "title": "Patient History",
@@ -616,6 +632,7 @@
       "temperatureSummary": "{{value}} °C - {{status}}",
       "severity": {
         "normal": "Normal",
+        "offline": "Offline",
         "notice": "Needs attention",
         "critical": "Critical"
       }
@@ -716,6 +733,7 @@
       "searchPlaceholder": "Search users...",
       "total": "total: {{total}}",
       "edit": "Edit",
+      "empty": "No users to show.",
       "savedSuccessfully": "Changes were saved successfully",
       "saveError": "We could not save the changes. Please check the required fields.",
       "invalidPhone": "Enter a valid Peru phone number. Example: +51 999 999 999.",
@@ -753,12 +771,13 @@
       "subtitle": "Register equipment and assign it directly to each patient.",
       "searchPlaceholder": "Search by code, model, serial, or patient...",
       "total": "{{total}} devices",
+      "empty": "No devices to show.",
       "edit": "Edit device",
       "newDevice": "New device",
       "unassigned": "Unassigned",
       "createdSuccessfully": "Device registered successfully",
       "savedSuccessfully": "Device updated successfully",
-      "saveError": "We could not save it. Check that the code and serial are unique.",
+      "saveError": "We could not save it. Check that the serial/MAC does not already exist in the backend.",
       "summary": {
         "total": "Total",
         "available": "Available",
@@ -826,11 +845,14 @@
     },
     "common": {
       "month": "Month",
-      "monthPlaceholder": "Select month"
+      "monthPlaceholder": "Select month",
+      "loading": "Loading..."
     },
     "subscriptions": {
       "title": "Subscriptions",
       "subtitle": "Monthly subscription overview.",
+      "allMonths": "All",
+      "empty": "No subscriptions to show.",
       "summary": {
         "active": "Active",
         "new": "New",
@@ -851,6 +873,7 @@
     "supportTickets": {
       "title": "Support Tickets",
       "subtitle": "Inbox conversations with users.",
+      "empty": "No tickets to show.",
       "replyPlaceholder": "Type a reply...",
       "sendReply": "Send reply",
       "markDone": "mark done",

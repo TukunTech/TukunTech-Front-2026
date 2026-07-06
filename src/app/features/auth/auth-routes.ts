@@ -36,6 +36,28 @@ export const authRoutes: Routes = [
     path: 'register',
     pathMatch: 'full',
     component: RegisterPlan
+  },
+  {
+    path: 'payment/success',
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result').then(m => m.PaymentResult),
+    data: { status: 'success' }
+  },
+  {
+    path: 'payment/canceled',
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result').then(m => m.PaymentResult),
+    data: { status: 'canceled' }
+  },
+  {
+    path: 'payment/cancel',
+    redirectTo: 'payment/canceled',
+    pathMatch: 'full'
+  },
+  {
+    path: 'payment/failed',
+    redirectTo: 'payment/canceled',
+    pathMatch: 'full'
   }
 
 ];

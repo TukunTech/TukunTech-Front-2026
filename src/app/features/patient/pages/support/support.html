@@ -49,14 +49,43 @@
       <section class="support-card message-card">
         <div class="card-title-row">
           <div>
-            <h2>{{ 'patient.support.form.title' | translate }}</h2>
-            <p>{{ 'patient.support.form.description' | translate }}</p>
+            <h2>{{ selectedTicket ? selectedTicket.subject : ('patient.support.form.title' | translate) }}</h2>
+            <p>{{ selectedTicket ? selectedTicket.id : ('patient.support.form.description' | translate) }}</p>
           </div>
 
           <i class="bi bi-chat-right-text"></i>
         </div>
 
-        <form (ngSubmit)="submitTicket()">
+        <div class="ticket-thread" *ngIf="selectedTicket">
+          <div
+            class="thread-message"
+            *ngFor="let message of selectedTicket.messages"
+            [class.thread-message--admin]="message.fromAdmin"
+          >
+            <div class="thread-meta">
+              <strong>{{ message.authorName }}</strong>
+              <span>{{ message.createdAt }}</span>
+            </div>
+            <p>{{ message.message }}</p>
+          </div>
+        </div>
+
+        <form *ngIf="selectedTicket" (ngSubmit)="sendReply()">
+          <label for="support-reply">Respuesta</label>
+
+          <textarea
+            id="support-reply"
+            name="replyMessage"
+            [(ngModel)]="replyMessage">
+          </textarea>
+
+          <button class="send-button" type="submit" [disabled]="!replyMessage.trim()">
+            <i class="bi bi-send"></i>
+            Responder
+          </button>
+        </form>
+
+        <form *ngIf="!selectedTicket" (ngSubmit)="submitTicket()">
           <label for="support-subject">
             {{ 'patient.support.form.subject' | translate }}
           </label>
@@ -96,7 +125,10 @@
             <p>{{ 'patient.support.history.description' | translate }}</p>
           </div>
 
-          <i class="bi bi-book"></i>
+          <button class="new-ticket-button" type="button" (click)="startNewTicket()">
+            <i class="bi bi-plus-lg"></i>
+            Nuevo ticket
+          </button>
         </div>
 
         <div class="tickets-table">
@@ -106,7 +138,13 @@
             <span>{{ 'patient.support.history.status' | translate }}</span>
           </div>
 
-          <div class="ticket-row" *ngFor="let ticket of tickets">
+          <button
+            class="ticket-row"
+            type="button"
+            *ngFor="let ticket of tickets"
+            [class.ticket-row--active]="selectedTicketId === ticket.id"
+            (click)="selectTicket(ticket)"
+          >
             <div>
               <span class="mobile-label">
                 {{ 'patient.support.history.subject' | translate }}
@@ -132,7 +170,7 @@
                 {{ getStatusLabelKey(ticket.status) | translate }}
               </span>
             </div>
-          </div>
+          </button>
         </div>
       </section>
     </div>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export type SubscriptionRole = 'patient' | 'caregiver';
-export type SubscriptionStatus = 'active' | 'expired' | 'canceled';
+export type SubscriptionStatus = 'active' | 'inactive' | 'expired' | 'canceled';
 
 export interface SubscriptionAccess {
   email: string;
@@ -15,32 +15,7 @@ export interface SubscriptionAccess {
 @Injectable({ providedIn: 'root' })
 export class SubscriptionAccessStore {
   private readonly storageKey = 'tukuntech.subscription-access.v1';
-  private accounts: Array<Omit<SubscriptionAccess, 'daysRemaining' | 'canAccess'>> = [
-    {
-      email: 'demo.patient@tukuntech.app',
-      role: 'patient',
-      status: 'active',
-      renewsOn: '2026-07-23',
-    },
-    {
-      email: 'demo.caregiver@tukuntech.app',
-      role: 'caregiver',
-      status: 'active',
-      renewsOn: '2026-07-24',
-    },
-    {
-      email: 'expired.patient@tukuntech.app',
-      role: 'patient',
-      status: 'expired',
-      renewsOn: '2026-06-10',
-    },
-    {
-      email: 'expired.caregiver@tukuntech.app',
-      role: 'caregiver',
-      status: 'expired',
-      renewsOn: '2026-06-10',
-    },
-  ];
+  private accounts: Array<Omit<SubscriptionAccess, 'daysRemaining' | 'canAccess'>> = [];
 
   constructor() {
     const saved = globalThis.localStorage?.getItem(this.storageKey);
@@ -54,13 +29,13 @@ export class SubscriptionAccessStore {
   }
 
   getRoleAccess(role: SubscriptionRole): SubscriptionAccess {
-    return this.getAccountAccess(`demo.${role}@tukuntech.app`, role);
+    return this.getAccountAccess('', role);
   }
 
   getAccountAccess(email: string, role: SubscriptionRole): SubscriptionAccess {
     const account = this.accounts.find(
       (item) => item.email.toLowerCase() === email.trim().toLowerCase() && item.role === role,
-    ) ?? { email: email.trim(), role, status: 'active' as const, renewsOn: '2026-07-20' };
+    ) ?? { email: email.trim(), role, status: 'inactive' as const, renewsOn: '' };
 
     const daysRemaining = this.calculateDaysRemaining(account.renewsOn);
     const status: SubscriptionStatus =
@@ -118,6 +93,10 @@ export class SubscriptionAccessStore {
   private calculateDaysRemaining(renewsOn: string): number {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    if (!renewsOn) {
+      return -1;
+    }
+
     const renewal = new Date(`${renewsOn}T00:00:00`);
     return Math.ceil((renewal.getTime() - today.getTime()) / 86_400_000);
   }

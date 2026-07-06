@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthLayout } from '../../components/auth-layout/auth-layout';
 import { NgIf } from '@angular/common';
-import { SubscriptionAccessStore } from '../../../../core/subscription/subscription-access.store';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { finalize, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -16,15 +17,14 @@ export class Login {
   role: 'patient' | 'caregiver' | 'admin' = 'patient';
 
   email = '';
-  password = 'password';
-  subscriptionBlocked = false;
-  renewalSucceeded = false;
-  blockedRenewalDate = '';
+  password = '';
+  isSubmitting = false;
+  loginError = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private subscriptionStore: SubscriptionAccessStore
+    private authService: AuthApiService
   ) {
     const currentRole = this.route.snapshot.paramMap.get('role');
 
@@ -40,49 +40,51 @@ export class Login {
     if (blockedRole === 'caregiver' || blockedRole === 'patient') {
       this.role = blockedRole;
     }
-
-    this.email = this.role === 'admin'
-      ? 'demo.admin@tukuntech.app'
-      : 'demo.caregiver@tukuntech.app';
-    this.subscriptionBlocked = this.route.snapshot.queryParamMap.get('reason') === 'subscription-expired';
-    if (this.subscriptionBlocked && this.role !== 'admin') {
-      this.blockedRenewalDate = this.subscriptionStore.getRoleAccess(this.role).renewsOn;
-    }
   }
 
   signIn() {
-    const resolvedRole = this.resolveRoleFromEmail();
+    this.loginError = '';
+    this.isSubmitting = true;
 
-    if (resolvedRole !== 'admin') {
-      const access = this.subscriptionStore.getAccountAccess(this.email, resolvedRole);
-      if (!access.canAccess) {
-        this.subscriptionBlocked = true;
-        this.renewalSucceeded = false;
-        this.blockedRenewalDate = access.renewsOn;
-        return;
+    this.authService.login({
+      email: this.email.trim(),
+      password: this.password
+    }).pipe(
+      timeout(15000),
+      finalize(() => {
+        this.isSubmitting = false;
+      })
+    ).subscribe({
+      next: () => {
+        const role = this.authService.getSession()?.role.toUpperCase();
+
+        if (role === 'PATIENT') {
+          this.router.navigate(['/patient/today']);
+          return;
+        }
+
+        if (role === 'CAREGIVER') {
+          this.router.navigate(['/caregiver/vital-signs']);
+          return;
+        }
+
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+          return;
+        }
+
+        this.authService.logout();
+        this.loginError = 'No se pudo reconocer el rol de esta cuenta.';
+      },
+      error: error => {
+        this.authService.logout();
+        this.loginError = error.name === 'TimeoutError'
+          ? 'El servidor tardó demasiado en responder. Intenta nuevamente.'
+          : typeof error.error === 'string'
+          ? error.error
+          : 'No se pudo iniciar sesion. Revisa el correo y la contrasena.';
       }
-    }
-
-    if (resolvedRole === 'patient') {
-      this.router.navigate(['/patient/today']);
-      return;
-    }
-
-    if (resolvedRole === 'caregiver') {
-      this.router.navigate(['/caregiver/vital-signs']);
-      return;
-    }
-
-    this.router.navigate(['/admin']);
-  }
-
-  renewSubscription(): void {
-    const resolvedRole = this.resolveRoleFromEmail();
-    if (resolvedRole === 'admin') return;
-    const access = this.subscriptionStore.renew(this.email, resolvedRole);
-    this.subscriptionBlocked = false;
-    this.renewalSucceeded = true;
-    this.blockedRenewalDate = access.renewsOn;
+    });
   }
 
   goBack() {
@@ -91,11 +93,6 @@ export class Login {
 
   goToCreateAccount() {
     this.router.navigate(['/register']);
-  }
-
-
-  simulateError() {
-    alert('Simulated login error');
   }
 
   showPassword = false;
@@ -116,12 +113,4 @@ export class Login {
     return this.isAdminLogin ? 'roles.admin' : 'roles.member';
   }
 
-  private resolveRoleFromEmail(): 'patient' | 'caregiver' | 'admin' {
-    if (this.role === 'admin') {
-      return 'admin';
-    }
-
-    const normalizedEmail = this.email.trim().toLowerCase();
-    return normalizedEmail.includes('patient') ? 'patient' : 'caregiver';
-  }
 }

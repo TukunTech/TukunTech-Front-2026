@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
 import { SubscriptionAccessStore } from '../../../core/subscription/subscription-access.store';
+import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 
 import {
   CreateEmergencyContactPayload,
@@ -14,56 +17,46 @@ import {
   providedIn: 'root'
 })
 export class PatientProfileRepository {
-  constructor(private subscriptionStore: SubscriptionAccessStore) {}
+  constructor(
+    private authService: AuthApiService,
+    private subscriptionStore: SubscriptionAccessStore,
+    private userProfileApi: UserProfileApiService
+  ) {}
   private profile: PatientProfile = {
-    userId: 'patient-demo-user',
-    email: 'demo.patient@tukuntech.app',
-    initials: 'EM',
-    fullName: 'Eleanor Marsh',
-    age: 68,
-    address: 'Av. siempre viva 235',
+    userId: '',
+    email: '',
+    initials: '',
+    fullName: '',
+    age: null,
+    address: '',
     bloodType: 'A+',
-    gender: 'Female',
-    notes: 'no notes'
+    gender: 'Prefer not to say',
+    notes: ''
   };
 
   private subscription: PatientSubscription = {
-    id: 'subscription-demo-1',
-    name: 'TukunTech Premium',
-    renewsOn: '2026-06-23',
-    priceLabel: '$19.99',
-    status: 'active',
-    planLabel: 'Premium - monthly'
+    id: '',
+    name: '',
+    renewsOn: '',
+    priceLabel: '',
+    status: 'inactive',
+    planLabel: ''
   };
 
-  private emergencyContacts: EmergencyContact[] = [
-    {
-      id: 'contact-demo-1',
-      patientUserId: 'patient-demo-user',
-      name: 'Sarah Marsh',
-      relation: 'Daughter',
-      phone: '(503) 555-0184'
-    },
-    {
-      id: 'contact-demo-2',
-      patientUserId: 'patient-demo-user',
-      name: 'Dr. Patel',
-      relation: 'Family doctor',
-      phone: '(503) 555-0102'
-    }
-  ];
+  private emergencyContacts: EmergencyContact[] = [];
 
   getProfilePageData(userId: string): Observable<PatientProfilePageData> {
-    const access = this.subscriptionStore.getRoleAccess('patient');
-    return of({
-      profile: { ...this.profile, userId },
-      subscription: {
-        ...this.subscription,
-        renewsOn: access.renewsOn,
-        status: access.canAccess ? 'active' : 'inactive'
-      },
-      emergencyContacts: this.getContactsByUser(userId)
-    });
+    return this.userProfileApi.getMyProfile().pipe(
+      map(profile => {
+        this.profile = this.mapProfile(profile);
+        return {
+          profile: { ...this.profile },
+          subscription: this.mapSubscription(profile),
+          emergencyContacts: this.mapEmergencyContacts(profile)
+        };
+      }),
+      catchError(() => of(this.createFallbackPageData(userId)))
+    );
   }
 
   renewSubscription(): Observable<PatientSubscription> {
@@ -79,40 +72,172 @@ export class PatientProfileRepository {
   }
 
   updateProfile(userId: string, profile: PatientProfile): Observable<PatientProfile> {
-    this.profile = {
-      ...profile,
-      userId
-    };
-
-    return of({ ...this.profile });
+    return this.userProfileApi.updatePersonalInfo(userId, {
+      fullName: profile.fullName,
+      gender: this.toApiGender(profile.gender),
+      age: profile.age ?? 0,
+      bloodType: this.toApiBloodType(profile.bloodType),
+      address: profile.address,
+      notes: profile.notes
+    }).pipe(
+      map(() => {
+        this.profile = { ...profile, userId };
+        return { ...this.profile };
+      })
+    );
   }
 
   createEmergencyContact(
     patientUserId: string,
     payload: CreateEmergencyContactPayload
   ): Observable<EmergencyContact> {
-    const contact: EmergencyContact = {
-      ...payload,
-      id: `contact-${Date.now()}`,
-      patientUserId
-    };
-
-    this.emergencyContacts = [...this.emergencyContacts, contact];
-
-    return of({ ...contact });
+    return this.userProfileApi.addEmergencyContact(patientUserId, {
+      name: payload.name,
+      relationship: payload.relation,
+      phoneNumber: payload.phone
+    }).pipe(
+      map(() => ({
+        ...payload,
+        id: `contact-${Date.now()}`,
+        patientUserId
+      }))
+    );
   }
 
   deleteEmergencyContact(patientUserId: string, contactId: string): Observable<void> {
-    this.emergencyContacts = this.emergencyContacts.filter(contact =>
-      contact.patientUserId !== patientUserId || contact.id !== contactId
-    );
-
-    return of(void 0);
+    return this.userProfileApi.deleteEmergencyContact(patientUserId, contactId);
   }
 
-  private getContactsByUser(userId: string): EmergencyContact[] {
-    return this.emergencyContacts
-      .filter(contact => contact.patientUserId === userId)
-      .map(contact => ({ ...contact }));
+  private mapProfile(profile: UserProfileResponse): PatientProfile {
+    return {
+      userId: profile.id,
+      email: profile.email,
+      initials: this.getInitials(profile.fullName || profile.email),
+      fullName: profile.fullName || profile.email,
+      age: this.toOptionalNumber(profile.age),
+      address: profile.address || '',
+      bloodType: this.mapBloodType(profile.bloodType),
+      gender: this.mapGender(profile.gender),
+      notes: profile.notes || ''
+    };
+  }
+
+  private createFallbackPageData(userId: string): PatientProfilePageData {
+    const session = this.authService.getSession();
+    const email = session?.email || this.profile.email || '';
+    const fallbackProfile: PatientProfile = {
+      userId: session?.userId || userId || this.profile.userId || '',
+      email,
+      initials: this.getInitials(email),
+      fullName: email,
+      age: null,
+      address: '',
+      bloodType: 'A+',
+      gender: 'Prefer not to say',
+      notes: ''
+    };
+
+    this.profile = fallbackProfile;
+
+    return {
+      profile: { ...fallbackProfile },
+      subscription: {
+        id: fallbackProfile.userId,
+        name: '',
+        renewsOn: '',
+        priceLabel: '',
+        status: 'inactive',
+        planLabel: ''
+      },
+      emergencyContacts: []
+    };
+  }
+
+  private mapSubscription(profile: UserProfileResponse): PatientSubscription {
+    const isActive = profile.status === 'ACTIVE';
+    return {
+      id: profile.id,
+      name: profile.subscriptionType || 'TukunTech',
+      renewsOn: profile.subscriptionEndDate || '',
+      priceLabel: '',
+      status: isActive ? 'active' : 'inactive',
+      planLabel: profile.subscriptionType || ''
+    };
+  }
+
+  private mapEmergencyContacts(profile: UserProfileResponse): EmergencyContact[] {
+    return (profile.emergencyContacts || []).map((contact, index) => ({
+      id: contact.internalId || `contact-${profile.id}-${index}`,
+      patientUserId: profile.id,
+      name: contact.name || '',
+      relation: contact.relationship || '',
+      phone: contact.phoneNumber || ''
+    }));
+  }
+
+  private toOptionalNumber(value: unknown): number | null {
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : null;
+  }
+
+  private mapBloodType(value?: string): PatientProfile['bloodType'] {
+    const bloodTypes: Record<string, PatientProfile['bloodType']> = {
+      A_POSITIVE: 'A+',
+      A_NEGATIVE: 'A-',
+      B_POSITIVE: 'B+',
+      B_NEGATIVE: 'B-',
+      AB_POSITIVE: 'AB+',
+      AB_NEGATIVE: 'AB-',
+      O_POSITIVE: 'O+',
+      O_NEGATIVE: 'O-'
+    };
+
+    return bloodTypes[value || ''] || 'A+';
+  }
+
+  private mapGender(value?: string): PatientProfile['gender'] {
+    const genders: Record<string, PatientProfile['gender']> = {
+      FEMALE: 'Female',
+      MALE: 'Male',
+      OTHER: 'Other',
+      PREFER_NOT_TO_SAY: 'Prefer not to say'
+    };
+
+    return genders[value || ''] || 'Prefer not to say';
+  }
+
+  private toApiBloodType(value: PatientProfile['bloodType']): string {
+    const bloodTypes: Record<PatientProfile['bloodType'], string> = {
+      'A+': 'A_POSITIVE',
+      'A-': 'A_NEGATIVE',
+      'B+': 'B_POSITIVE',
+      'B-': 'B_NEGATIVE',
+      'AB+': 'AB_POSITIVE',
+      'AB-': 'AB_NEGATIVE',
+      'O+': 'O_POSITIVE',
+      'O-': 'O_NEGATIVE'
+    };
+
+    return bloodTypes[value];
+  }
+
+  private toApiGender(value: PatientProfile['gender']): string {
+    const genders: Record<PatientProfile['gender'], string> = {
+      Female: 'FEMALE',
+      Male: 'MALE',
+      Other: 'OTHER',
+      'Prefer not to say': 'PREFER_NOT_TO_SAY'
+    };
+
+    return genders[value];
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('');
   }
 }

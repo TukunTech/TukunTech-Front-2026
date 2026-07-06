@@ -12,7 +12,7 @@
     type="success">
   </app-toast>
 
-  <section class="profile-page">
+  <section class="profile-page" *ngIf="profileLoaded; else profileLoading">
 
     <div class="page-header">
       <div>
@@ -33,7 +33,7 @@
         </div>
 
         <h2>{{ profile.fullName }}</h2>
-        <p>{{ profile.age }} {{ 'patient.profile.yearsOld' | translate }}</p>
+        <p *ngIf="profile.age !== null">{{ profile.age }} {{ 'patient.profile.yearsOld' | translate }}</p>
 
         <div class="subscription-block">
           <h3>{{ 'patient.profile.subscription' | translate }}</h3>
@@ -180,6 +180,17 @@
 
   </section>
 
+  <ng-template #profileLoading>
+    <section class="profile-page profile-loading">
+      <div class="page-header">
+        <div>
+          <h1>{{ 'patient.profile.title' | translate }}</h1>
+          <p>Cargando información del perfil...</p>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
   <div class="modal-backdrop" *ngIf="showContactModal">
     <div class="contact-modal">
 
@@ -197,7 +208,19 @@
       <input type="text" [(ngModel)]="newContact.relation" />
 
       <label>{{ 'patient.profile.phone' | translate }}</label>
-      <input type="text" [(ngModel)]="newContact.phone" />
+      <input
+        type="tel"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="9"
+        [ngModel]="newContact.phone"
+        (ngModelChange)="updateContactPhone($event)"
+      />
+
+      <p class="form-error" *ngIf="contactError">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ contactError }}
+      </p>
 
       <div class="modal-actions">
         <button class="modal-cancel" type="button" (click)="closeContactModal()">

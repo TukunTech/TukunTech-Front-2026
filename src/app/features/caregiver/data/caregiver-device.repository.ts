@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { DeviceAssignmentStore } from '../../../core/device-assignment/device-assignment.store';
+import { DeviceApiService, DeviceStatusResponse, PatientDashboardResponse } from '../../../core/devices/device-api.service';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
+import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 
 import {
   CaregiverDeviceConnectionStatus,
   CaregiverDeviceDashboard,
-  CaregiverDeviceSignalLevel,
-  CaregiverDeviceSyncStatus,
   CaregiverPatientDevice
 } from '../domain/caregiver-device';
 
@@ -14,115 +16,45 @@ import {
   providedIn: 'root',
 })
 export class CaregiverDeviceRepository {
-  constructor(private assignmentStore: DeviceAssignmentStore) {}
-  private devices: CaregiverPatientDevice[] = [
-    this.createDevice(
-      'device-eleanor',
-      'patient-eleanor',
-      'Eleanor Marsh',
-      'EM',
-      'CB-9F32-01',
-      28,
-      92,
-      'strong',
-      96,
-      'good',
-      'online',
-    ),
-    this.createDevice(
-      'device-charls',
-      'patient-charls',
-      'Charls March',
-      'CM',
-      'C1-K22L-01',
-      34,
-      88,
-      'strong',
-      94,
-      'good',
-      'online',
-    ),
-    this.createDevice(
-      'device-miguel',
-      'patient-miguel',
-      'Miguel Montana',
-      'MM',
-      'H4-23LP-01',
-      67,
-      62,
-      'medium',
-      90,
-      'good',
-      'online',
-    ),
-    this.createDevice(
-      'device-marian',
-      'patient-marian',
-      'Marian Medilla',
-      'MM',
-      'CM-660E-12',
-      78,
-      86,
-      'strong',
-      95,
-      'good',
-      'online',
-    ),
-    this.createDevice(
-      'device-robert',
-      'patient-robert',
-      'Robert Silva',
-      'RS',
-      'CR-520F-08',
-      0,
-      0,
-      'weak',
-      0,
-      'failed',
-      'online',
-    ),
-  ];
+  constructor(
+    private assignmentStore: DeviceAssignmentStore,
+    private authService: AuthApiService,
+    private userProfileApi: UserProfileApiService,
+    private deviceApi: DeviceApiService
+  ) {}
 
   getDashboard(caregiverUserId: string): Observable<CaregiverDeviceDashboard> {
-    return of({
-      caregiverUserId,
-      caregiverEmail: 'demo.caregiver@tukuntech.app',
-      devices: this.devices.flatMap((device) => {
-        const assignment = this.assignmentStore.getByPatient(device.patient.userId);
-        return assignment
-          ? [
-              {
-                ...this.cloneDevice(device),
-                id: assignment.deviceId,
-                label: assignment.model,
-                serialNumber: assignment.serialNumber,
-                firmwareVersion: assignment.firmwareVersion,
-                connectionStatus: assignment.connectionStatus,
-              },
-            ]
-          : [];
-      }),
-    });
+    return this.userProfileApi.getMyPatients().pipe(
+      switchMap(patients => {
+        const dashboardRequests = patients.map(patient =>
+          this.deviceApi.getCaregiverPatientDashboard(patient.id).pipe(catchError(() => of(null)))
+        );
+
+        return (dashboardRequests.length ? forkJoin(dashboardRequests) : of([])).pipe(
+          map(dashboards => ({
+            caregiverUserId: this.authService.getSession()?.userId || caregiverUserId,
+            caregiverEmail: this.authService.getSession()?.email || '',
+            devices: patients.map((patient, index) => this.createDeviceFromProfile(patient, dashboards[index])),
+          }))
+        );
+      })
+    );
   }
 
   getDeviceByPatient(
     caregiverUserId: string,
     patientUserId: string,
   ): Observable<CaregiverPatientDevice | undefined> {
-    const device = this.devices.find((item) => item.patient.userId === patientUserId);
-    const assignment = this.assignmentStore.getByPatient(patientUserId);
+    return this.userProfileApi.getMyPatients().pipe(
+      switchMap(patients => {
+        const patient = patients.find(item => item.id === patientUserId);
+        if (!patient) return of(undefined);
 
-    return of(
-      device && assignment
-        ? {
-            ...this.cloneDevice(device),
-            id: assignment.deviceId,
-            label: assignment.model,
-            serialNumber: assignment.serialNumber,
-            firmwareVersion: assignment.firmwareVersion,
-            connectionStatus: assignment.connectionStatus,
-          }
-        : undefined,
+        return this.deviceApi.getCaregiverPatientDashboard(patientUserId).pipe(
+          map(dashboard => this.createDeviceFromProfile(patient, dashboard)),
+          catchError(() => of(this.createDeviceFromProfile(patient)))
+        );
+      })
     );
   }
 
@@ -130,60 +62,56 @@ export class CaregiverDeviceRepository {
     patientUserId: string,
     connectionStatus: CaregiverDeviceConnectionStatus,
   ): Observable<CaregiverPatientDevice | undefined> {
-    this.devices = this.devices.map((device) => {
-      if (device.patient.userId !== patientUserId) {
-        return device;
-      }
-
-      return {
-        ...device,
-        connectionStatus,
-      };
-    });
     this.assignmentStore.setConnectionStatus(patientUserId, connectionStatus);
-
-    const device = this.devices.find((item) => item.patient.userId === patientUserId);
-
-    return of(device ? this.cloneDevice(device) : undefined);
+    return this.getDeviceByPatient(this.authService.getSession()?.userId || "", patientUserId);
   }
 
-  private createDevice(
-    id: string,
-    patientUserId: string,
-    fullName: string,
-    initials: string,
-    serialNumber: string,
-    batteryPercent: number,
-    wifiSignalPercent: number,
-    wifiSignalLevel: CaregiverDeviceSignalLevel,
-    syncPercent: number,
-    syncStatus: CaregiverDeviceSyncStatus,
-    connectionStatus: CaregiverDeviceConnectionStatus,
-  ): CaregiverPatientDevice {
+  private createDeviceFromProfile(profile: UserProfileResponse, dashboard: PatientDashboardResponse | null = null): CaregiverPatientDevice {
+    const assignment = this.assignmentStore.getByPatient(profile.id);
+    const device = dashboard?.device;
+    const online = this.deviceApi.isDeviceConnected(device);
+    const deviceId = this.getDeviceId(device);
+    const model = this.getDeviceModel(device);
+    const lastSyncedAt = this.getLastSyncedAt(device);
+
     return {
-      id,
+      id: deviceId || assignment?.deviceId || '',
       patient: {
-        userId: patientUserId,
-        fullName,
-        initials,
+        userId: profile.id,
+        fullName: profile.fullName || profile.email,
+        initials: this.getInitials(profile.fullName || profile.email),
       },
-      label: 'TukunTech IOT',
-      serialNumber,
-      firmwareVersion: '1.0.5',
-      connectionStatus,
-      batteryPercent,
-      wifiSignalPercent,
-      wifiSignalLevel,
-      syncPercent,
-      syncStatus,
-      lastSyncedAt: '2026-06-04T09:00:00.000Z',
+      label: model || assignment?.model || '',
+      serialNumber: deviceId || assignment?.serialNumber || '',
+      firmwareVersion: assignment?.firmwareVersion || '',
+      connectionStatus: online ? 'online' : 'offline',
+      batteryPercent: device?.batteryLevel ?? 0,
+      wifiSignalPercent: online ? 100 : 0,
+      wifiSignalLevel: online ? 'strong' : 'off',
+      syncPercent: online ? 100 : 0,
+      syncStatus: online ? 'good' : 'failed',
+      lastSyncedAt,
     };
   }
 
-  private cloneDevice(device: CaregiverPatientDevice): CaregiverPatientDevice {
-    return {
-      ...device,
-      patient: { ...device.patient },
-    };
+  private getDeviceId(device?: DeviceStatusResponse | null): string {
+    return device?.deviceId || device?.rawDeviceId || device?.id || '';
+  }
+
+  private getDeviceModel(device?: DeviceStatusResponse | null): string {
+    return device?.model || device?.modelName || '';
+  }
+
+  private getLastSyncedAt(device?: DeviceStatusResponse | null): string {
+    return device?.lastSyncedAt || device?.lastSeenAt || '';
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('');
   }
 }

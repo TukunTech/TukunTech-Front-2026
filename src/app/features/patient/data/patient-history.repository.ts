@@ -4,25 +4,25 @@ import { map, Observable, of } from 'rxjs';
 import {
   evaluatePatientVitals,
   PatientVitalAlert,
-  PatientVitals
+  PatientVitalsPageData
 } from '../domain/patient-vitals';
 import { PatientVitalsRepository } from './patient-vitals.repository';
 import {
   PatientHistoryQuery,
   PatientHistoryPeriod,
   PatientHistoryRecordSource,
-  PatientVitalHistoryRecord
+  PatientVitalHistoryRecord,
+  isOfflineHistoryRecord
 } from '../domain/patient-history';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientHistoryRepository {
+  private readonly periodicSnapshotIntervalMs = 10 * 60 * 1000;
   private records: PatientVitalHistoryRecord[] = [];
 
-  constructor(private patientVitalsRepository: PatientVitalsRepository) {
-    this.records = this.createSeedRecords();
-  }
+  constructor(private patientVitalsRepository: PatientVitalsRepository) {}
 
   getHistory(
     userId: string,
@@ -35,10 +35,21 @@ export class PatientHistoryRepository {
     return this.recordCurrentVitals(userId, 'hourly-snapshot');
   }
 
+  recordPeriodicSnapshotIfDue(userId: string): Observable<PatientVitalHistoryRecord | null> {
+    if (!this.isPeriodicSnapshotDue(userId)) {
+      return of(null);
+    }
+
+    return this.recordCurrentVitals(userId, 'hourly-snapshot');
+  }
+
   recordAlertSnapshot(userId: string): Observable<PatientVitalHistoryRecord | null> {
     return this.patientVitalsRepository.getVitalsPageData(userId).pipe(
       map(data => {
-        const alerts = evaluatePatientVitals(data.vitals, data.alertSettings);
+        const draftRecord = this.createRecord(userId, 'alert-event', data);
+        const alerts = isOfflineHistoryRecord(draftRecord)
+          ? []
+          : evaluatePatientVitals(data.vitals, data.alertSettings);
 
         if (!alerts.length) {
           return null;
@@ -48,14 +59,7 @@ export class PatientHistoryRepository {
           return null;
         }
 
-        return this.storeRecord({
-          id: this.createId(),
-          patientUserId: userId,
-          recordedAt: new Date().toISOString(),
-          source: 'alert-event',
-          vitals: data.vitals,
-          alerts
-        });
+        return this.storeRecord({ ...draftRecord, alerts });
       })
     );
   }
@@ -65,15 +69,31 @@ export class PatientHistoryRepository {
     source: PatientHistoryRecordSource
   ): Observable<PatientVitalHistoryRecord> {
     return this.patientVitalsRepository.getVitalsPageData(userId).pipe(
-      map(data => this.storeRecord({
-        id: this.createId(),
-        patientUserId: userId,
-        recordedAt: new Date().toISOString(),
-        source,
-        vitals: data.vitals,
-        alerts: evaluatePatientVitals(data.vitals, data.alertSettings)
-      }))
+      map(data => {
+        const record = this.createRecord(userId, source, data);
+        return this.storeRecord({
+          ...record,
+          alerts: isOfflineHistoryRecord(record)
+            ? []
+            : evaluatePatientVitals(data.vitals, data.alertSettings)
+        });
+      })
     );
+  }
+
+  private createRecord(
+    userId: string,
+    source: PatientHistoryRecordSource,
+    data: PatientVitalsPageData
+  ): PatientVitalHistoryRecord {
+    return {
+      id: this.createId(),
+      patientUserId: userId,
+      recordedAt: new Date().toISOString(),
+      source,
+      vitals: data.vitals,
+      alerts: []
+    };
   }
 
   private getRecordsForUser(
@@ -125,113 +145,6 @@ export class PatientHistoryRepository {
     return date;
   }
 
-  private createSeedRecords(): PatientVitalHistoryRecord[] {
-    const recentRecords = [
-      this.createRecord(
-        'history-001',
-        'patient-demo-user',
-        '2026-06-04T09:00:00.000Z',
-        'hourly-snapshot',
-        99,
-        99,
-        37.7
-      ),
-      this.createRecord(
-        'history-002',
-        'patient-demo-user',
-        '2026-06-04T08:00:00.000Z',
-        'hourly-snapshot',
-        74,
-        98,
-        36.7
-      ),
-      this.createRecord(
-        'history-003',
-        'patient-demo-user',
-        '2026-06-04T07:34:00.000Z',
-        'alert-event',
-        118,
-        94,
-        36.9
-      ),
-      this.createRecord(
-        'history-004',
-        'patient-demo-user',
-        '2026-06-04T07:00:00.000Z',
-        'hourly-snapshot',
-        82,
-        97,
-        36.8
-      ),
-      this.createRecord(
-        'history-005',
-        'patient-demo-user',
-        '2026-06-04T06:21:00.000Z',
-        'alert-event',
-        132,
-        88,
-        39.2
-      ),
-      this.createRecord(
-        'history-006',
-        'patient-demo-user',
-        '2026-06-04T06:00:00.000Z',
-        'hourly-snapshot',
-        76,
-        98,
-        36.6
-      )
-    ];
-
-    const historicalRecords = Array.from({ length: 121 }, (_, index) => {
-      const date = new Date('2026-06-20T09:00:00.000Z');
-      date.setUTCDate(date.getUTCDate() - (index * 2));
-      const isAlert = index % 5 === 0;
-      const isCritical = index % 15 === 0;
-
-      return this.createRecord(
-        `history-generated-${index + 1}`,
-        'patient-demo-user',
-        date.toISOString(),
-        isAlert ? 'alert-event' : 'hourly-snapshot',
-        isCritical ? 132 : isAlert ? 108 : 72 + (index % 18),
-        isCritical ? 87 : isAlert ? 93 : 96 + (index % 4),
-        isCritical ? 39.2 : isAlert ? 38.2 : 36.4 + ((index % 8) / 10)
-      );
-    });
-
-    return [...recentRecords, ...historicalRecords];
-  }
-
-  private createRecord(
-    id: string,
-    patientUserId: string,
-    recordedAt: string,
-    source: PatientHistoryRecordSource,
-    heartRate: number,
-    oxygen: number,
-    temperature: number
-  ): PatientVitalHistoryRecord {
-    const vitals: PatientVitals = {
-      patientUserId,
-      measuredAt: recordedAt,
-      heartRate,
-      oxygen,
-      temperature
-    };
-
-    const alertSettings = this.patientVitalsRepository.getDefaultAlertSettings(patientUserId);
-
-    return {
-      id,
-      patientUserId,
-      recordedAt,
-      source,
-      vitals,
-      alerts: evaluatePatientVitals(vitals, alertSettings)
-    };
-  }
-
   private storeRecord(record: PatientVitalHistoryRecord): PatientVitalHistoryRecord {
     this.records = [
       record,
@@ -239,6 +152,20 @@ export class PatientHistoryRepository {
     ];
 
     return record;
+  }
+
+  private isPeriodicSnapshotDue(userId: string): boolean {
+    const latestPeriodicSnapshot = this.records
+      .filter(record =>
+        record.patientUserId === userId &&
+        record.source === 'hourly-snapshot'
+      )
+      .map(record => new Date(record.recordedAt).getTime())
+      .filter(timestamp => Number.isFinite(timestamp))
+      .sort((first, second) => second - first)[0];
+
+    return !latestPeriodicSnapshot ||
+      Date.now() - latestPeriodicSnapshot >= this.periodicSnapshotIntervalMs;
   }
 
   private hasDuplicateAlertEvent(

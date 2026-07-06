@@ -16,20 +16,6 @@
       <span>{{ roleLabelKey | translate }}</span>
     </div>
 
-    <section class="subscription-blocked" *ngIf="subscriptionBlocked">
-      <i class="bi bi-credit-card-2-front"></i>
-      <div>
-        <strong>{{ 'subscription.expiredTitle' | translate }}</strong>
-        <p>{{ 'subscription.expiredLoginMessage' | translate:{ date: blockedRenewalDate } }}</p>
-        <button type="button" (click)="renewSubscription()">{{ 'subscription.renewNow' | translate }}</button>
-      </div>
-    </section>
-
-    <p class="renewal-success" *ngIf="renewalSucceeded">
-      <i class="bi bi-check-circle"></i>
-      {{ 'subscription.renewedLoginMessage' | translate:{ date: blockedRenewalDate } }}
-    </p>
-
     <form class="login-form" (ngSubmit)="signIn()">
 
       <label>
@@ -72,11 +58,16 @@
         </button>
       </div>
 
-      <button class="sign-in-button" type="button" (click)="signIn()">
-        {{ 'login.signIn' | translate }}
+      <button class="sign-in-button" type="button" [disabled]="isSubmitting" (click)="signIn()">
+        {{ isSubmitting ? 'Conectando...' : ('login.signIn' | translate) }}
       </button>
 
     </form>
+
+    <p class="login-error" *ngIf="loginError">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ loginError }}
+    </p>
 
     <p class="create-account" *ngIf="!isAdminLogin">
       {{ 'login.noAccount' | translate }}

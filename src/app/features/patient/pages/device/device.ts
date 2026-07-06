@@ -1,11 +1,13 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { UserProfileApiService } from '../../../../core/profiles/user-profile-api.service';
 import { PatientAlertRepository } from '../../data/patient-alert.repository';
 import { PatientDeviceRepository } from '../../data/patient-device.repository';
 import {
@@ -26,8 +28,8 @@ import {
   styleUrl: './device.css',
 })
 export class Device {
-  userId = 'patient-demo-user';
-  email = 'demo.patient@tukuntech.app';
+  userId = '';
+  email = '';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
   urgentAlertMessageKey = '';
@@ -50,18 +52,23 @@ export class Device {
     connectionStatus: 'offline',
     batteryPercent: 0,
     wifiSignalPercent: 0,
-    wifiSignalLevel: 'weak',
+    wifiSignalLevel: 'off',
     syncPercent: 0,
     syncStatus: 'pending',
     lastSyncedAt: ''
   };
 
   constructor(
+    private authService: AuthApiService,
+    private userProfileApi: UserProfileApiService,
     private patientDeviceRepository: PatientDeviceRepository,
-    private patientAlertRepository: PatientAlertRepository
+    private patientAlertRepository: PatientAlertRepository,
+    private changeDetector: ChangeDetectorRef
   ) {
-    this.loadDevice();
-    this.loadGlobalUrgentAlert();
+    const session = this.authService.getSession();
+    this.userId = session?.userId || '';
+    this.email = session?.email || '';
+    this.loadProfileAndDevice();
   }
 
   getConnectionStatusLabelKey(status: PatientDeviceConnectionStatus): string {
@@ -172,21 +179,37 @@ export class Device {
       : 'patient.device.alert';
   }
 
+  private loadProfileAndDevice(): void {
+    this.userProfileApi.getMyProfile().subscribe(profile => {
+      this.userId = profile.id || this.userId;
+      this.email = profile.email || this.email;
+      this.changeDetector.detectChanges();
+      this.loadDevice();
+      this.loadGlobalUrgentAlert();
+    });
+  }
+
   private loadDevice(): void {
+    if (!this.userId) return;
+
     this.patientDeviceRepository
       .getDeviceByPatient(this.userId)
       .subscribe(device => {
         this.device = device;
+        this.changeDetector.detectChanges();
       });
   }
 
   private loadGlobalUrgentAlert(): void {
+    if (!this.userId) return;
+
     this.patientAlertRepository
       .getGlobalUrgentAlert(this.userId)
       .subscribe(alert => {
         this.urgentAlertShow = !!alert;
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
+        this.changeDetector.detectChanges();
       });
   }
 }

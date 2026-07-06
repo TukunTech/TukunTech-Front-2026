@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { DeviceAssignmentStore } from '../../../core/device-assignment/device-assignment.store';
+import { DeviceApiService, PatientDashboardResponse } from '../../../core/devices/device-api.service';
 
 import {
   PatientMedicalParameters,
@@ -11,26 +13,49 @@ import {
   CaregiverVitalAlertSettings,
   CaregiverVitalSignsDashboard
 } from '../domain/caregiver-vital-signs';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
+import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CaregiverVitalSignsRepository {
+  private readonly telemetryFreshnessMs = 10000;
   private patients: CaregiverPatientSummary[] = [];
 
   constructor(
     private parametersStore: PatientMedicalParametersStore,
-    private assignmentStore: DeviceAssignmentStore
-  ) {
-    this.patients = this.createPatients();
-  }
+    private assignmentStore: DeviceAssignmentStore,
+    private authService: AuthApiService,
+    private userProfileApi: UserProfileApiService,
+    private deviceApi: DeviceApiService
+  ) {}
 
   getDashboard(caregiverUserId: string): Observable<CaregiverVitalSignsDashboard> {
-    return of({
-      caregiverUserId,
-      caregiverEmail: 'demo.caregiver@tukuntech.app',
-      patients: this.patients.map(patient => this.clonePatient(patient))
-    });
+    return this.userProfileApi.getMyPatients().pipe(
+      switchMap(patients => {
+        const patientRequests = patients.map(patient =>
+          forkJoin({
+            dashboard: this.deviceApi.getCaregiverPatientDashboard(patient.id).pipe(catchError(() => of(null))),
+            vitals: this.deviceApi.getLatestVitals(patient.id).pipe(catchError(() => of(null)))
+          })
+        );
+
+        return (patientRequests.length ? forkJoin(patientRequests) : of([])).pipe(
+          map(patientData => {
+            this.patients = patients.map((patient, index) =>
+              this.createPatientFromProfile(patient, patientData[index]?.dashboard, patientData[index]?.vitals)
+            );
+
+            return {
+              caregiverUserId: this.authService.getSession()?.userId || caregiverUserId,
+              caregiverEmail: this.authService.getSession()?.email || '',
+              patients: this.patients.map(patient => this.clonePatient(patient))
+            };
+          })
+        );
+      })
+    );
   }
 
   getPatient(
@@ -89,119 +114,76 @@ export class CaregiverVitalSignsRepository {
     return of(patient ? this.clonePatient(patient) : undefined);
   }
 
-  private createPatient(
-    userId: string,
-    fullName: string,
-    initials: string,
-    age: number,
-    heartRate: number,
-    oxygen: number,
-    temperature: number,
-    deviceId: string,
-    battery: number,
-    wifiStrength: CaregiverPatientSummary['device']['wifiStrength'],
-    connectionStatus: CaregiverPatientSummary['device']['connectionStatus']
+  private createPatientFromProfile(
+    profile: UserProfileResponse,
+    dashboard: PatientDashboardResponse | null,
+    latestVitals: {
+      heartRate?: number;
+      oxygenSaturation?: number;
+      temperature?: number;
+      lastUpdated?: string;
+      measuredAt?: string;
+    } | null
   ): CaregiverPatientSummary {
-    const alertSettings = this.createDefaultAlertSettings(userId);
+    const userId = profile.id;
     const assignment = this.assignmentStore.getByPatient(userId);
+    const alertSettings = this.createDefaultAlertSettingsFromProfile(profile);
+    const device = dashboard?.device;
+    const vitals = latestVitals || dashboard?.currentVitals;
+    const measuredAt = vitals?.lastUpdated || vitals?.measuredAt || '';
+    const hasFreshTelemetry = this.hasFreshTelemetry(measuredAt);
+    const isOnline = hasFreshTelemetry || this.deviceApi.isDeviceConnected(device);
 
     return {
       userId,
-      fullName,
-      initials,
-      age,
+      fullName: dashboard?.patientName || profile.fullName || profile.email,
+      initials: this.getInitials(profile.fullName || profile.email),
+      age: profile.age ?? 0,
       vitals: {
         patientUserId: userId,
-        measuredAt: '2026-06-04T09:00:00.000Z',
-        heartRate,
-        oxygen,
-        temperature
+        measuredAt,
+        heartRate: Math.round(vitals?.heartRate || 0),
+        oxygen: Math.round(vitals?.oxygenSaturation || 0),
+        temperature: vitals?.temperature || 0
       },
       alertSettings,
       device: {
-        id: assignment?.deviceId ?? '',
-        model: assignment?.model ?? 'TukunTech IoT',
-        battery,
-        wifiStrength,
-        connectionStatus: assignment?.connectionStatus ?? 'offline'
+        id: device?.deviceId || assignment?.deviceId || '',
+        model: device?.model || assignment?.model || '',
+        battery: device?.batteryLevel || 0,
+        wifiStrength: isOnline ? 'strong' : 'off',
+        connectionStatus: isOnline ? 'online' : 'offline'
       }
     };
-  }
-
-  private createPatients(): CaregiverPatientSummary[] {
-    return [
-      this.createPatient(
-        'patient-eleanor',
-        'Eleanor Marsh',
-        'EM',
-        82,
-        74,
-        90,
-        36.6,
-        'CB-8DF3-01',
-        86,
-        'strong',
-        'online',
-      ),
-      this.createPatient(
-        'patient-charls',
-        'Charls March',
-        'CM',
-        72,
-        99,
-        97,
-        36.7,
-        'CZ-K230-01',
-        45,
-        'strong',
-        'online',
-      ),
-      this.createPatient(
-        'patient-miguel',
-        'Miguel Montana',
-        'MM',
-        78,
-        92,
-        99,
-        36.6,
-        'CX-771A-04',
-        64,
-        'medium',
-        'online',
-      ),
-      this.createPatient(
-        'patient-marian',
-        'Marian Medilla',
-        'MM',
-        88,
-        99,
-        97,
-        36.8,
-        'CM-660E-12',
-        78,
-        'strong',
-        'online',
-      ),
-      this.createPatient(
-        'patient-robert',
-        'Robert Silva',
-        'RS',
-        69,
-        88,
-        99,
-        36.8,
-        'CR-520F-08',
-        66,
-        'weak',
-        'online',
-      ),
-    ];
   }
 
   private createDefaultAlertSettings(patientUserId: string): CaregiverVitalAlertSettings {
     const parameters = this.parametersStore.getParameters(patientUserId);
 
     return this.mapParametersToAlertSettings(parameters);
+  }
+
+  private createDefaultAlertSettingsFromProfile(profile: UserProfileResponse): CaregiverVitalAlertSettings {
+    if (
+      profile.minHeartRate === undefined ||
+      profile.maxHeartRate === undefined ||
+      profile.minOxygenSaturation === undefined ||
+      profile.maxOxygenSaturation === undefined ||
+      profile.minTemperature === undefined ||
+      profile.maxTemperature === undefined
+    ) {
+      return this.createDefaultAlertSettings(profile.id);
+    }
+
+    return this.mapParametersToAlertSettings({
+      patientUserId: profile.id,
+      heartRateMin: profile.minHeartRate,
+      heartRateMax: profile.maxHeartRate,
+      oxygenSaturationMin: profile.minOxygenSaturation,
+      oxygenSaturationMax: profile.maxOxygenSaturation,
+      temperatureMin: profile.minTemperature,
+      temperatureMax: profile.maxTemperature
+    });
   }
 
   private mapParametersToAlertSettings(
@@ -229,8 +211,18 @@ export class CaregiverVitalSignsRepository {
     };
   }
 
+  private hasFreshTelemetry(measuredAt: string): boolean {
+    if (!measuredAt) {
+      return false;
+    }
+
+    const measuredAtMs = Date.parse(measuredAt);
+
+    return Number.isFinite(measuredAtMs) && Date.now() - measuredAtMs <= this.telemetryFreshnessMs;
+  }
+
   private clonePatient(patient: CaregiverPatientSummary): CaregiverPatientSummary {
-    const alertSettings = this.createDefaultAlertSettings(patient.userId);
+    const alertSettings = patient.alertSettings;
 
     return {
       ...patient,
@@ -243,5 +235,14 @@ export class CaregiverVitalSignsRepository {
       },
       device: { ...patient.device }
     };
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('');
   }
 }

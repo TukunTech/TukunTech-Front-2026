@@ -169,6 +169,23 @@
   transform: scale(0.99);
 }
 
+.sign-in-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fff1f1;
+  color: #b4232a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
 .link-button,
 .back-button {
   width: 100%;

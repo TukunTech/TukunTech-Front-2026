@@ -58,6 +58,20 @@
     "goHome": "Ir al inicio",
     "goBack": "Volver atrás"
   },
+  "paymentResult": {
+    "success": {
+      "title": "Pago confirmado",
+      "description": "Stripe confirmó tu pago. Tu cuenta TukunTech está en proceso de activación.",
+      "notice": "Si acabas de pagar, espera unos segundos antes de iniciar sesión para que el backend termine de activar la cuenta.",
+      "action": "Ir a iniciar sesión"
+    },
+    "canceled": {
+      "title": "Pago no completado",
+      "description": "El pago fue cancelado o rechazado. No se activó ninguna cuenta.",
+      "primaryAction": "Intentar de nuevo",
+      "secondaryAction": "Ir a iniciar sesión"
+    }
+  },
   "register": {
     "patient": {
       "title": "Crea tu cuenta de paciente",
@@ -176,6 +190,8 @@
       "patientPassword": "contraseña mínima de 6 caracteres",
       "patientPasswordMatch": "las contraseñas no coinciden",
       "patientDni": "DNI obligatorio de 8 dígitos",
+      "duplicateDni": "DNI repetido; cada paciente debe tener un DNI �nico",
+      "caregiverAccount": "Usa un correo válido y una contraseña de al menos 6 caracteres que coincida en ambos campos.",
       "fullName": "nombre completo vacío",
       "age": "edad vacía",
       "gender": "género sin seleccionar",
@@ -200,9 +216,11 @@
     },
     "payment": {
       "title": "Pago",
-      "description": "Este es un paso de pago simulado. La pasarela real se conectará más adelante.",
+      "description": "Serás redirigido a Stripe para completar el pago. La cuenta se activará cuando Stripe confirme el pago.",
       "plan": "Plan individual",
-      "mockPay": "Simular pago y continuar",
+      "mockPay": "Pagar con Stripe",
+      "payWithStripe": "Pagar con Stripe",
+      "creatingCheckout": "Preparando pago...",
       "familyPlan": "Plan seleccionado"
     },
     "done": {
@@ -329,8 +347,6 @@
       "wifi": "WiFi",
       "sync": "Sincronización",
       "strong": "Buena Conexion",
-      "medium": "Media",
-      "weak": "Débil",
       "good": "Correcto",
       "pending": "Pendiente",
       "failed": "Fallida",
@@ -338,7 +354,8 @@
       "disconnectedTitle": "Dispositivo desconectado",
       "alert": "Tu dispositivo está funcionando correctamente. Te notificaremos aquí si ocurre algún cambio.",
       "disconnectedAlert": "El monitoreo está desactivado. Reconecta el dispositivo para volver a conocer el estado del paciente.",
-      "disconnectedGlobalAlert": "Urgente: reconecta el dispositivo. El monitoreo del paciente está desactivado mientras el dispositivo esté sin conexión."
+      "disconnectedGlobalAlert": "Urgente: reconecta el dispositivo. El monitoreo del paciente está desactivado mientras el dispositivo esté sin conexión.",
+      "off": "Off"
     },
     "history": {
       "title": "Mi historial",
@@ -365,11 +382,12 @@
       "temperature": "Temperatura",
       "status": "Estado",
       "sources": {
-        "hourly-snapshot": "Registro por hora",
+        "hourly-snapshot": "Registro periódico",
         "alert-event": "Evento de alerta"
       },
       "severity": {
         "normal": "Normal",
+        "offline": "Offline",
         "notice": "Requiere atención",
         "critical": "Crítico"
       }
@@ -513,8 +531,7 @@
       },
       "wifi": {
         "strong": "Fuerte",
-        "medium": "Media",
-        "weak": "Débil"
+        "off": "Off"
       },
       "alerts": {
         "heartRateLow": {
@@ -574,13 +591,12 @@
       "wifi": "WiFi",
       "sync": "Sincronización",
       "strong": "Fuerte",
-      "medium": "Media",
-      "weak": "Débil",
       "good": "Correcto",
       "pending": "Pendiente",
       "failed": "Fallida",
       "offlineAlertTitle": "Dispositivo desconectado",
-      "offlineAlertMessage": "Urgente: reconecta el dispositivo de {{patients}}. El monitoreo está desactivado mientras está sin conexión."
+      "offlineAlertMessage": "Urgente: reconecta el dispositivo de {{patients}}. El monitoreo está desactivado mientras está sin conexión.",
+      "off": "Off"
     },
     "history": {
       "title": "Historial de pacientes",
@@ -615,6 +631,7 @@
       "temperatureSummary": "{{value}} °C - {{status}}",
       "severity": {
         "normal": "Normal",
+        "offline": "Offline",
         "notice": "Requiere atención",
         "critical": "Crítico"
       }
@@ -715,6 +732,7 @@
       "searchPlaceholder": "Buscar usuarios...",
       "total": "total: {{total}}",
       "edit": "Editar",
+      "empty": "No hay usuarios para mostrar.",
       "savedSuccessfully": "Cambios guardados correctamente",
       "saveError": "No se pudieron guardar los cambios. Revisa los campos obligatorios.",
       "invalidPhone": "Ingresa un número de Perú válido. Ejemplo: +51 999 999 999.",
@@ -752,12 +770,13 @@
       "subtitle": "Registra equipos y asígnalos directamente a cada paciente.",
       "searchPlaceholder": "Buscar por código, modelo, serial o paciente...",
       "total": "{{total}} dispositivos",
+      "empty": "No hay dispositivos para mostrar.",
       "edit": "Editar dispositivo",
       "newDevice": "Nuevo dispositivo",
       "unassigned": "Sin asignar",
       "createdSuccessfully": "Dispositivo registrado correctamente",
       "savedSuccessfully": "Dispositivo actualizado correctamente",
-      "saveError": "No se pudo guardar. Revisa que el código y el serial sean únicos.",
+      "saveError": "No se pudo guardar. Revisa que el serial/MAC no exista ya en el backend.",
       "summary": {
         "total": "Total",
         "available": "Disponibles",
@@ -825,11 +844,14 @@
     },
     "common": {
       "month": "Mes",
-      "monthPlaceholder": "Selecciona mes"
+      "monthPlaceholder": "Selecciona mes",
+      "loading": "Cargando..."
     },
     "subscriptions": {
       "title": "Suscripciones",
       "subtitle": "Resumen mensual de suscripciones.",
+      "allMonths": "Todos",
+      "empty": "No hay suscripciones para mostrar.",
       "summary": {
         "active": "Activas",
         "new": "Nuevas",
@@ -850,6 +872,7 @@
     "supportTickets": {
       "title": "Tickets de soporte",
       "subtitle": "Conversaciones de soporte con usuarios.",
+      "empty": "No hay tickets para mostrar.",
       "replyPlaceholder": "Escribe una respuesta...",
       "sendReply": "Enviar respuesta",
       "markDone": "marcar resuelto",

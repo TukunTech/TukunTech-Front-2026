@@ -1,6 +1,6 @@
 export type PatientDeviceConnectionStatus = 'online' | 'offline';
 
-export type PatientDeviceSignalLevel = 'strong' | 'medium' | 'weak';
+export type PatientDeviceSignalLevel = 'strong' | 'off';
 
 export type PatientDeviceSyncStatus = 'good' | 'pending' | 'failed';
 

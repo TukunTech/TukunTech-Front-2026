@@ -10,7 +10,7 @@
     type="success">
   </app-toast>
 
-  <section class="admin-settings-page">
+  <section class="admin-settings-page" *ngIf="settingsLoaded; else settingsLoading">
 
     <header class="page-header">
       <div>
@@ -50,4 +50,12 @@
     </section>
 
   </section>
+
+  <ng-template #settingsLoading>
+    <section class="admin-settings-page">
+      <section class="settings-card settings-card--loading">
+        <p>{{ 'common.loading' | translate }}</p>
+      </section>
+    </section>
+  </ng-template>
 </app-dashboard-layout>

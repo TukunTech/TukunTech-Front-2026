@@ -1,6 +1,6 @@
 export type CaregiverDeviceConnectionStatus = 'online' | 'offline';
 
-export type CaregiverDeviceSignalLevel = 'strong' | 'medium' | 'weak';
+export type CaregiverDeviceSignalLevel = 'strong' | 'off';
 
 export type CaregiverDeviceSyncStatus = 'good' | 'pending' | 'failed';
 

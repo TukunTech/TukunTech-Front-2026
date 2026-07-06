@@ -113,6 +113,12 @@
   border-bottom: none;
 }
 
+.users-row--state {
+  grid-template-columns: 1fr;
+  min-height: 64px;
+  color: #667985;
+}
+
 .role-pill,
 .status-pill {
   min-width: 110px;

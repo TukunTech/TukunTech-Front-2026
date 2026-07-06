@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
@@ -9,6 +9,7 @@ import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import {
   CustomSelect,
   CustomSelectOption
@@ -38,8 +39,8 @@ import { CaregiverVitalAlert } from '../../domain/caregiver-vital-signs';
   styleUrl: './history.css',
 })
 export class History {
-  caregiverUserId = 'caregiver-demo-user';
-  email = 'demo.caregiver@tukuntech.app';
+  caregiverUserId = '';
+  email = '';
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
   urgentAlertMessageKey = '';
@@ -64,12 +65,16 @@ export class History {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private caregiverAlertRepository: CaregiverAlertRepository,
     private caregiverHistoryRepository: CaregiverHistoryRepository,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.caregiverUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
-    this.loadGlobalCriticalAlert();
   }
 
   get patientOptions(): CustomSelectOption[] {
@@ -232,15 +237,20 @@ export class History {
     this.caregiverHistoryRepository
       .getDashboard(this.caregiverUserId, this.historyQuery)
       .subscribe(data => {
+        this.caregiverUserId = data.caregiverUserId;
         this.email = data.caregiverEmail;
         this.patients = data.patients;
         this.selectedPatientId = this.selectedPatientId || data.patients[0]?.userId || '';
         this.selectedReportPatientId = this.selectedReportPatientId || this.selectedPatientId;
         this.loadHistory();
+        this.changeDetector.detectChanges();
+        this.loadGlobalCriticalAlert();
       });
   }
 
   private loadGlobalCriticalAlert(): void {
+    if (!this.caregiverUserId) return;
+
     this.caregiverAlertRepository
       .getGlobalCriticalAlert(this.caregiverUserId)
       .subscribe(alert => {
@@ -248,6 +258,7 @@ export class History {
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
         this.urgentAlertMessageParams = alert?.messageParams || {};
+        this.changeDetector.detectChanges();
       });
   }
 
@@ -261,6 +272,7 @@ export class History {
       .getPatientHistory(this.caregiverUserId, this.selectedPatientId, this.historyQuery)
       .subscribe(history => {
         this.history = history;
+        this.changeDetector.detectChanges();
       });
   }
 

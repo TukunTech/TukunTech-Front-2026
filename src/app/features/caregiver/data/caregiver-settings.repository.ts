@@ -15,24 +15,24 @@ import {
 export class CaregiverSettingsRepository {
   constructor(private subscriptionStore: SubscriptionAccessStore) {}
   private preferences: CaregiverSettingsPreferences = {
-    caregiverUserId: 'caregiver-demo-user',
+    caregiverUserId: '',
     language: 'en'
   };
 
   private subscription: CaregiverFamilySubscription = {
-    id: 'caregiver-family-plus',
-    name: 'TukunTech Family Plus',
-    renewsOn: '2026-06-24',
-    priceLabel: '$200',
-    status: 'active',
-    planLabel: 'Premium - monthly'
+    id: '',
+    name: '',
+    renewsOn: '',
+    priceLabel: '',
+    status: 'inactive',
+    planLabel: ''
   };
 
   getSettings(caregiverUserId: string): Observable<CaregiverSettingsDashboard> {
     const access = this.subscriptionStore.getRoleAccess('caregiver');
     return of({
       caregiverUserId,
-      caregiverEmail: 'demo.caregiver@tukuntech.app',
+      caregiverEmail: '',
       preferences: {
         ...this.preferences,
         caregiverUserId
@@ -60,7 +60,7 @@ export class CaregiverSettingsRepository {
   renewSubscription(
     caregiverUserId: string
   ): Observable<CaregiverFamilySubscription> {
-    const access = this.subscriptionStore.renew('demo.caregiver@tukuntech.app', 'caregiver');
+    const access = this.subscriptionStore.renew('', 'caregiver');
     this.subscription = {
       ...this.subscription,
       status: 'active',
@@ -73,7 +73,7 @@ export class CaregiverSettingsRepository {
   cancelSubscription(
     caregiverUserId: string
   ): Observable<CaregiverFamilySubscription> {
-    this.subscriptionStore.cancel('demo.caregiver@tukuntech.app', 'caregiver');
+    this.subscriptionStore.cancel('', 'caregiver');
     this.subscription = {
       ...this.subscription,
       status: 'canceled'

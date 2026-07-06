@@ -3,7 +3,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { SubscriptionAccessStore, SubscriptionRole } from '../../../core/subscription/subscription-access.store';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
 
 export interface DashboardMenuItem {
   icon: string;
@@ -24,26 +24,15 @@ export class DashboardLayout implements OnInit {
 
   constructor(
     private router: Router,
-    private subscriptionStore: SubscriptionAccessStore
+    private authService: AuthApiService
   ) {}
 
   ngOnInit(): void {
-    const role: SubscriptionRole | null = this.router.url.startsWith('/patient')
-      ? 'patient'
-      : this.router.url.startsWith('/caregiver') ? 'caregiver' : null;
-
-    if (!role) return;
-    const access = this.subscriptionStore.getRoleAccess(role);
-    if (!access.canAccess) {
-      this.router.navigate(['/login'], { queryParams: { reason: 'subscription-expired', role } });
-      return;
-    }
-    this.subscriptionWarningShow = access.canAccess && access.daysRemaining <= 7;
-    this.subscriptionDaysRemaining = Math.max(0, access.daysRemaining);
-    this.subscriptionRenewalRoute = role === 'patient' ? '/patient/profile' : '/caregiver/settings';
+    this.subscriptionWarningShow = false;
   }
 
   logout() {
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 

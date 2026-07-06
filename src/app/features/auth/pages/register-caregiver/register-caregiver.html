@@ -113,6 +113,11 @@
 
       </div>
 
+      <p class="form-error" *ngIf="showAccountValidationError">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'register.validation.caregiverAccount' | translate }}
+      </p>
+
     </div>
 
     <!-- STEP 3 -->
@@ -345,13 +350,34 @@
 
       </div>
 
+      <label class="terms-check">
+        <input
+          type="checkbox"
+          name="termsAccepted"
+          [(ngModel)]="termsAccepted"
+          (ngModelChange)="showTermsError = false; onboardingError = ''"
+        />
+        <span>Acepto los términos y condiciones para crear la cuenta y procesar el pago.</span>
+      </label>
+
       <button
         class="mock-payment-button"
         type="button"
-        (click)="continue()"
+        [disabled]="isSubmittingOnboarding"
+        (click)="submitOnboarding()"
       >
-        {{ 'register.payment.mockPay' | translate }}
+        {{ isSubmittingOnboarding ? ('register.payment.creatingCheckout' | translate) : ('register.payment.payWithStripe' | translate) }}
       </button>
+
+      <p class="form-error" *ngIf="showTermsError">
+        <i class="bi bi-exclamation-circle"></i>
+        Debes aceptar los términos y condiciones para continuar.
+      </p>
+
+      <p class="form-error" *ngIf="onboardingError">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ onboardingError }}
+      </p>
 
     </div>
 

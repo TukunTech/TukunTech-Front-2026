@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
+import { AuthApiService } from '../../../core/auth/auth-api.service';
+import { CurrentVitalsResponse, DeviceApiService } from '../../../core/devices/device-api.service';
 import {
   PatientMedicalParameters,
   PatientMedicalParametersStore
 } from '../../../core/patient-monitoring/patient-medical-parameters.store';
+import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 import {
   PatientVitalAlertSettings,
   PatientVitals,
@@ -15,31 +19,40 @@ import {
   providedIn: 'root'
 })
 export class PatientVitalsRepository {
-  private vitals: PatientVitals = {
-    patientUserId: 'patient-demo-user',
-    measuredAt: '2026-06-04T09:00:00.000Z',
-    heartRate: 99,
-    oxygen: 99,
-    temperature: 37.7
-  };
-
-  constructor(private parametersStore: PatientMedicalParametersStore) {}
+  constructor(
+    private authService: AuthApiService,
+    private parametersStore: PatientMedicalParametersStore,
+    private userProfileApi: UserProfileApiService,
+    private deviceApi: DeviceApiService
+  ) {}
 
   getVitalsPageData(userId: string): Observable<PatientVitalsPageData> {
-    const alertSettings = this.createAlertSettings(userId);
+    return this.userProfileApi.getMyProfile().pipe(
+      switchMap(profile => {
+        const resolvedUserId = profile.id || userId;
+        const alertSettings = this.createAlertSettingsFromProfile(profile, resolvedUserId);
 
-    return of({
-      patientName: 'Eleanor Marsh',
-      initials: 'EM',
-      email: 'demo.patient@tukuntech.app',
-      vitals: {
-        ...this.vitals,
-        patientUserId: userId
-      },
-      alertSettings: {
-        ...alertSettings
-      }
-    });
+        return this.deviceApi.getMyPatientDashboard().pipe(
+          map(dashboard => dashboard.currentVitals || {}),
+          catchError(() => this.deviceApi.getLatestVitals(resolvedUserId)),
+          map(vitals => ({
+            patientName: profile.fullName || profile.email,
+            initials: this.getInitials(profile.fullName || profile.email),
+            email: profile.email,
+            vitals: this.mapVitals(vitals, resolvedUserId),
+            alertSettings
+          })),
+          catchError(() => of({
+            patientName: profile.fullName || profile.email,
+            initials: this.getInitials(profile.fullName || profile.email),
+            email: profile.email,
+            vitals: this.createEmptyVitals(resolvedUserId),
+            alertSettings
+          }))
+        );
+      }),
+      catchError(() => of(this.createFallbackVitalsPageData(userId)))
+    );
   }
 
   getDefaultAlertSettings(userId: string): PatientVitalAlertSettings {
@@ -58,10 +71,56 @@ export class PatientVitalsRepository {
     return of(nextSettings);
   }
 
+  private createEmptyVitals(patientUserId: string): PatientVitals {
+    return {
+      patientUserId,
+      measuredAt: '',
+      heartRate: 0,
+      oxygen: 0,
+      temperature: 0
+    };
+  }
+
+  private mapVitals(vitals: CurrentVitalsResponse, patientUserId: string): PatientVitals {
+    return {
+      patientUserId,
+      measuredAt: vitals.measuredAt || vitals.lastUpdated || '',
+      heartRate: Math.round(vitals.heartRate || 0),
+      oxygen: Math.round(vitals.oxygenSaturation || 0),
+      temperature: vitals.temperature || 0
+    };
+  }
+
   private createAlertSettings(userId: string): PatientVitalAlertSettings {
     return this.mapParametersToAlertSettings(
       this.parametersStore.getParameters(userId)
     );
+  }
+
+  private createAlertSettingsFromProfile(
+    profile: UserProfileResponse,
+    userId: string
+  ): PatientVitalAlertSettings {
+    if (
+      profile.minHeartRate === undefined ||
+      profile.maxHeartRate === undefined ||
+      profile.minOxygenSaturation === undefined ||
+      profile.maxOxygenSaturation === undefined ||
+      profile.minTemperature === undefined ||
+      profile.maxTemperature === undefined
+    ) {
+      return this.createAlertSettings(userId);
+    }
+
+    return this.mapParametersToAlertSettings({
+      patientUserId: userId,
+      heartRateMin: profile.minHeartRate,
+      heartRateMax: profile.maxHeartRate,
+      oxygenSaturationMin: profile.minOxygenSaturation,
+      oxygenSaturationMax: profile.maxOxygenSaturation,
+      temperatureMin: profile.minTemperature,
+      temperatureMax: profile.maxTemperature
+    });
   }
 
   private mapParametersToAlertSettings(
@@ -87,5 +146,28 @@ export class PatientVitalsRepository {
         criticalHigh: parameters.temperatureMax + 1
       }
     };
+  }
+
+  private createFallbackVitalsPageData(userId: string): PatientVitalsPageData {
+    const session = this.authService.getSession();
+    const fallbackUserId = session?.userId || userId || '';
+    const fallbackName = session?.email || 'Paciente';
+
+    return {
+      patientName: fallbackName,
+      initials: this.getInitials(fallbackName),
+      email: session?.email || '',
+      vitals: this.createEmptyVitals(fallbackUserId),
+      alertSettings: this.createAlertSettings(fallbackUserId)
+    };
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('');
   }
 }

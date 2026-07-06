@@ -1,11 +1,12 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { CaregiverAlertRepository } from '../../data/caregiver-alert.repository';
 import { CaregiverDeviceRepository } from '../../data/caregiver-device.repository';
 import {
@@ -28,8 +29,8 @@ import {
   styleUrl: './device.css',
 })
 export class Device {
-  caregiverUserId = 'caregiver-demo-user';
-  email = 'demo.caregiver@tukuntech.app';
+  caregiverUserId = '';
+  email = '';
   devices: CaregiverPatientDevice[] = [];
   urgentAlertShow = false;
   urgentAlertTitleKey = '';
@@ -46,11 +47,15 @@ export class Device {
   ];
 
   constructor(
+    private authService: AuthApiService,
     private caregiverAlertRepository: CaregiverAlertRepository,
-    private caregiverDeviceRepository: CaregiverDeviceRepository
+    private caregiverDeviceRepository: CaregiverDeviceRepository,
+    private changeDetector: ChangeDetectorRef
   ) {
+    const session = this.authService.getSession();
+    this.caregiverUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDevices();
-    this.loadGlobalCriticalAlert();
   }
 
   get offlineDevices(): CaregiverPatientDevice[] {
@@ -163,12 +168,17 @@ export class Device {
     this.caregiverDeviceRepository
       .getDashboard(this.caregiverUserId)
       .subscribe(data => {
+        this.caregiverUserId = data.caregiverUserId;
         this.email = data.caregiverEmail;
         this.devices = data.devices;
+        this.changeDetector.detectChanges();
+        this.loadGlobalCriticalAlert();
       });
   }
 
   private loadGlobalCriticalAlert(): void {
+    if (!this.caregiverUserId) return;
+
     this.caregiverAlertRepository
       .getGlobalCriticalAlert(this.caregiverUserId)
       .subscribe(alert => {
@@ -176,6 +186,7 @@ export class Device {
         this.urgentAlertTitleKey = alert?.titleKey || '';
         this.urgentAlertMessageKey = alert?.messageKey || '';
         this.urgentAlertMessageParams = alert?.messageParams || {};
+        this.changeDetector.detectChanges();
       });
   }
 }

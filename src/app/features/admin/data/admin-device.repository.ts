@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Inject } from '@angular/core';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { API_BASE_URL } from '../../../core/api/api.config';
+import { AuthApiService } from '../../../core/auth/auth-api.service';
+import { AdminDeviceResponse, DeviceApiService } from '../../../core/devices/device-api.service';
 import { DeviceAssignmentStore } from '../../../core/device-assignment/device-assignment.store';
+import { UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
 
 import {
   AdminAssignablePatient,
@@ -10,75 +17,94 @@ import {
   AdminDevicesDashboard
 } from '../domain/admin-device';
 
+interface AdminUserResponse {
+  userId?: string;
+  id?: string;
+  email: string;
+  fullName?: string;
+  role: string;
+  subscriptionPlan?: string;
+  status?: string;
+  subscriptionEnd?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminDeviceRepository {
-  private individualPatients: AdminAssignablePatient[] = [
-    this.createPatient('patient-sarah', 'Sarah Marsh', 'sarah@tukuntech.com', 'individual'),
-    this.createPatient('patient-james', 'James Patel', 'james@tukuntech.com', 'individual'),
-    this.createPatient('patient-lucia', 'Lucía Torres', 'lucia@tukuntech.com', 'individual')
-  ];
+  private individualPatients: AdminAssignablePatient[] = [];
 
-  private caregivers: AdminCaregiverGroup[] = [
-    {
-      id: 'caregiver-sara',
-      fullName: 'Sara Ramírez',
-      email: 'sara@tukuntech.com',
-      patients: [
-        this.createPatient('patient-eleanor', 'Eleanor Marsh', 'eleanor@tukuntech.com', 'caregiver-patient', 'device-eleanor', 'caregiver-sara'),
-        this.createPatient('patient-charls', 'Charls March', 'charls@tukuntech.com', 'caregiver-patient', 'device-charls', 'caregiver-sara'),
-        this.createPatient('patient-miguel', 'Miguel Montana', 'miguel@tukuntech.com', 'caregiver-patient', 'device-miguel', 'caregiver-sara'),
-        this.createPatient('patient-ana', 'Ana Ramírez', 'ana@tukuntech.com', 'caregiver-patient', undefined, 'caregiver-sara'),
-        this.createPatient('patient-luis', 'Luis Ramírez', 'luis@tukuntech.com', 'caregiver-patient', undefined, 'caregiver-sara')
-      ]
-    },
-    {
-      id: 'caregiver-carlos',
-      fullName: 'Carlos Mendoza',
-      email: 'carlos@tukuntech.com',
-      patients: [
-        this.createPatient('patient-marian', 'Marian Medilla', 'marian@tukuntech.com', 'caregiver-patient', 'device-marian', 'caregiver-carlos'),
-        this.createPatient('patient-robert', 'Robert Silva', 'robert@tukuntech.com', 'caregiver-patient', 'device-robert', 'caregiver-carlos'),
-        this.createPatient('patient-michael', 'Michael Mendoza', 'michael@tukuntech.com', 'caregiver-patient', undefined, 'caregiver-carlos'),
-        this.createPatient('patient-sofia', 'Sofía Mendoza', 'sofia@tukuntech.com', 'caregiver-patient', undefined, 'caregiver-carlos'),
-        this.createPatient('patient-diego', 'Diego Mendoza', 'diego@tukuntech.com', 'caregiver-patient', undefined, 'caregiver-carlos')
-      ]
-    }
-  ];
+  private caregivers: AdminCaregiverGroup[] = [];
 
-  private devices: AdminDevice[] = [
-    this.createSeedDevice('device-eleanor', 'CC4B32', 'Tukun Care 2', 'CB-9F32-01', 'online', '2.4.1', '2026-05-12', 'patient-eleanor'),
-    this.createSeedDevice('device-charls', 'DD8A91', 'Tukun Care 2', 'C1-K22L-01', 'offline', '2.4.1', '2026-05-16', 'patient-charls'),
-    this.createSeedDevice('device-miguel', 'FF3K22', 'Tukun Care Pro', 'H4-23LP-01', 'online', '2.5.0', '2026-05-22', 'patient-miguel'),
-    this.createSeedDevice('device-marian', 'AA7N40', 'Tukun Care 2', 'CM-660E-12', 'offline', '2.4.1', '2026-06-02', 'patient-marian'),
-    this.createSeedDevice('device-robert', 'ZX9P15', 'Tukun Care Pro', 'CR-520F-08', 'error', '2.5.0', '2026-06-03', 'patient-robert')
-  ];
+  private devices: AdminDevice[] = [];
 
-  constructor(private assignmentStore: DeviceAssignmentStore) {
-    this.devices = this.devices.map(device => {
-      if (!device.assignedPatient) return device;
-      const savedAssignment = this.assignmentStore.getByPatient(device.assignedPatient.id);
-      return savedAssignment ? { ...device, status: savedAssignment.connectionStatus } : device;
-    });
-    this.devices.filter(device => device.assignedPatient).forEach(device => this.publishAssignment(device));
-  }
+  constructor(
+    private assignmentStore: DeviceAssignmentStore,
+    private deviceApi: DeviceApiService,
+    private http: HttpClient,
+    private authService: AuthApiService,
+    @Inject(API_BASE_URL) private apiBaseUrl: string
+  ) {}
 
   getDashboard(adminUserId: string): Observable<AdminDevicesDashboard> {
-    return of(this.buildDashboard(adminUserId));
+    return forkJoin({
+      patients: this.http.get<UserProfileResponse[]>(`${this.apiBaseUrl}/profiles/patients`).pipe(catchError(() => of(null))),
+      caregivers: this.http.get<UserProfileResponse[]>(`${this.apiBaseUrl}/profiles/caregivers`).pipe(catchError(() => of(null))),
+      adminUsers: this.http.get<AdminUserResponse[]>(`${this.apiBaseUrl}/admin/users`).pipe(catchError(() => of(null))),
+      devices: this.deviceApi.getAdminDevices().pipe(catchError(() => of(null)))
+    }).pipe(
+      switchMap(({ patients, caregivers, adminUsers, devices }) => {
+        const profiles = this.resolveAvailableProfiles(patients, caregivers, adminUsers);
+        const patientRequests = profiles.caregivers.map(caregiver =>
+          this.http
+            .get<UserProfileResponse[]>(`${this.apiBaseUrl}/profiles/caregivers/${caregiver.id}/patients`)
+            .pipe(catchError(() => of(null)))
+        );
+
+        return (patientRequests.length ? forkJoin(patientRequests) : of([])).pipe(
+          map(caregiverPatients => ({
+            ...profiles,
+            caregiverPatients,
+            devices
+          }))
+        );
+      }),
+      map(({ patients, caregivers, caregiverPatients, devices }) => {
+        this.applyRealProfiles(patients, caregivers, caregiverPatients);
+
+        if (devices) {
+          this.devices = devices.map(device => this.mapAdminDevice(device));
+          this.syncPatientAssignmentsFromDevices();
+        }
+
+        return this.buildDashboard(this.authService.getSession()?.userId || adminUserId);
+      }),
+      catchError(() => of(this.buildDashboard(adminUserId)))
+    );
   }
 
   createDevice(adminUserId: string, draft: AdminDeviceDraft): Observable<AdminDevice> {
-    if (!this.isValidDraft(draft) || this.hasDuplicateIdentity(draft)) {
-      return throwError(() => new Error('Invalid or duplicated device'));
+    if (!this.isValidDraft(draft)) {
+      return throwError(() => new Error('Missing required device fields'));
     }
 
-    const device: AdminDevice = {
-      id: `device-${Date.now()}`,
-      ...this.normalizeDraft(draft),
-      status: 'available',
-      assignedPatient: null
-    };
-    this.devices = [device, ...this.devices];
-    return of(this.cloneDevice(device));
+    const normalizedDraft = this.normalizeDraft(draft);
+
+    return this.http.post(`${this.apiBaseUrl}/devices/provision`, {
+      macAddress: normalizedDraft.serialNumber,
+      modelName: normalizedDraft.model,
+      firmwareVersion: normalizedDraft.firmwareVersion
+    }, { responseType: 'text' }).pipe(
+      map(response => {
+        const device: AdminDevice = {
+          id: this.extractDeviceId(response) || normalizedDraft.serialNumber,
+          ...normalizedDraft,
+          status: 'available',
+          assignedPatient: null
+        };
+        this.devices = [device, ...this.devices];
+        return this.cloneDevice(device);
+      }),
+      catchError(() => throwError(() => new Error('Device provision failed')))
+    );
   }
 
   updateDevice(adminUserId: string, deviceId: string, draft: AdminDeviceDraft): Observable<AdminDevice> {
@@ -87,14 +113,30 @@ export class AdminDeviceRepository {
       return throwError(() => new Error('Invalid or duplicated device'));
     }
 
+    const normalizedDraft = this.normalizeDraft(draft);
+    const shouldMakeAvailable = normalizedDraft.status === 'available';
     const next: AdminDevice = {
       ...current,
-      ...this.normalizeDraft(draft),
-      status: current.assignedPatient && draft.status === 'available' ? current.status : draft.status
+      ...normalizedDraft,
+      status: normalizedDraft.status,
+      assignedPatient: shouldMakeAvailable ? null : current.assignedPatient
     };
-    this.devices = this.devices.map(device => device.id === deviceId ? next : device);
-    if (next.assignedPatient) this.publishAssignment(next);
-    return of(this.cloneDevice(next));
+    return this.deviceApi.updateAdminDevice(deviceId, {
+      modelName: next.model,
+      status: this.toApiDeviceStatus(next.status),
+      assignedPatientId: shouldMakeAvailable ? '' : next.assignedPatient?.id
+    }).pipe(
+      map(() => {
+        this.devices = this.devices.map(device => device.id === deviceId ? next : device);
+        if (next.assignedPatient) {
+          this.publishAssignment(next);
+        } else {
+          this.clearPatientDevice(deviceId);
+          this.assignmentStore.removeByDevice(deviceId);
+        }
+        return this.cloneDevice(next);
+      })
+    );
   }
 
   assignDevice(adminUserId: string, patientId: string, deviceId: string): Observable<AdminDevice> {
@@ -105,18 +147,25 @@ export class AdminDeviceRepository {
       return throwError(() => new Error('Assignment violates business rules'));
     }
 
-    this.setPatientDevice(patientId, deviceId);
-    const assignedPatient = this.findPatient(patientId)!;
-    const next = { ...device, status: 'online' as const, assignedPatient: { ...assignedPatient } };
-    this.devices = this.devices.map(item => item.id === deviceId ? next : item);
-    this.publishAssignment(next);
-    return of(this.cloneDevice(next));
+    return this.http.post(`${this.apiBaseUrl}/devices/${deviceId}/assign`, {
+      patientId
+    }, { responseType: 'text' }).pipe(
+      map(() => {
+        this.setPatientDevice(patientId, deviceId);
+        const assignedPatient = this.findPatient(patientId)!;
+        const next = { ...device, status: 'online' as const, assignedPatient: { ...assignedPatient } };
+        this.devices = this.devices.map(item => item.id === deviceId ? next : item);
+        this.publishAssignment(next);
+        return this.cloneDevice(next);
+      }),
+      catchError(() => throwError(() => new Error('Device assignment failed')))
+    );
   }
 
   private buildDashboard(adminUserId: string): AdminDevicesDashboard {
     return {
       adminUserId,
-      adminEmail: 'demo.admin@tukuntech.app',
+      adminEmail: this.authService.getSession()?.email || '',
       summary: {
         total: this.devices.length,
         available: this.devices.filter(device => device.status === 'available').length,
@@ -223,5 +272,224 @@ export class AdminDeviceRepository {
       firmwareVersion: device.firmwareVersion,
       connectionStatus: device.status === 'online' ? 'online' : 'offline'
     });
+  }
+
+  private clearPatientDevice(deviceId: string): void {
+    this.individualPatients = this.individualPatients.map(patient =>
+      patient.assignedDeviceId === deviceId ? { ...patient, assignedDeviceId: undefined } : patient
+    );
+    this.caregivers = this.caregivers.map(caregiver => ({
+      ...caregiver,
+      patients: caregiver.patients.map(patient =>
+        patient.assignedDeviceId === deviceId ? { ...patient, assignedDeviceId: undefined } : patient
+      )
+    }));
+  }
+
+  private syncPatientAssignmentsFromDevices(): void {
+    const assignments = new Map(
+      this.devices
+        .filter(device => !!device.assignedPatient)
+        .map(device => [device.assignedPatient!.id, device.id])
+    );
+
+    this.individualPatients = this.individualPatients.map(patient => ({
+      ...patient,
+      assignedDeviceId: assignments.get(patient.id)
+    }));
+
+    this.caregivers = this.caregivers.map(caregiver => ({
+      ...caregiver,
+      patients: caregiver.patients.map(patient => ({
+        ...patient,
+        assignedDeviceId: assignments.get(patient.id)
+      }))
+    }));
+  }
+
+  private mapAdminDevice(device: AdminDeviceResponse): AdminDevice {
+    const assignedPatient = device.assignedPatientId ? this.findPatient(device.assignedPatientId) || null : null;
+    const status = this.mapDeviceStatus(device.connectionStatus || device.status, device.allocationStatus, !!assignedPatient);
+    const mappedDevice: AdminDevice = {
+      id: device.deviceId,
+      code: device.deviceId?.slice(0, 8).toUpperCase() || '',
+      model: device.modelName || 'TukunTech IoT',
+      serialNumber: device.deviceId || '',
+      status,
+      firmwareVersion: '-',
+      registeredAt: (device.provisionedAt || '').slice(0, 10),
+      assignedPatient: assignedPatient ? { ...assignedPatient, assignedDeviceId: device.deviceId } : null
+    };
+
+    if (mappedDevice.assignedPatient) {
+      this.publishAssignment(mappedDevice);
+    } else {
+      this.assignmentStore.removeByDevice(mappedDevice.id);
+    }
+    return mappedDevice;
+  }
+
+  private mapDeviceStatus(
+    status: string | undefined,
+    allocationStatus: string | undefined,
+    assigned: boolean
+  ): AdminDevice['status'] {
+    const normalizedAllocation = (allocationStatus || '').toUpperCase();
+    if (!assigned && (normalizedAllocation.includes('DISPONIBLE') || normalizedAllocation.includes('AVAILABLE'))) {
+      return 'available';
+    }
+
+    const normalizedStatus = (status || '').toUpperCase();
+    if (normalizedStatus.includes('ERROR') || normalizedStatus.includes('MAINTENANCE')) return 'error';
+    if (normalizedStatus.includes('ONLINE') || normalizedStatus.includes('ACTIVE')) return 'online';
+    if (normalizedStatus.includes('OFFLINE') || normalizedStatus.includes('INACTIVE')) return 'offline';
+    if (normalizedStatus.includes('PROVISIONED') || normalizedStatus.includes('AVAILABLE') || normalizedStatus.includes('DISPONIBLE')) {
+      return assigned ? 'online' : 'available';
+    }
+    return assigned ? 'offline' : 'available';
+  }
+
+  private toApiDeviceStatus(status: AdminDevice['status']): string {
+    const statuses: Record<AdminDevice['status'], string> = {
+      available: 'PROVISIONED',
+      online: 'ONLINE',
+      offline: 'OFFLINE',
+      error: 'MAINTENANCE'
+    };
+    return statuses[status];
+  }
+
+  private applyRealProfiles(
+    patientProfiles: UserProfileResponse[],
+    caregiverProfiles: UserProfileResponse[],
+    caregiverPatientProfiles: Array<UserProfileResponse[] | null> = []
+  ): void {
+    const caregivers = caregiverProfiles.map(profile => this.createCaregiverGroup(profile));
+    const caregiverIds = new Set(caregivers.map(caregiver => caregiver.id));
+    const patients = patientProfiles.map(profile => this.createPatientFromProfile(profile));
+    const hasCaregiverPatientData = caregiverPatientProfiles.some(group => Array.isArray(group));
+    const groupedPatientIds = new Set<string>();
+
+    this.individualPatients = [];
+    this.caregivers = caregivers.map((caregiver, index) => {
+      const patientsForCaregiver = caregiverPatientProfiles[index]?.map(profile =>
+        this.createPatientFromProfile({
+          ...profile,
+          managedByCaregiverId: profile.managedByCaregiverId || caregiver.id
+        })
+      );
+
+      if (patientsForCaregiver) {
+        patientsForCaregiver.forEach(patient => groupedPatientIds.add(patient.id));
+
+        return {
+          ...caregiver,
+          patients: patientsForCaregiver
+        };
+      }
+
+      const fallbackPatients = patients.filter(patient => patient.caregiverId === caregiver.id);
+      fallbackPatients.forEach(patient => groupedPatientIds.add(patient.id));
+
+      return {
+        ...caregiver,
+        patients: fallbackPatients
+      };
+    });
+
+    const unlinkedPatients = hasCaregiverPatientData
+      ? patients.filter(patient => !groupedPatientIds.has(patient.id))
+      : patients.filter(patient => !patient.caregiverId || !caregiverIds.has(patient.caregiverId));
+
+    if (unlinkedPatients.length) {
+      this.caregivers = [
+        ...this.caregivers,
+        {
+          id: 'unlinked-caregiver',
+          fullName: 'Sin cuidador asignado',
+          email: '',
+          patients: unlinkedPatients
+        }
+      ];
+    }
+  }
+
+  private resolveAvailableProfiles(
+    patientProfiles: UserProfileResponse[] | null,
+    caregiverProfiles: UserProfileResponse[] | null,
+    adminUsers: AdminUserResponse[] | null
+  ): { patients: UserProfileResponse[]; caregivers: UserProfileResponse[] } {
+    const adminPatients = this.mapAdminUsersByRole(adminUsers, 'PATIENT');
+    const adminCaregivers = this.mapAdminUsersByRole(adminUsers, 'CAREGIVER');
+    const patients = patientProfiles?.length ? patientProfiles : adminPatients;
+    const caregivers = caregiverProfiles?.length ? caregiverProfiles : adminCaregivers;
+
+    return { patients, caregivers };
+  }
+
+  private mapAdminUsersByRole(
+    adminUsers: AdminUserResponse[] | null,
+    role: 'PATIENT' | 'CAREGIVER'
+  ): UserProfileResponse[] {
+    if (!adminUsers?.length) {
+      return [];
+    }
+
+    return adminUsers
+      .filter(user => this.normalizeRole(user.role) === role)
+      .map(user => ({
+        id: user.userId || user.id || '',
+        email: user.email,
+        role,
+        fullName: user.fullName,
+        subscriptionType: user.subscriptionPlan,
+        status: user.status,
+        subscriptionEndDate: user.subscriptionEnd
+      }))
+      .filter(profile => !!profile.id && !!profile.email);
+  }
+
+  private normalizeRole(role: string | undefined): string {
+    return (role || '')
+      .toUpperCase()
+      .replace(/^ROLE_/, '');
+  }
+
+  private createCaregiverGroup(profile: UserProfileResponse): AdminCaregiverGroup {
+    return {
+      id: profile.id,
+      fullName: this.getDisplayName(profile),
+      email: profile.email,
+      patients: []
+    };
+  }
+
+  private createPatientFromProfile(profile: UserProfileResponse): AdminAssignablePatient {
+    const savedAssignment = this.assignmentStore.getByPatient(profile.id);
+
+    return {
+      id: profile.id,
+      fullName: this.getDisplayName(profile),
+      email: profile.email,
+      accountType: 'caregiver-patient',
+      caregiverId: profile.managedByCaregiverId,
+      assignedDeviceId: savedAssignment?.deviceId
+    };
+  }
+
+  private getDisplayName(profile: UserProfileResponse): string {
+    if (profile.fullName?.trim()) {
+      return profile.fullName.trim();
+    }
+
+    return profile.email.split('@')[0]
+      .split(/[._-]+/)
+      .filter(Boolean)
+      .map(part => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join(' ') || profile.email;
+  }
+
+  private extractDeviceId(response: string): string {
+    return response.match(/Dispositivo\s+([^\s]+)/i)?.[1] || '';
   }
 }

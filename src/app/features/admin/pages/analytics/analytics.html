@@ -23,7 +23,11 @@
       </div>
     </header>
 
-    <section class="metrics-grid">
+    <section class="analytics-state-card" *ngIf="!analyticsLoaded">
+      <p>{{ 'common.loading' | translate }}</p>
+    </section>
+
+    <section class="metrics-grid" *ngIf="analyticsLoaded">
       <article
         class="metric-card"
         *ngFor="let metric of metrics"
@@ -34,7 +38,7 @@
       </article>
     </section>
 
-    <section class="chart-card">
+    <section class="chart-card" *ngIf="analyticsLoaded">
       <h2>{{ 'admin.analytics.chartTitle' | translate }}</h2>
 
       <div class="chart-shell">

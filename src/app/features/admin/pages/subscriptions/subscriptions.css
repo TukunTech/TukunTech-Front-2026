@@ -145,6 +145,11 @@
   border-bottom: none;
 }
 
+.subscriptions-row--state {
+  grid-template-columns: 1fr;
+  color: #667985;
+}
+
 .status-pill {
   min-width: 84px;
   min-height: 24px;

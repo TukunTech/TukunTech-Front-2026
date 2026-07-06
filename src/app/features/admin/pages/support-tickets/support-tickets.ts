@@ -1,9 +1,10 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AppToast } from '../../../../shared/components/app-toast/app-toast';
+import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { DashboardLayout } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { adminMenuItems } from '../../admin-menu';
 import { AdminSupportTicketRepository } from '../../data/admin-support-ticket.repository';
@@ -19,10 +20,11 @@ import {
   templateUrl: './support-tickets.html',
   styleUrl: './support-tickets.css',
 })
-export class SupportTickets {
-  adminUserId = 'admin-demo-user';
-  email = 'demo.admin@tukuntech.app';
+export class SupportTickets implements OnInit {
+  adminUserId = '';
+  email = '';
   tickets: AdminSupportTicket[] = [];
+  ticketsLoaded = false;
   selectedTicketId = '';
   replyMessage = '';
   showToast = false;
@@ -30,7 +32,16 @@ export class SupportTickets {
   toastMessageKey = '';
   menuItems = adminMenuItems;
 
-  constructor(private adminSupportTicketRepository: AdminSupportTicketRepository) {
+  constructor(
+    private authService: AuthApiService,
+    private adminSupportTicketRepository: AdminSupportTicketRepository,
+    private changeDetector: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const session = this.authService.getSession();
+    this.adminUserId = session?.userId || '';
+    this.email = session?.email || '';
     this.loadDashboard();
   }
 
@@ -104,12 +115,15 @@ export class SupportTickets {
   }
 
   private loadDashboard(): void {
+    this.ticketsLoaded = false;
     this.adminSupportTicketRepository
       .getDashboard(this.adminUserId)
       .subscribe(data => {
         this.email = data.adminEmail;
         this.tickets = data.tickets;
         this.selectedTicketId = data.tickets[0]?.id ?? '';
+        this.ticketsLoaded = true;
+        this.changeDetector.detectChanges();
       });
   }
 
@@ -119,6 +133,7 @@ export class SupportTickets {
         ? ticket
         : item
     );
+    this.changeDetector.detectChanges();
   }
 
   private showFeedback(type: 'success' | 'error', messageKey: string): void {

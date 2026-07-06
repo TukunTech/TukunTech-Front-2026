@@ -22,14 +22,12 @@
 .devices-table-head, .devices-row { min-width:980px; display:grid; grid-template-columns:.8fr 1.1fr 1.1fr 1.25fr .9fr .95fr 34px; align-items:center; gap:12px; padding:0 30px; }
 .devices-table-head { min-height:40px; border-block:1px solid #e2e9e8; background:#f6faf9; font-size:12px; font-weight:600; }
 .devices-row { min-height:58px; border-bottom:1px solid #edf1f0; font-size:12px; }.devices-row:last-child { border-bottom:0; }
+.devices-row--state{grid-template-columns:1fr;color:#667985}
 .patient-cell--empty { color:#8a9a9f; }.edit-button { border:0; background:transparent; color:#3fa292; cursor:pointer; }
 .status-pill { min-width:76px; padding:5px 10px; border-radius:999px; display:inline-flex; justify-content:center; font-size:11px; font-weight:600; }
 .status-pill--available { background:#dff5ef; color:#287666; }.status-pill--online { background:#4cbe85; color:#fff; }.status-pill--offline { background:#eef3f3; color:#667985; }.status-pill--error { background:#e94c4c; color:#fff; }
 
 .assignment-card { padding:26px; }.section-header h2 { margin:0 0 4px; font-size:21px; }.availability-badge { padding:7px 12px; border-radius:999px; background:#e5f6ec; color:#287666; font-size:12px; }
-.assignment-modes { margin:22px 0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-.assignment-modes button { padding:14px 16px; border:1px solid #dce7e5; border-radius:18px; background:#fbfdfd; color:#10232b; display:flex; align-items:center; gap:13px; text-align:left; cursor:pointer; }
-.assignment-modes button > i { width:38px; height:38px; border-radius:13px; background:#edf5f3; color:#3fa292; display:grid; place-items:center; font-size:18px; }.assignment-modes span { display:flex; flex-direction:column; gap:2px; }.assignment-modes small { color:#71838b; }
 .assignment-modes .assignment-mode--active { border-color:#3fa292; background:#f0faf7; box-shadow:0 0 0 1px rgba(63,162,146,.12); }.assignment-modes .assignment-mode--active > i { background:#3fa292; color:#fff; }
 .assignment-flow { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(270px,.7fr); gap:16px; align-items:start; }
 .selection-panel, .device-selection-panel { border:1px solid #e0e9e8; border-radius:20px; background:#fbfdfd; padding:18px; }.step-label { display:block; margin-bottom:12px; color:#3b565d; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
