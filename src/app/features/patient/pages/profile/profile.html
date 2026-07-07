@@ -9,7 +9,7 @@
   <app-toast
     [show]="showToast"
     [message]="toastMessageKey | translate"
-    type="success">
+    [type]="toastType">
   </app-toast>
 
   <section class="profile-page" *ngIf="profileLoaded; else profileLoading">

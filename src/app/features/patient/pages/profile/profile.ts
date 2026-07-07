@@ -50,6 +50,7 @@ export class Profile {
   showContactModal = false;
 
   showToast = false;
+  toastType: 'success' | 'error' = 'success';
   toastMessageKey = '';
   contactError = '';
 
@@ -177,24 +178,30 @@ export class Profile {
   saveChanges(): void {
     this.patientProfileRepository
       .updateProfile(this.userId, this.profile)
-      .subscribe(profile => {
-        this.profile = profile;
-        this.email = profile.email;
-        this.showSuccessToast('patient.profile.changesSavedSuccessfully');
+      .subscribe({
+        next: profile => {
+          this.profile = profile;
+          this.email = profile.email;
+          this.loadProfile();
+          this.showToastMessage('success', 'patient.profile.changesSavedSuccessfully');
+        },
+        error: () => {
+          this.showToastMessage('error', 'patient.profile.saveError');
+        }
       });
   }
 
   renewSubscription(): void {
     this.patientProfileRepository.renewSubscription().subscribe(subscription => {
       this.subscription = subscription;
-      this.showSuccessToast('subscription.renewedSuccessfully');
+      this.showToastMessage('success', 'subscription.renewedSuccessfully');
     });
   }
 
   cancelSubscription(): void {
     this.patientProfileRepository.cancelSubscription().subscribe(subscription => {
       this.subscription = subscription;
-      this.showSuccessToast('subscription.canceledSuccessfully');
+      this.showToastMessage('success', 'subscription.canceledSuccessfully');
     });
   }
 
@@ -248,6 +255,11 @@ export class Profile {
   }
 
   private showSuccessToast(messageKey: string): void {
+    this.showToastMessage('success', messageKey);
+  }
+
+  private showToastMessage(type: 'success' | 'error', messageKey: string): void {
+    this.toastType = type;
     this.toastMessageKey = messageKey;
     this.showToast = true;
 

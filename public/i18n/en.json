@@ -419,6 +419,7 @@
       "saveContact": "Save contact",
       "add": "Add",
       "changesSavedSuccessfully": "Changes were saved successfully",
+      "saveError": "We could not save the profile. Check the details and try again.",
       "contactAddedSuccessfully": "Emergency contact added successfully",
       "name": "Name",
       "relation": "Relation",

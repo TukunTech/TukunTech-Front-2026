@@ -40,7 +40,7 @@ export class PatientHistoryRepository {
       return of(null);
     }
 
-    return this.recordCurrentVitals(userId, 'hourly-snapshot');
+    return this.recordCurrentVitals(userId, 'hourly-snapshot', false);
   }
 
   recordAlertSnapshot(userId: string): Observable<PatientVitalHistoryRecord | null> {
@@ -66,14 +66,15 @@ export class PatientHistoryRepository {
 
   private recordCurrentVitals(
     userId: string,
-    source: PatientHistoryRecordSource
+    source: PatientHistoryRecordSource,
+    includeAlerts = true
   ): Observable<PatientVitalHistoryRecord> {
     return this.patientVitalsRepository.getVitalsPageData(userId).pipe(
       map(data => {
         const record = this.createRecord(userId, source, data);
         return this.storeRecord({
           ...record,
-          alerts: isOfflineHistoryRecord(record)
+          alerts: !includeAlerts || isOfflineHistoryRecord(record)
             ? []
             : evaluatePatientVitals(data.vitals, data.alertSettings)
         });
@@ -191,6 +192,6 @@ export class PatientHistoryRepository {
   }
 
   private createId(): string {
-    return `history-${Date.now()}`;
+    return `history-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   }
 }

@@ -418,6 +418,7 @@
       "cancel": "Cancelar",
       "saveContact": "Guardar contacto",
       "changesSavedSuccessfully": "Cambios guardados correctamente",
+      "saveError": "No se pudo guardar el perfil. Revisa los datos e intenta nuevamente.",
       "contactAddedSuccessfully": "Contacto de emergencia agregado correctamente",
       "name": "Nombre",
       "relation": "Relación",
