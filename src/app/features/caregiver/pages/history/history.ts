@@ -210,6 +210,7 @@ export class History {
       next: message => {
         this.reportMessageType = 'success';
         this.reportMessage = message || 'Reporte solicitado. n8n esta procesando el PDF.';
+        this.loadHistory();
         this.changeDetector.detectChanges();
       },
       error: error => {

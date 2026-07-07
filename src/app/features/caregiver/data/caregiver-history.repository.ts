@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthApiService } from '../../../core/auth/auth-api.service';
 import { PatientMedicalParametersStore } from '../../../core/patient-monitoring/patient-medical-parameters.store';
 import { UserProfileApiService, UserProfileResponse } from '../../../core/profiles/user-profile-api.service';
+import { HealthReportResponse, ReportApiService } from '../../../core/reports/report-api.service';
 
 import {
   CaregiverHistoryDashboard,
@@ -12,7 +13,10 @@ import {
   CaregiverHistoryPeriod,
   CaregiverVitalHistoryRecord
 } from '../domain/caregiver-history';
-import { CaregiverVitalAlertSettings } from '../domain/caregiver-vital-signs';
+import {
+  CaregiverVitalAlertSettings,
+  evaluateCaregiverPatientVitals
+} from '../domain/caregiver-vital-signs';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +30,8 @@ export class CaregiverHistoryRepository {
   constructor(
     private authService: AuthApiService,
     private parametersStore: PatientMedicalParametersStore,
-    private userProfileApi: UserProfileApiService
+    private userProfileApi: UserProfileApiService,
+    private reportApi: ReportApiService
   ) {}
 
   getDashboard(
@@ -59,11 +64,12 @@ export class CaregiverHistoryRepository {
     patientUserId: string,
     query: CaregiverHistoryQuery
   ): Observable<CaregiverVitalHistoryRecord[]> {
-    const records = this.records
-      .filter(record => record.patientUserId === patientUserId);
-
-    return of(this.filterRecords(records, query)
-      .map(record => this.cloneRecord(record)));
+    return this.reportApi.listPatientReports(patientUserId).pipe(
+      map(reports => this.filterRecords(
+        reports.map(report => this.mapReportToHistoryRecord(report, patientUserId)),
+        query
+      ).map(record => this.cloneRecord(record)))
+    );
   }
 
   private createDefaultAlertSettings(patientUserId: string): CaregiverVitalAlertSettings {
@@ -153,6 +159,45 @@ export class CaregiverHistoryRepository {
       userId: profile.id,
       fullName,
       initials: this.getInitials(fullName)
+    };
+  }
+
+  private mapReportToHistoryRecord(
+    report: HealthReportResponse,
+    patientUserId: string
+  ): CaregiverVitalHistoryRecord {
+    const settings = this.alertSettings.get(patientUserId) || this.createDefaultAlertSettings(patientUserId);
+    const heartRate = report.avgHeartRate || 0;
+    const oxygen = report.avgSpO2 || 0;
+    const temperature = report.avgTemperature || 0;
+    const recordedAt = report.generatedAt || report.endDate;
+    const vitals = {
+      patientUserId,
+      measuredAt: recordedAt,
+      heartRate,
+      oxygen,
+      temperature
+    };
+
+    return {
+      id: report.reportId,
+      patientUserId,
+      recordedAt,
+      source: 'hourly',
+      vitals,
+      ranges: {
+        heartRate: {
+          min: report.minHeartRate || heartRate,
+          max: report.maxHeartRate || heartRate
+        },
+        oxygen: {
+          min: oxygen,
+          max: oxygen
+        }
+      },
+      alerts: heartRate || oxygen || temperature
+        ? evaluateCaregiverPatientVitals(vitals, settings)
+        : []
     };
   }
 

@@ -9,6 +9,20 @@ export interface GenerateReportRequest {
   endDate: string;
 }
 
+export interface HealthReportResponse {
+  reportId: string;
+  patientId: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  generatedAt: string;
+  avgHeartRate: number | null;
+  minHeartRate: number | null;
+  maxHeartRate: number | null;
+  avgSpO2: number | null;
+  avgTemperature: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReportApiService {
   constructor(
@@ -26,5 +40,9 @@ export class ReportApiService {
     return this.http.post(`${this.apiBaseUrl}/reports/caregiver/patient/${patientId}/generate`, request, {
       responseType: 'text'
     });
+  }
+
+  listPatientReports(patientId: string): Observable<HealthReportResponse[]> {
+    return this.http.get<HealthReportResponse[]>(`${this.apiBaseUrl}/reports/caregiver/patient/${patientId}`);
   }
 }
