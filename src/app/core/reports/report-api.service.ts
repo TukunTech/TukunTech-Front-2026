@@ -21,4 +21,10 @@ export class ReportApiService {
       responseType: 'text'
     });
   }
+
+  generatePatientReport(patientId: string, request: GenerateReportRequest): Observable<string> {
+    return this.http.post(`${this.apiBaseUrl}/reports/caregiver/patient/${patientId}/generate`, request, {
+      responseType: 'text'
+    });
+  }
 }

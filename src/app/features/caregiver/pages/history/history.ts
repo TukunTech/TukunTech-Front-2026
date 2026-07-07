@@ -2,12 +2,14 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { ReportApiService } from '../../../../core/reports/report-api.service';
 import {
   CustomSelect,
   CustomSelectOption
@@ -52,6 +54,7 @@ export class History {
   dateTo = '2026-06-20';
   alertsOnly = false;
   history: CaregiverVitalHistoryRecord[] = [];
+  isGeneratingReport = false;
   reportMessage = '';
   reportMessageType: 'success' | 'error' = 'error';
 
@@ -68,6 +71,7 @@ export class History {
     private authService: AuthApiService,
     private caregiverAlertRepository: CaregiverAlertRepository,
     private caregiverHistoryRepository: CaregiverHistoryRepository,
+    private reportApi: ReportApiService,
     private translateService: TranslateService,
     private changeDetector: ChangeDetectorRef
   ) {
@@ -190,8 +194,30 @@ export class History {
   }
 
   generateReport(): void {
-    this.reportMessageType = 'error';
-    this.reportMessage = 'El backend solo expone reportes n8n para el paciente autenticado. Falta un endpoint para generar reportes de pacientes desde cuidador.';
+    if (!this.selectedReportPatientId || this.isGeneratingReport) {
+      return;
+    }
+
+    this.reportMessage = '';
+    this.isGeneratingReport = true;
+
+    this.reportApi.generatePatientReport(this.selectedReportPatientId, this.getReportRange()).pipe(
+      finalize(() => {
+        this.isGeneratingReport = false;
+        this.changeDetector.detectChanges();
+      })
+    ).subscribe({
+      next: message => {
+        this.reportMessageType = 'success';
+        this.reportMessage = message || 'Reporte solicitado. n8n esta procesando el PDF.';
+        this.changeDetector.detectChanges();
+      },
+      error: error => {
+        this.reportMessageType = 'error';
+        this.reportMessage = this.getErrorMessage(error, 'No se pudo generar el reporte del paciente.');
+        this.changeDetector.detectChanges();
+      }
+    });
   }
 
   private loadDashboard(): void {
@@ -244,6 +270,55 @@ export class History {
       to: this.dateTo,
       alertsOnly: this.alertsOnly
     };
+  }
+
+  private getReportRange(): { startDate: string; endDate: string } {
+    if (this.selectedPeriod === 'custom') {
+      return {
+        startDate: this.dateFrom,
+        endDate: this.dateTo
+      };
+    }
+
+    const end = new Date();
+    const start = new Date(end);
+
+    if (this.selectedPeriod === 'weekly') {
+      start.setDate(end.getDate() - 7);
+    } else if (this.selectedPeriod === 'biweekly') {
+      start.setDate(end.getDate() - 14);
+    } else if (this.selectedPeriod === 'monthly') {
+      start.setMonth(end.getMonth() - 1);
+    } else {
+      start.setFullYear(end.getFullYear() - 1);
+    }
+
+    return {
+      startDate: this.toDateOnly(start),
+      endDate: this.toDateOnly(end)
+    };
+  }
+
+  private toDateOnly(date: Date): string {
+    return date.toISOString().slice(0, 10);
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const httpError = error as { error?: unknown; message?: string };
+
+    if (typeof httpError.error === 'string' && httpError.error.trim()) {
+      return httpError.error;
+    }
+
+    if (httpError.error && typeof httpError.error === 'object') {
+      const body = httpError.error as Record<string, unknown>;
+      const message = body['message'] || body['error'];
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    return httpError.message || fallback;
   }
 
 }

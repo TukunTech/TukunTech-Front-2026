@@ -77,6 +77,7 @@ export class RegisterCaregiver {
   showAccountValidationError = false;
   isSubmittingOnboarding = false;
   onboardingError = '';
+  accountConflictAlert = '';
   termsAccepted = false;
   showTermsError = false;
 
@@ -222,7 +223,16 @@ export class RegisterCaregiver {
     if (this.isSubmittingOnboarding) return;
 
     this.onboardingError = '';
+    this.accountConflictAlert = '';
     this.isSubmittingOnboarding = true;
+
+    const localDuplicateEmailMessage = this.getLocalDuplicateEmailMessage();
+    if (localDuplicateEmailMessage) {
+      this.accountConflictAlert = localDuplicateEmailMessage;
+      this.onboardingError = localDuplicateEmailMessage;
+      this.isSubmittingOnboarding = false;
+      return;
+    }
 
     const request = this.onboardingApi.buildRequest(
       this.email,
@@ -256,6 +266,9 @@ export class RegisterCaregiver {
         this.onboardingError = error.name === 'TimeoutError'
           ? 'El servidor tardó demasiado preparando Stripe. Intenta nuevamente en unos segundos.'
           : this.getOnboardingErrorMessage(error);
+        this.accountConflictAlert = this.isAccountConflictMessage(this.onboardingError)
+          ? 'Este correo ya esta registrado en TukunTech. Usa otro correo o inicia sesion si la cuenta ya fue creada.'
+          : '';
       }
     });
   }
@@ -409,6 +422,34 @@ export class RegisterCaregiver {
     return this.patients.filter(patient => patient !== currentPatient && patient.dni.trim() === normalizedDni).length > 0;
   }
 
+  clearAccountConflictAlert(): void {
+    this.accountConflictAlert = '';
+    this.onboardingError = '';
+  }
+
+  private getLocalDuplicateEmailMessage(): string {
+    const caregiverEmail = this.normalizeEmail(this.email);
+    const patientEmails = this.patients
+      .map(patient => this.normalizeEmail(patient.email))
+      .filter(Boolean);
+
+    if (caregiverEmail && patientEmails.includes(caregiverEmail)) {
+      return 'El correo del cuidador no puede repetirse como correo de paciente.';
+    }
+
+    const repeatedPatientEmail = patientEmails.find((email, index) =>
+      patientEmails.indexOf(email) !== index
+    );
+
+    return repeatedPatientEmail
+      ? 'Hay pacientes con el mismo correo. Cada cuenta debe usar un correo unico.'
+      : '';
+  }
+
+  private normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
+  }
+
   private getOnboardingErrorMessage(error: unknown): string {
     const httpError = error as { error?: unknown; message?: string };
 
@@ -425,5 +466,13 @@ export class RegisterCaregiver {
     }
 
     return httpError.message || 'No se pudo crear la cuenta. Revisa los datos, DNI unico, terminos aceptados y configuracion de Stripe en backend.';
+  }
+
+  private isAccountConflictMessage(message: string): boolean {
+    const normalizedMessage = message.toLowerCase();
+    return normalizedMessage.includes('ya existe un usuario') ||
+      normalizedMessage.includes('correo electrónico') ||
+      normalizedMessage.includes('correo electronico') ||
+      normalizedMessage.includes('already exists');
   }
 }

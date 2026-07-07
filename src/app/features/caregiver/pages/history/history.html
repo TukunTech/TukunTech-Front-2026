@@ -54,9 +54,9 @@
           </app-custom-select>
         </div>
 
-        <button class="generate-button" type="button" (click)="generateReport()">
-          <i class="bi bi-download"></i>
-          {{ 'caregiver.history.generateButton' | translate }}
+        <button class="generate-button" type="button" [disabled]="isGeneratingReport" (click)="generateReport()">
+          <i class="bi" [class.bi-download]="!isGeneratingReport" [class.bi-hourglass-split]="isGeneratingReport"></i>
+          {{ isGeneratingReport ? 'Generando...' : ('caregiver.history.generateButton' | translate) }}
         </button>
       </div>
 

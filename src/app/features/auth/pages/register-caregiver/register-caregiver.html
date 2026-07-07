@@ -56,6 +56,7 @@
         type="email"
         name="email"
         [(ngModel)]="email"
+        (ngModelChange)="clearAccountConflictAlert()"
         [placeholder]="'register.account.emailPlaceholder' | translate"
       />
 
@@ -146,7 +147,8 @@
       <div class="register-card patient-form-card">
 
         <app-patient-form
-          [(patient)]="patients[activePatientIndex]">
+          [(patient)]="patients[activePatientIndex]"
+          (patientChange)="clearAccountConflictAlert()">
         </app-patient-form>
 
         <section class="validation-summary" *ngIf="showMedicalParametersError && patientInfoValidationErrors.length">
@@ -355,7 +357,7 @@
           type="checkbox"
           name="termsAccepted"
           [(ngModel)]="termsAccepted"
-          (ngModelChange)="showTermsError = false; onboardingError = ''"
+          (ngModelChange)="showTermsError = false; clearAccountConflictAlert()"
         />
         <span>Acepto los términos y condiciones para crear la cuenta y procesar el pago.</span>
       </label>
@@ -374,7 +376,15 @@
         Debes aceptar los términos y condiciones para continuar.
       </p>
 
-      <p class="form-error" *ngIf="onboardingError">
+      <section class="form-error account-conflict-alert" *ngIf="accountConflictAlert">
+        <i class="bi bi-person-x"></i>
+        <div>
+          <strong>Correo ya registrado</strong>
+          <span>{{ accountConflictAlert }}</span>
+        </div>
+      </section>
+
+      <p class="form-error" *ngIf="onboardingError && !accountConflictAlert">
         <i class="bi bi-exclamation-circle"></i>
         {{ onboardingError }}
       </p>
