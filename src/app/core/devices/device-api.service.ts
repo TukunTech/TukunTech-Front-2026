@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../api/api.config';
 
@@ -74,15 +73,7 @@ export class DeviceApiService {
   }
 
   getLatestVitals(patientId: string): Observable<VitalSignsResponse> {
-    return this.getFirstAvailable<VitalSignsResponse>([
-      `${this.apiBaseUrl}/telemetry/latest/${patientId}`,
-      `${this.apiBaseUrl}/telemetry/${patientId}/latest`,
-      `${this.apiBaseUrl}/telemetry/patient/${patientId}/latest`,
-      `${this.apiBaseUrl}/telemetry/latest?patientId=${patientId}`,
-      `${this.apiBaseUrl}/vital-signs/latest/${patientId}`,
-      `${this.apiBaseUrl}/vital-signs/${patientId}/latest`,
-      `${this.apiBaseUrl}/vital-signs/patient/${patientId}/latest`
-    ]);
+    return this.http.get<VitalSignsResponse>(`${this.apiBaseUrl}/vital-signs/latest/${patientId}`);
   }
 
   getCaregiverPatientDashboard(patientId: string): Observable<PatientDashboardResponse> {
@@ -103,15 +94,5 @@ export class DeviceApiService {
     }
 
     return !!device.isOnline;
-  }
-
-  private getFirstAvailable<T>(urls: string[], index = 0): Observable<T> {
-    if (index >= urls.length) {
-      return throwError(() => new Error('No telemetry endpoint available'));
-    }
-
-    return this.http.get<T>(urls[index]).pipe(
-      catchError(() => this.getFirstAvailable<T>(urls, index + 1))
-    );
   }
 }
