@@ -8,7 +8,6 @@ import {
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
-import { CaregiverAlertRepository } from '../../data/caregiver-alert.repository';
 import { EcgLiveChart } from '../../../../shared/components/ecg-live-chart/ecg-live-chart';
 import { CaregiverVitalSignsRepository } from '../../data/caregiver-vital-signs.repository';
 import {
@@ -60,7 +59,6 @@ export class VitalSigns implements OnDestroy {
 
   constructor(
     private authService: AuthApiService,
-    private caregiverAlertRepository: CaregiverAlertRepository,
     private caregiverVitalSignsRepository: CaregiverVitalSignsRepository,
     private translateService: TranslateService,
     private changeDetector: ChangeDetectorRef
@@ -271,23 +269,28 @@ export class VitalSigns implements OnDestroy {
         this.patients = data.patients;
         this.selectedPatientId = this.selectedPatientId || data.patients[0]?.userId || '';
         this.isLoading = false;
+        this.updateGlobalCriticalAlert();
         this.changeDetector.detectChanges();
-        this.loadGlobalCriticalAlert();
       });
   }
 
-  private loadGlobalCriticalAlert(): void {
-    if (!this.caregiverUserId) return;
+  private updateGlobalCriticalAlert(): void {
+    const criticalPatientNames = this.patients
+      .filter(patient => {
+        if (patient.device.connectionStatus === 'offline') {
+          return true;
+        }
 
-    this.caregiverAlertRepository
-      .getGlobalCriticalAlert(this.caregiverUserId)
-      .subscribe(alert => {
-        this.urgentAlertShow = !!alert;
-        this.urgentAlertTitleKey = alert?.titleKey || '';
-        this.urgentAlertMessageKey = alert?.messageKey || '';
-        this.urgentAlertMessageParams = alert?.messageParams || {};
-        this.changeDetector.detectChanges();
-      });
+        return this.getAlerts(patient).some(alert => alert.severity === 'critical');
+      })
+      .map(patient => patient.fullName);
+
+    this.urgentAlertShow = criticalPatientNames.length > 0;
+    this.urgentAlertTitleKey = this.urgentAlertShow ? 'caregiver.globalAlert.title' : '';
+    this.urgentAlertMessageKey = this.urgentAlertShow ? 'caregiver.globalAlert.message' : '';
+    this.urgentAlertMessageParams = this.urgentAlertShow
+      ? { patients: criticalPatientNames.join(', ') }
+      : {};
   }
 
   private getSelectedAlertTitleKey(

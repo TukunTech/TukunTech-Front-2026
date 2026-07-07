@@ -35,16 +35,13 @@ export class CaregiverVitalSignsRepository {
     return this.userProfileApi.getMyPatients().pipe(
       switchMap(patients => {
         const patientRequests = patients.map(patient =>
-          forkJoin({
-            dashboard: this.deviceApi.getCaregiverPatientDashboard(patient.id).pipe(catchError(() => of(null))),
-            vitals: this.deviceApi.getLatestVitals(patient.id).pipe(catchError(() => of(null)))
-          })
+          this.deviceApi.getCaregiverPatientDashboard(patient.id).pipe(catchError(() => of(null)))
         );
 
         return (patientRequests.length ? forkJoin(patientRequests) : of([])).pipe(
           map(patientData => {
             this.patients = patients.map((patient, index) =>
-              this.createPatientFromProfile(patient, patientData[index]?.dashboard, patientData[index]?.vitals)
+              this.createPatientFromProfile(patient, patientData[index])
             );
 
             return {
@@ -116,20 +113,13 @@ export class CaregiverVitalSignsRepository {
 
   private createPatientFromProfile(
     profile: UserProfileResponse,
-    dashboard: PatientDashboardResponse | null,
-    latestVitals: {
-      heartRate?: number;
-      oxygenSaturation?: number;
-      temperature?: number;
-      lastUpdated?: string;
-      measuredAt?: string;
-    } | null
+    dashboard: PatientDashboardResponse | null
   ): CaregiverPatientSummary {
     const userId = profile.id;
     const assignment = this.assignmentStore.getByPatient(userId);
     const alertSettings = this.createDefaultAlertSettingsFromProfile(profile);
     const device = dashboard?.device;
-    const vitals = latestVitals || dashboard?.currentVitals;
+    const vitals = dashboard?.currentVitals;
     const measuredAt = vitals?.lastUpdated || vitals?.measuredAt || '';
     const hasFreshTelemetry = this.hasFreshTelemetry(measuredAt);
     const isOnline = hasFreshTelemetry || this.deviceApi.isDeviceConnected(device);

@@ -34,7 +34,6 @@ export class PatientVitalsRepository {
 
         return this.deviceApi.getMyPatientDashboard().pipe(
           map(dashboard => dashboard.currentVitals || {}),
-          catchError(() => this.deviceApi.getLatestVitals(resolvedUserId)),
           map(vitals => ({
             patientName: profile.fullName || profile.email,
             initials: this.getInitials(profile.fullName || profile.email),

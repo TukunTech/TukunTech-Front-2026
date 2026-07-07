@@ -43,14 +43,6 @@ export interface PatientDashboardResponse {
   currentVitals?: CurrentVitalsResponse;
 }
 
-export interface VitalSignsResponse {
-  patientId: string;
-  heartRate?: number;
-  oxygenSaturation?: number;
-  temperature?: number;
-  lastUpdated?: string;
-}
-
 export interface AdminUpdateDeviceRequest {
   modelName: string;
   status: string;
@@ -70,10 +62,6 @@ export class DeviceApiService {
 
   updateAdminDevice(deviceId: string, request: AdminUpdateDeviceRequest): Observable<string> {
     return this.http.put(`${this.apiBaseUrl}/admin/devices/${deviceId}`, request, { responseType: 'text' });
-  }
-
-  getLatestVitals(patientId: string): Observable<VitalSignsResponse> {
-    return this.http.get<VitalSignsResponse>(`${this.apiBaseUrl}/vital-signs/latest/${patientId}`);
   }
 
   getCaregiverPatientDashboard(patientId: string): Observable<PatientDashboardResponse> {
