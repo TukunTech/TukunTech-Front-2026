@@ -255,9 +255,7 @@ export class RegisterCaregiver {
       error: error => {
         this.onboardingError = error.name === 'TimeoutError'
           ? 'El servidor tardó demasiado preparando Stripe. Intenta nuevamente en unos segundos.'
-          : typeof error.error === 'string'
-          ? error.error
-          : 'No se pudo crear la cuenta. Revisa los datos, DNI unico y terminos aceptados.';
+          : this.getOnboardingErrorMessage(error);
       }
     });
   }
@@ -409,5 +407,23 @@ export class RegisterCaregiver {
   private hasDuplicateDni(dni: string, currentPatient: PatientFormData): boolean {
     const normalizedDni = dni.trim();
     return this.patients.filter(patient => patient !== currentPatient && patient.dni.trim() === normalizedDni).length > 0;
+  }
+
+  private getOnboardingErrorMessage(error: unknown): string {
+    const httpError = error as { error?: unknown; message?: string };
+
+    if (typeof httpError.error === 'string' && httpError.error.trim()) {
+      return httpError.error;
+    }
+
+    if (httpError.error && typeof httpError.error === 'object') {
+      const body = httpError.error as Record<string, unknown>;
+      const message = body['message'] || body['error'] || body['detail'];
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    return httpError.message || 'No se pudo crear la cuenta. Revisa los datos, DNI unico, terminos aceptados y configuracion de Stripe en backend.';
   }
 }

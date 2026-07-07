@@ -54,11 +54,20 @@
           {{ 'patient.history.alertsOnly' | translate }}
         </button>
 
-        <button class="generate-button" type="button" (click)="generateReport()">
-          <i class="bi bi-download"></i>
-          {{ 'patient.history.generateButton' | translate }}
+        <button class="generate-button" type="button" [disabled]="isGeneratingReport" (click)="generateReport()">
+          <i class="bi" [class.bi-download]="!isGeneratingReport" [class.bi-hourglass-split]="isGeneratingReport"></i>
+          {{ isGeneratingReport ? 'Generando...' : ('patient.history.generateButton' | translate) }}
         </button>
       </div>
+
+      <p
+        class="report-message"
+        *ngIf="reportMessage"
+        [class.report-message--success]="reportMessageType === 'success'"
+        [class.report-message--error]="reportMessageType === 'error'"
+      >
+        {{ reportMessage }}
+      </p>
     </section>
 
     <section class="history-card">

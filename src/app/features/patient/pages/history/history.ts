@@ -2,14 +2,14 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { finalize } from 'rxjs';
 
 import {
   DashboardLayout,
   DashboardMenuItem
 } from '../../../../shared/components/dashboard-layout/dashboard-layout';
 import { AuthApiService } from '../../../../core/auth/auth-api.service';
+import { ReportApiService } from '../../../../core/reports/report-api.service';
 import {
   CustomSelect,
   CustomSelectOption
@@ -42,6 +42,9 @@ export class History {
   dateTo = '2026-06-20';
   alertsOnly = false;
   history: PatientVitalHistoryRecord[] = [];
+  isGeneratingReport = false;
+  reportMessage = '';
+  reportMessageType: 'success' | 'error' = 'success';
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.patient.vitalSigns', route: '/patient/today' },
@@ -56,6 +59,7 @@ export class History {
     private authService: AuthApiService,
     private patientAlertRepository: PatientAlertRepository,
     private patientHistoryRepository: PatientHistoryRepository,
+    private reportApi: ReportApiService,
     private translateService: TranslateService,
     private changeDetector: ChangeDetectorRef
   ) {
@@ -148,29 +152,30 @@ export class History {
   }
 
   generateReport(): void {
-    const doc = new jsPDF();
+    if (this.isGeneratingReport) {
+      return;
+    }
 
-    doc.setFontSize(18);
-    doc.text('TukunTech - Vital Signs Report', 14, 18);
+    this.reportMessage = '';
+    this.isGeneratingReport = true;
 
-    doc.setFontSize(11);
-    doc.text(`Period: ${this.selectedPeriod}`, 14, 28);
-    doc.text(`Patient: ${this.email || this.userId}`, 14, 36);
-
-    autoTable(doc, {
-      startY: 46,
-      head: [['Date', 'Source', 'Heart rate', 'Oxygen', 'Temperature', 'Status']],
-      body: this.history.map(item => [
-        this.formatDateTime(item.recordedAt),
-        this.translateService.instant(this.getSourceLabelKey(item)),
-        this.formatHeartRate(item),
-        this.formatOxygen(item),
-        this.formatTemperature(item),
-        this.getReportStatus(item)
-      ])
+    this.reportApi.generateMyReport(this.getReportRange()).pipe(
+      finalize(() => {
+        this.isGeneratingReport = false;
+        this.changeDetector.detectChanges();
+      })
+    ).subscribe({
+      next: message => {
+        this.reportMessageType = 'success';
+        this.reportMessage = message || 'Reporte solicitado. n8n esta procesando el PDF.';
+        this.changeDetector.detectChanges();
+      },
+      error: error => {
+        this.reportMessageType = 'error';
+        this.reportMessage = this.getErrorMessage(error, 'No se pudo generar el reporte.');
+        this.changeDetector.detectChanges();
+      }
     });
-
-    doc.save(`tukuntech-${this.selectedPeriod}-report.pdf`);
   }
 
   private loadHistory(): void {
@@ -200,13 +205,52 @@ export class History {
       });
   }
 
-  private getReportStatus(item: PatientVitalHistoryRecord): string {
-    if (!item.alerts.length) {
-      return this.translateService.instant(this.getSeverityLabelKey(item));
+  private getReportRange(): { startDate: string; endDate: string } {
+    if (this.selectedPeriod === 'custom') {
+      return {
+        startDate: this.dateFrom,
+        endDate: this.dateTo
+      };
     }
 
-    return item.alerts
-      .map(alert => this.translateService.instant(alert.titleKey))
-      .join(', ');
+    const end = new Date();
+    const start = new Date(end);
+
+    if (this.selectedPeriod === 'weekly') {
+      start.setDate(end.getDate() - 7);
+    } else if (this.selectedPeriod === 'biweekly') {
+      start.setDate(end.getDate() - 14);
+    } else if (this.selectedPeriod === 'monthly') {
+      start.setMonth(end.getMonth() - 1);
+    } else {
+      start.setFullYear(end.getFullYear() - 1);
+    }
+
+    return {
+      startDate: this.toDateOnly(start),
+      endDate: this.toDateOnly(end)
+    };
+  }
+
+  private toDateOnly(date: Date): string {
+    return date.toISOString().slice(0, 10);
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    const httpError = error as { error?: unknown; message?: string };
+
+    if (typeof httpError.error === 'string' && httpError.error.trim()) {
+      return httpError.error;
+    }
+
+    if (httpError.error && typeof httpError.error === 'object') {
+      const body = httpError.error as Record<string, unknown>;
+      const message = body['message'] || body['error'];
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    return httpError.message || fallback;
   }
 }

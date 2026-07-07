@@ -91,6 +91,26 @@
   gap: 14px;
 }
 
+.report-message {
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.report-message--success {
+  color: #087963;
+  background: #e7fbf5;
+  border: 1px solid #b8efe2;
+}
+
+.report-message--error {
+  color: #c53b48;
+  background: #fff0f2;
+  border: 1px solid #ffc8d0;
+}
+
 .report-actions label {
   font-size: 14px;
   color: #667985;

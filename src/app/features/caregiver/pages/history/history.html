@@ -59,6 +59,15 @@
           {{ 'caregiver.history.generateButton' | translate }}
         </button>
       </div>
+
+      <p
+        class="report-message"
+        *ngIf="reportMessage"
+        [class.report-message--success]="reportMessageType === 'success'"
+        [class.report-message--error]="reportMessageType === 'error'"
+      >
+        {{ reportMessage }}
+      </p>
     </section>
 
     <div class="patient-tabs">

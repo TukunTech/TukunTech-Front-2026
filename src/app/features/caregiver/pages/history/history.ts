@@ -2,8 +2,6 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 import {
   DashboardLayout,
@@ -54,6 +52,8 @@ export class History {
   dateTo = '2026-06-20';
   alertsOnly = false;
   history: CaregiverVitalHistoryRecord[] = [];
+  reportMessage = '';
+  reportMessageType: 'success' | 'error' = 'error';
 
   menuItems: DashboardMenuItem[] = [
     { icon: 'bi-sun', labelKey: 'sidebar.caregiver.vitalSigns', route: '/caregiver/vital-signs' },
@@ -190,47 +190,8 @@ export class History {
   }
 
   generateReport(): void {
-    const selectedPatient = this.patients.find(patient =>
-      patient.userId === this.selectedReportPatientId
-    );
-
-    if (!selectedPatient) {
-      return;
-    }
-
-    this.caregiverHistoryRepository
-      .getPatientHistory(this.caregiverUserId, selectedPatient.userId, this.historyQuery)
-      .subscribe(records => {
-        const doc = new jsPDF();
-        const title = this.translateService.instant('caregiver.history.reportTitle');
-
-        doc.setFontSize(18);
-        doc.text(title, 14, 18);
-
-        doc.setFontSize(11);
-        doc.text(`${this.translateService.instant('caregiver.history.patient')}: ${selectedPatient.fullName}`, 14, 28);
-        doc.text(`${this.translateService.instant('caregiver.history.period')}: ${this.getPeriodLabel()}`, 14, 36);
-
-        autoTable(doc, {
-          startY: 46,
-          head: [[
-            this.translateService.instant('caregiver.history.date'),
-            this.translateService.instant('caregiver.history.heartRate'),
-            this.translateService.instant('caregiver.history.oxygen'),
-            this.translateService.instant('caregiver.history.temperature'),
-            this.translateService.instant('caregiver.history.status')
-          ]],
-          body: records.map(item => [
-            this.formatDate(item.recordedAt),
-            this.formatHeartRate(item),
-            this.formatOxygen(item),
-            this.formatTemperature(item),
-            this.getReportStatus(item)
-          ])
-        });
-
-        doc.save(`tukuntech-${selectedPatient.fullName.replace(/\s+/g, '-').toLowerCase()}-${this.selectedPeriod}-report.pdf`);
-      });
+    this.reportMessageType = 'error';
+    this.reportMessage = 'El backend solo expone reportes n8n para el paciente autenticado. Falta un endpoint para generar reportes de pacientes desde cuidador.';
   }
 
   private loadDashboard(): void {
@@ -276,12 +237,6 @@ export class History {
       });
   }
 
-  private getPeriodLabel(): string {
-    return this.periodOptions.find(option =>
-      option.value === this.selectedPeriod
-    )?.label || this.selectedPeriod;
-  }
-
   private get historyQuery() {
     return {
       period: this.selectedPeriod,
@@ -291,13 +246,4 @@ export class History {
     };
   }
 
-  private getReportStatus(item: CaregiverVitalHistoryRecord): string {
-    if (!item.alerts.length) {
-      return this.translateService.instant(this.getSeverityLabelKey(item));
-    }
-
-    return item.alerts
-      .map(alert => this.translateService.instant(alert.titleKey))
-      .join(', ');
-  }
 }
